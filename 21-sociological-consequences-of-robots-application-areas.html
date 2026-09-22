@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sociological Consequences of Robots and Application Areas | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="What robots do to jobs, skills, safety and society: unemployment and de-skilling on one side, safer work and new industries on the other, together wit">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit III &middot; Topic 21 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit III &rsaquo; Topic 21</nav><div class="unit-tag">Unit III</div><h2 class="page-title"><span class="topic-no">21</span>Sociological Consequences of Robots and Application Areas</h2><p class="lede">What robots do to jobs, skills, safety and society: unemployment and de-skilling on one side, safer work and new industries on the other, together with a summary of every application area.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Why the Social Impact Matters to an Engineer</a></li><li><a href="#sec2">Positive Consequences</a></li><li><a href="#sec3">Negative Consequences</a></li><li><a href="#sec4">How Society and Industry Respond</a></li><li><a href="#sec5">Application Areas of Robots &mdash; Summary</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Why the Social Impact Matters to an Engineer</h3><p>Robots change the way work is done, and therefore they change society. An engineer who designs, installs or maintains a robot is directly responsible for some of these changes. It is therefore part of professional competence to understand them. The effects are neither wholly good nor wholly bad; they depend on how the technology is introduced, who benefits, and what is done to help those who are displaced.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Sociological consequences of robots &mdash; positive and negative</text><rect x="50" y="55" width="370" height="220" rx="8" class="t-box4"/><text x="235" y="82" font-size="13" fill="#157a4b" text-anchor="middle" font-weight="700">POSITIVE</text><text x="70" y="110" font-size="10.5" fill="#12283d" text-anchor="start">+ Removes people from dull, dirty and dangerous jobs</text><text x="70" y="130" font-size="10.5" fill="#12283d" text-anchor="start">+ Higher productivity and lower cost of goods</text><text x="70" y="150" font-size="10.5" fill="#12283d" text-anchor="start">+ Better and more consistent quality</text><text x="70" y="170" font-size="10.5" fill="#12283d" text-anchor="start">+ Works in environments unsafe for humans</text><text x="70" y="190" font-size="10.5" fill="#12283d" text-anchor="start">+ Creates new jobs in programming, maintenance,</text><text x="70" y="210" font-size="10.5" fill="#12283d" text-anchor="start">+ integration, supervision and robot manufacturing</text><text x="70" y="230" font-size="10.5" fill="#12283d" text-anchor="start">+ Enables surgery, rehabilitation and elder care</text><text x="70" y="250" font-size="10.5" fill="#12283d" text-anchor="start">+ Raises the skill level and wages of remaining workers</text><rect x="460" y="55" width="370" height="220" rx="8" class="t-box5"/><text x="645" y="82" font-size="13" fill="#a8232a" text-anchor="middle" font-weight="700">NEGATIVE</text><text x="480" y="110" font-size="10.5" fill="#12283d" text-anchor="start">&minus; Displacement of unskilled and semi-skilled workers</text><text x="480" y="130" font-size="10.5" fill="#12283d" text-anchor="start">&minus; Structural unemployment in certain regions</text><text x="480" y="150" font-size="10.5" fill="#12283d" text-anchor="start">&minus; Loss of traditional craft skills</text><text x="480" y="170" font-size="10.5" fill="#12283d" text-anchor="start">&minus; De-skilling and monotony for the remaining operators</text><text x="480" y="190" font-size="10.5" fill="#12283d" text-anchor="start">&minus; High capital cost excludes small industries</text><text x="480" y="210" font-size="10.5" fill="#12283d" text-anchor="start">&minus; Privacy and safety concerns with service robots</text><text x="480" y="230" font-size="10.5" fill="#12283d" text-anchor="start">&minus; Dependence on machines; loss of self-reliance</text><text x="480" y="250" font-size="10.5" fill="#12283d" text-anchor="start">&minus; Ethical issues for autonomous weapons and AI decisions</text></svg></div><figcaption><b>Fig. 1:</b> Positive and negative sociological consequences of introducing robots.</figcaption></figure><h3 id="sec2"><span class="sec-no">2.</span>Positive Consequences</h3><ol><li><b>Removal of people from dangerous, dirty and dull work.</b> This is the strongest argument for robots. Foundries, forging, die casting, spray painting, welding, chemical handling, mining, and work in extreme heat, cold, radiation, vacuum or high pressure are hazardous. Robots can perform these tasks indefinitely without injury. The number of industrial accidents and occupational diseases falls sharply when robots take over the hazardous operations.</li><li><b>Higher productivity and lower cost.</b> A robot works 24 hours a day, 7 days a week, without breaks, leave or fatigue, and with consistent speed. This raises output per worker and reduces the cost of goods, making products affordable to more people and improving the standard of living.</li><li><b>Better and more consistent quality.</b> A robot repeats exactly the same motion within a fraction of a millimetre. Weld quality, paint thickness, torque of a screw and dimensional accuracy all become far more uniform than with human work. Scrap and rework fall, and customers receive more reliable products. This is particularly important in safety-critical products such as cars and medical devices.</li><li><b>Creation of new jobs.</b> Every wave of automation has created more jobs than it destroyed, though not the same jobs and not for the same people. Robotics creates work in robot design and manufacture, system integration, programming, simulation, installation, commissioning, maintenance, repair, sales, training, safety assessment and supervision. Studies consistently show that a robot cell needs several skilled people to support it.</li><li><b>Higher skill level and better pay for the remaining workforce.</b> The operator who used to load a machine by hand becomes a technician who programs and maintains a robot cell. This work is more interesting, less physically damaging and better paid.</li><li><b>Ability to manufacture in high-cost countries.</b> Automation reduces the importance of cheap labour, so manufacturing can return to countries with high wages but good infrastructure and skills. This is sometimes called <b>reshoring</b>.</li><li><b>New products and new industries.</b> Many products could not be made at all without robots: microelectronics, precision optics, minimally invasive surgical instruments, and complex composite structures. Robots also enable small-batch customisation, such as patient-specific implants.</li><li><b>Assistance to the elderly, the disabled and the isolated.</b> Service robots can help people live independently for longer, which is important as populations age. Robotic wheelchairs, exoskeletons, prostheses and companion robots improve quality of life.</li><li><b>Work in places humans cannot go.</b> Deep sea, space, inside nuclear reactors, inside volcanoes, in collapsed buildings and in mines after an explosion.</li><li><b>Reduction of physical strain and repetitive strain injury.</b> Lifting, repetitive reaching and awkward postures cause a large share of occupational illness. Robots eliminate these.</li></ol><h3 id="sec3"><span class="sec-no">3.</span>Negative Consequences</h3><ol><li><b>Unemployment and job displacement.</b> The most widely discussed problem. Robots replace workers in repetitive manufacturing, in material handling, in warehousing, and increasingly in agriculture, retail and driving. Workers whose skills are specific to the replaced task may find it very hard to get new employment, particularly if they are older or live in a region dominated by one industry. This is <b>structural</b> or <b>technological unemployment</b>.</li><li><b>De-skilling.</b> When a craft skill is embodied in a program, the skill is lost from the workforce. A machinist who no longer cuts metal by hand loses the feel for the material. This makes the remaining workforce dependent on the machine and on the few people who can program it.</li><li><b>Monotony and loss of job satisfaction for the remaining workers.</b> A person who only loads and unloads a robot, or only watches a screen, may find the work even more boring than the manual task that was automated. This is sometimes called the <b>desert of automation</b>.</li><li><b>Widening inequality.</b> The benefits of automation accrue mainly to the owners of capital, while the cost falls mainly on the displaced workers. Unless tax, education and social policies redistribute the gains, the gap between rich and poor widens.</li><li><b>High capital cost excludes small industry.</b> A robot cell costs a great deal, so large firms can automate while small firms cannot. This can concentrate industry in fewer, larger companies.</li><li><b>Dependence and loss of self-reliance.</b> As more tasks are automated, fewer people know how to do them manually. If the system fails, the consequences can be serious. This is a real concern in aviation, in medicine and in power generation.</li><li><b>New safety hazards.</b> A robot is strong, fast and does not stop for a person. Most industrial robot accidents occur during programming, maintenance or troubleshooting, when the safeguarding is bypassed. New hazards appear with collaborative robots and with autonomous mobile robots sharing space with people.</li><li><b>Privacy and surveillance.</b> Robots with cameras, microphones and sensors in homes, hospitals and public spaces can collect a great deal of personal data.</li><li><b>Ethical and legal problems.</b> Who is responsible when an autonomous vehicle or a surgical robot causes harm &mdash; the manufacturer, the programmer, the owner or the operator? How should a self-driving car choose in an unavoidable accident? Should autonomous weapons be permitted at all?</li><li><b>Psychological and social effects.</b> Concerns about the effect of companion robots on children and the elderly, about reduced human contact, and about the meaning of work in a highly automated society.</li><li><b>Environmental impact.</b> Manufacturing and disposing of robots consumes energy and materials, though robots also enable more efficient production and less waste overall.</li></ol><h3 id="sec4"><span class="sec-no">4.</span>How Society and Industry Respond</h3><ul><li><b>Education and retraining</b> &mdash; the single most important measure. Vocational training in mechatronics, robotics programming and maintenance converts a displaced operator into a valued technician.</li><li><b>Redeployment within the company</b> &mdash; a responsible employer moves affected workers to other tasks rather than dismissing them.</li><li><b>Safety standards and legislation</b> &mdash; ISO 10218 for industrial robots, ISO/TS 15066 for collaborative robots, national factory acts, and mandatory risk assessment before a robot cell is commissioned.</li><li><b>Human-centred design</b> &mdash; designing the automated cell so that the human role is enriched (supervision, quality judgement, exception handling) rather than reduced to a trivial task.</li><li><b>Social and fiscal policy</b> &mdash; discussion of shorter working weeks, universal basic income, robot taxes and profit sharing as ways of distributing the gains of automation.</li><li><b>Ethics frameworks</b> &mdash; professional codes of conduct and, increasingly, national and international guidance on autonomous systems.</li><li><b>Union and worker participation</b> &mdash; involving workers in the planning of automation greatly improves both the outcome and the acceptance.</li></ul><div class="note"><span class="tag">Note</span><p>The historical evidence is encouraging. Every major technological change &mdash; the spinning jenny, the steam engine, the internal combustion engine, the computer &mdash; was predicted to cause mass unemployment, and in each case total employment eventually grew and new kinds of work appeared. The adjustment, however, was painful for the generation that lived through it, and the speed of change matters. The task of an engineer and of a society is to make the transition as smooth as possible.</p></div><h3 id="sec5"><span class="sec-no">5.</span>Application Areas of Robots &mdash; Summary</h3><div class="tbl-scroll"><table><caption>Table 21.1 &mdash; Application areas of robots</caption><thead><tr><th>Area</th><th>Typical tasks</th><th>Robot type used</th><th>Why a robot is used</th></tr></thead><tbody><tr><td>Automobile manufacture</td><td>Spot and arc welding, painting, sealing, assembly, windscreen fitting, palletising</td><td>6-axis articulated, heavy payload, paint-safe</td><td>Hazardous fumes and heat, heavy guns, need for consistent quality, high volume</td></tr><tr><td>Electronics and electrical</td><td>SMT placement, insertion, screwdriving, testing, dispensing, cleanroom handling</td><td>SCARA, Delta, small articulated</td><td>Very high speed, micron-level accuracy, cleanliness</td></tr><tr><td>Metal and machining</td><td>Machine loading, deburring, grinding, polishing, laser and plasma cutting, forging</td><td>Articulated with force sensing</td><td>Noise, dust, sparks, heavy parts, repetitive strain</td></tr><tr><td>Plastics and rubber</td><td>Injection mould and die casting extraction, trimming, deflashing</td><td>SCARA and articulated</td><td>Hot parts, hazardous atmosphere, need for consistent cycle time</td></tr><tr><td>Food and beverage</td><td>Pick and place, packaging, palletising, cutting, inspection, milking</td><td>Delta, hygienic articulated</td><td>Hygiene, speed, cold and wet environments, labour shortage</td></tr><tr><td>Pharmaceutical and medical device</td><td>Dispensing, blister packing, inspection, sterilisation handling</td><td>Cleanroom-rated articulated</td><td>Contamination control, traceability, accuracy</td></tr><tr><td>Logistics and warehousing</td><td>Sorting, order picking, palletising, AGV/AMR transport</td><td>Delta, articulated on mobile base, AMR</td><td>Enormous volumes, 24 h operation, labour cost</td></tr><tr><td>Agriculture</td><td>Harvesting, weeding, spraying, pruning, milking, feeding</td><td>Mobile platforms with arms, drones</td><td>Labour shortage, precision chemical reduction, data collection</td></tr><tr><td>Healthcare</td><td>Surgery, rehabilitation, prosthetics, disinfection, delivery, pharmacy</td><td>Specialised surgical and service robots</td><td>Precision beyond the human hand, minimally invasive access, infection control</td></tr><tr><td>Construction</td><td>Bricklaying, concrete printing, rebar tying, demolition, surveying</td><td>Large gantry and mobile manipulators</td><td>Heavy repetitive work, shortage of skilled labour, speed</td></tr><tr><td>Mining and oil &amp; gas</td><td>Drilling, haulage, inspection, offshore maintenance</td><td>Autonomous trucks, crawlers, ROVs</td><td>Extreme danger, remote locations</td></tr><tr><td>Defence and security</td><td>Bomb disposal, reconnaissance, surveillance, logistics, EOD</td><td>Tracked and legged mobile robots, drones</td><td>Direct risk to human life</td></tr><tr><td>Space and underwater</td><td>Satellite servicing, planetary exploration, hull and pipeline inspection</td><td>Space arms, rovers, ROVs, AUVs</td><td>Impossible or extremely hazardous for humans</td></tr><tr><td>Nuclear and hazardous</td><td>Decommissioning, waste handling, inspection inside reactors</td><td>Radiation-hardened teleoperators</td><td>Fatal radiation levels</td></tr><tr><td>Domestic</td><td>Vacuum cleaning, lawn mowing, pool cleaning, window cleaning, companion</td><td>Small mobile robots</td><td>Convenience, time saving, assistance for the elderly</td></tr><tr><td>Education and research</td><td>Teaching robotics, competitions, algorithm development</td><td>Small arms, kits, mobile platforms</td><td>Safe, affordable platforms for learning</td></tr><tr><td>Entertainment</td><td>Animatronics, theme park rides, robot shows, toys</td><td>Special purpose</td><td>Repeatable spectacular motion</td></tr></tbody></table></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>Robots remove people from dangerous, dirty and dull work, which is the strongest argument in their favour.</li><li>Positive consequences include higher productivity, lower cost, better and more consistent quality, new skilled jobs, higher pay for remaining workers, reshoring of manufacturing, new products, and help for the elderly and disabled.</li><li>Negative consequences include structural unemployment, de-skilling, monotony for the remaining workers, widening inequality, exclusion of small industry, dependence on machines, new safety hazards, privacy concerns and ethical problems.</li><li>Most robot accidents happen during programming and maintenance, when safeguards are bypassed, so safety standards such as ISO 10218 and ISO/TS 15066 are essential.</li><li>The main remedies are education and retraining, redeployment, safety legislation, human-centred design, social policy and worker participation.</li><li>History shows that every major technology eventually created more jobs than it destroyed, but the adjustment is painful for the generation living through it.</li><li>Application areas span automobile, electronics, metal, plastics, food, pharmaceutical, logistics, agriculture, healthcare, construction, mining, defence, space, nuclear, domestic, education and entertainment.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>What is meant by the sociological consequences of robots? Why should an engineer study them?</li><li>Explain any five positive consequences of introducing robots into industry.</li><li>Explain any five negative consequences of introducing robots into industry.</li><li>What is technological (structural) unemployment? Is it permanent?</li><li>What is de-skilling and how can it be avoided?</li><li>When do most robot accidents occur and why? Name two safety standards for robots.</li><li>List the measures by which society and industry can respond to the introduction of robots.</li><li>Give a table of application areas of robots with one example task and the robot type used in each.</li><li>Why are robots especially suitable for spray painting and for spot welding?</li><li>Discuss the ethical issues raised by autonomous vehicles and surgical robots.</li></ol></div><div class="pager"><a class="prev" href="20-fixed-versus-flexible-automation-applications.html"><span class="dir">&larr; Previous topic</span><span class="ttl">20. Fixed versus Flexible Automation; Robotics Applications, Current and Future</span></a><a class="next" href="22-specifications-of-industrial-robots.html"><span class="dir">Next topic &rarr;</span><span class="ttl">22. Specifications of Different Industrial Robots</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

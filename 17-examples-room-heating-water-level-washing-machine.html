@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Examples of Mechatronic Systems &mdash; Room Heating, Water Level Control and Washing Machine | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="Three complete case studies that bring together everything in Units I and II: a closed loop room heating system, an automatic water level controller, ">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit II &middot; Topic 17 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit II &rsaquo; Topic 17</nav><div class="unit-tag">Unit II</div><h2 class="page-title"><span class="topic-no">17</span>Examples of Mechatronic Systems &mdash; Room Heating, Water Level Control and Washing Machine</h2><p class="lede">Three complete case studies that bring together everything in Units I and II: a closed loop room heating system, an automatic water level controller, and a sequential washing machine system.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Case Study 1 &mdash; Heating a Room (Closed Loop System)</a></li><li><a href="#sec2">Case Study 2 &mdash; Automatic Control of Water Level</a></li><li><a href="#sec3">Case Study 3 &mdash; Washing Machine System</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Case Study 1 &mdash; Heating a Room (Closed Loop System)</h3><p>This is the simplest and clearest example of closed loop control and is worth understanding thoroughly, because every other control system follows the same pattern.</p><h4>Requirement</h4><p>The air temperature of a room must be maintained at a value chosen by the user, say 24 &deg;C, even though the outside temperature changes through the day, doors and windows are opened, and people and appliances add heat.</p><h4>The elements</h4><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 280" width="880" height="280" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Room heating &mdash; a closed loop (on-off) system</text><rect x="30" y="70" width="120" height="64" rx="8" class="t-box3"/><text x="90.0" y="93.5" class="t-lbl" style="font-size:11px">Set point</text><text x="90.0" y="110.5" class="t-lbl" style="font-size:11px">(thermostat dial)</text><circle cx="192" cy="102" r="16" class="cmp-f"/><text x="184" y="92" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">+</text><text x="184" y="116" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">−</text><rect x="235" y="70" width="130" height="64" rx="8" class="t-box2"/><text x="300.0" y="93.5" class="t-lbl" style="font-size:11px">Comparator</text><text x="300.0" y="110.5" class="t-lbl" style="font-size:11px">in thermostat</text><rect x="405" y="70" width="120" height="64" rx="8" class="t-box2"/><text x="465.0" y="93.5" class="t-lbl" style="font-size:11.5px">Relay /</text><text x="465.0" y="110.5" class="t-lbl" style="font-size:11.5px">switch</text><rect x="565" y="70" width="130" height="64" rx="8" class="t-box4"/><text x="630.0" y="93.5" class="t-lbl" style="font-size:11.5px">Heater</text><text x="630.0" y="110.5" class="t-lbl" style="font-size:11.5px">(actuator)</text><rect x="735" y="70" width="120" height="64" rx="8" class="t-box2"/><text x="795.0" y="93.5" class="t-lbl" style="font-size:11.5px">Room</text><text x="795.0" y="110.5" class="t-lbl" style="font-size:11.5px">(plant)</text><rect x="405" y="170" width="180" height="50" rx="8" class="t-box4"/><text x="495" y="190" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">Temperature sensor</text><text x="495" y="208" font-size="10.5" fill="#5b6b7c" text-anchor="middle">bimetal strip / thermistor</text><line x1="150" y1="102" x2="174" y2="102" class="lnk" marker-end="url(#ah)"/><line x1="208" y1="102" x2="233" y2="102" class="lnk" marker-end="url(#ah)"/><line x1="365" y1="102" x2="403" y2="102" class="lnk" marker-end="url(#ah)"/><line x1="525" y1="102" x2="563" y2="102" class="lnk" marker-end="url(#ah)"/><line x1="695" y1="102" x2="733" y2="102" class="lnk" marker-end="url(#ah)"/><text x="795" y="152" font-size="11" fill="#157a4b" text-anchor="middle">room temperature</text><polyline points="795,134 795,195 587,195" class="lnk" marker-end="url(#ah)"/><polyline points="405,195 192,195 192,120" class="lnk-d" marker-end="url(#ah)"/><text x="300" y="186" font-size="11" fill="#0f5fa8" text-anchor="middle">feedback signal</text><text x="212" y="96" font-size="11" fill="#a8232a" text-anchor="start">error</text><text x="440" y="252" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Heater ON while measured temperature is below the set point; OFF when it rises above the set point plus the hysteresis band. This gives on-off (bang-bang) control.</text></svg></div><figcaption><b>Fig. 1:</b> Room heating as a closed loop system. The thermostat compares the measured room temperature with the set point and switches the heater on or off.</figcaption></figure><div class="tbl-scroll"><table><caption>Table 17.1 &mdash; Elements of the room heating system</caption><thead><tr><th>Element</th><th>Device used</th><th>Function</th></tr></thead><tbody><tr><td>Set point</td><td>Thermostat dial or digital keypad</td><td>Stores the desired temperature</td></tr><tr><td>Error detector</td><td>Comparison inside the thermostat</td><td>Finds the difference between desired and measured temperature</td></tr><tr><td>Controller</td><td>Bimetal switch, electronic comparator or microcontroller with PID</td><td>Decides when to switch the heater</td></tr><tr><td>Actuator</td><td>Contactor / relay / solid state relay</td><td>Switches the heater current</td></tr><tr><td>Final control element</td><td>Resistance heater, heat pump or hot water valve</td><td>Adds heat to the room</td></tr><tr><td>Plant</td><td>The room (air plus walls and furniture)</td><td>Stores and loses heat</td></tr><tr><td>Measurement element</td><td>Bimetal strip, thermistor, RTD, LM35 or digital sensor such as the DHT11</td><td>Measures the actual room temperature</td></tr><tr><td>Disturbance</td><td>Outside temperature, open doors and windows, sunlight, people, appliances</td><td>Pushes the temperature away from the set point</td></tr></tbody></table></div><h4>Working</h4><p>The temperature sensor produces a signal proportional to the room temperature. The controller compares it with the set point. While the room temperature is below the set point, the error is positive and the heater is ON. Heat is added, the room warms up, and the error reduces. When the temperature reaches the set point, the heater is switched OFF. The room now loses heat through the walls and windows, so the temperature falls again. When it falls below the set point by a small amount, the heater is switched ON again. The cycle repeats and the temperature is held close to the set point.</p><h4>On-off control and hysteresis</h4><p>The simplest controller is <b>on-off</b> (also called <b>bang-bang</b> or <b>two-position</b>) control: the heater is either fully on or fully off. If the switching were exactly at the set point, the heater would chatter on and off many times a second because of the sensor's own noise and the tiny fluctuations of air temperature. This would destroy the contacts and be very inefficient.</p><p>To prevent this, a <b>hysteresis band</b> (also called the differential or the dead band) is introduced. The heater switches OFF at, say, 24.5 &deg;C and switches ON again only at 23.5 &deg;C. The temperature therefore oscillates between these two limits, and the switching rate is reduced to a few times per hour.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">On-off control with a hysteresis band</text><rect x="110" y="40" width="660" height="175" rx="6" class="t-box"/><line x1="150" y1="200" x2="150" y2="50" class="ax" marker-end="url(#ah)"/><line x1="150" y1="200" x2="740" y2="200" class="ax" marker-end="url(#ah)"/><text x="746" y="204" font-size="11.5" fill="#5b6b7c" text-anchor="start">time</text><text x="144" y="44" font-size="11.5" fill="#5b6b7c" text-anchor="start">temperature</text><line x1="150" y1="110" x2="740" y2="110" class="lnk" stroke-width="1.3" stroke-dasharray="6 4"/><text x="746" y="114" font-size="11" fill="#0f5fa8" text-anchor="start">set point</text><line x1="150" y1="92" x2="740" y2="92" class="ax" stroke-dasharray="6 4"/><text x="746" y="96" font-size="10.5" fill="#5b6b7c" text-anchor="start">upper limit</text><line x1="150" y1="128" x2="740" y2="128" class="ax" stroke-dasharray="6 4"/><text x="746" y="132" font-size="10.5" fill="#5b6b7c" text-anchor="start">lower limit</text><polyline points="150,175 218,92 286,128 354,92 422,128 490,92 558,128 626,92 694,128" fill="none" stroke="#a8232a" stroke-width="2.2"/><text x="440" y="235" font-size="11.5" fill="#12283d" text-anchor="middle">The hysteresis band prevents rapid ON/OFF chattering of the heater contacts, but the temperature always oscillates within the band.</text></svg></div><figcaption><b>Fig. 2:</b> On-off control with a hysteresis band. The temperature oscillates between the upper and lower limits and the heater switches only a few times an hour.</figcaption></figure><p>A bimetallic thermostat achieves this naturally: a strip of two metals with different expansion coefficients is bonded together and bends when heated. It carries the contacts and is placed near a small heater, so its own temperature rises a little when the contacts close, which automatically creates the hysteresis.</p><h4>Better control and specifications</h4><ul><li><b>Proportional control</b> &mdash; the heater power is varied continuously in proportion to the error, using phase-controlled thyristors or PWM. The temperature settles much closer to the set point with far less oscillation, but a steady-state offset remains.</li><li><b>PID control</b> &mdash; proportional plus integral plus derivative action removes the offset and gives a fast, smooth response. Used in industrial ovens, incubators and precision environmental chambers.</li><li><b>Fuzzy logic and adaptive control</b> &mdash; used in modern air conditioners to take account of room size, occupancy and outside conditions, improving comfort and saving energy.</li></ul><p>Typical performance specifications of a room heater controller are: set point range 5 &deg;C to 35 &deg;C, accuracy &plusmn;1 &deg;C, hysteresis 0.5 &deg;C to 2 &deg;C (adjustable), switching rating 16 A at 230 V AC, sensor type NTC thermistor of 10 k&#937; at 25 &deg;C, and supply 230 V AC.</p><div class="note"><span class="tag">Note</span><p>A closely related system is the <b>refrigerator</b> or <b>air conditioner</b>, which is exactly the same closed loop with the actuator removing heat instead of adding it. The human body is also a closed loop temperature control system, using temperature sensors in the skin and hypothalamus, with sweating and shivering as the actuators.</p></div><h3 id="sec2"><span class="sec-no">2.</span>Case Study 2 &mdash; Automatic Control of Water Level</h3><h4>Requirement</h4><p>An overhead tank must be kept filled from an underground sump by a motor pump. The pump must start automatically when the tank level falls, must stop when the tank is full, must not overflow, must not run when the sump is empty (which would damage it), and must not require anyone to climb up and switch it on.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 340" width="880" height="340" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Automatic control of water level in an overhead tank</text><path d="M 560 70 L 560 290 L 810 290 L 810 70" fill="none" stroke="#4a5b6d" stroke-width="2.4"/><path d="M 562 190 L 808 190 L 808 288 L 562 288 Z" fill="#d8ecf8" stroke="#5a9fc9" stroke-width="1.2"/><path d="M 562 190 q 20 -8 40 0 t 40 0 t 40 0 t 40 0 t 40 0 t 38 0" class="wire-b"/><text x="685" y="250" font-size="12" fill="#0f5fa8" text-anchor="middle" font-weight="600">water</text><text x="685" y="56" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">OVERHEAD TANK</text><line x1="740" y1="40" x2="740" y2="105" class="wire"/><line x1="740" y1="105" x2="700" y2="105" class="wire"/><circle cx="700" cy="105" r="4" class="dot"/><text x="756" y="109" font-size="10.5" fill="#a8232a" text-anchor="start" font-weight="600">HIGH probe (H)</text><line x1="740" y1="300" x2="740" y2="245" class="wire"/><line x1="740" y1="245" x2="700" y2="245" class="wire"/><circle cx="700" cy="245" r="4" class="dot"/><text x="756" y="249" font-size="10.5" fill="#157a4b" text-anchor="start" font-weight="600">LOW probe (L)</text><line x1="560" y1="300" x2="560" y2="300" class="wire"/><rect x="80" y="250" width="160" height="60" rx="4" class="t-box2"/><path d="M 82 282 L 238 282 L 238 308 L 82 308 Z" fill="#d8ecf8" stroke="#5a9fc9" stroke-width="1"/><text x="160" y="240" font-size="11" fill="#5b6b7c" text-anchor="middle">underground sump</text><circle cx="330" cy="280" r="26" class="cmp-f"/><circle cx="330" cy="280" r="22" class="cmp-f"/><text x="330" y="285" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">P</text><line x1="240" y1="280" x2="306" y2="280" class="cmp" stroke-width="3"/><line x1="354" y1="280" x2="420" y2="280" class="cmp" stroke-width="3"/><path d="M 420 280 L 420 40 L 620 40 L 620 70" class="cmp" stroke-width="3"/><polyline points="470,280 470,258" class="lnk" marker-end="url(#ah)"/><text x="486" y="262" font-size="10.5" fill="#5b6b7c" text-anchor="start">delivery pipe</text><text x="330" y="322" font-size="11" fill="#5b6b7c" text-anchor="middle">motor pump</text><rect x="60" y="60" width="250" height="120" rx="8" class="t-box3"/><text x="185" y="88" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Control unit (relay logic</text><text x="185" y="106" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">or microcontroller)</text><text x="185" y="134" font-size="10.5" fill="#5b6b7c" text-anchor="middle">L open &amp; sump has water &rarr; pump ON</text><text x="185" y="150" font-size="10.5" fill="#5b6b7c" text-anchor="middle">H touched &rarr; pump OFF</text><text x="185" y="166" font-size="10.5" fill="#5b6b7c" text-anchor="middle">sump empty &rarr; pump OFF (dry-run protection)</text><line x1="740" y1="40" x2="740" y2="26" class="wire"/><polyline points="310,120 360,120 360,96 700,96 700,105" class="lnk-d" marker-end="url(#ah)"/><polyline points="310,150 380,150 380,316 700,316 700,245" class="lnk-d" marker-end="url(#ah)"/><line x1="185" y1="180" x2="185" y2="220" class="wire"/><line x1="185" y1="220" x2="306" y2="220" class="wire"/><polyline points="306,220 330,220 330,254" class="lnk" marker-end="url(#ah)"/><text x="250" y="212" font-size="10.5" fill="#a8232a" text-anchor="middle">pump contactor</text></svg></div><figcaption><b>Fig. 3:</b> Automatic water level controller: two probes in the overhead tank detect the low and high levels, a third probe in the sump prevents dry running, and a relay or microcontroller controls the pump contactor.</figcaption></figure><h4>The elements</h4><div class="tbl-scroll"><table><caption>Table 17.2 &mdash; Elements of the water level control system</caption><thead><tr><th>Element</th><th>Device</th><th>Function</th></tr></thead><tbody><tr><td>Set point</td><td>Positions of the LOW and HIGH probes (or the float switches)</td><td>Defines the level band within which the pump operates</td></tr><tr><td>Measurement element</td><td>Conductivity probes, float and reed switches, or an ultrasonic sensor</td><td>Detects the water level</td></tr><tr><td>Controller</td><td>Relay logic circuit, dedicated water level controller IC, or a microcontroller</td><td>Implements the start/stop logic and the interlocks</td></tr><tr><td>Actuator / final control element</td><td>Contactor and single-phase or three-phase induction motor driving a centrifugal pump</td><td>Delivers water from the sump to the tank</td></tr><tr><td>Plant</td><td>The overhead tank</td><td>Stores the water</td></tr><tr><td>Controlled output</td><td>Water level in the tank</td><td>The variable being controlled</td></tr><tr><td>Disturbance</td><td>Water being drawn off by users, evaporation, leaks, and sump level changes</td><td>Changes the level</td></tr></tbody></table></div><h4>Working</h4><ol><li>Two stainless steel electrodes (probes) are suspended in the overhead tank: one near the bottom (LOW) and one near the top (HIGH). A third common electrode is placed at the bottom, and a fourth is placed in the sump.</li><li>A small low-voltage AC signal (usually 9 V to 12 V AC, never DC, because DC causes electrolysis and corrodes the probes) is applied. When water covers a probe, current flows through the water and the probe circuit is completed.</li><li>When the level falls below the LOW probe, the LOW circuit opens. The controller detects this and energises the pump contactor, provided the sump probe also shows that water is available.</li><li>The pump runs and the level rises. As soon as water covers the LOW probe again, the controller <b>latches</b> itself so that the pump keeps running even though the LOW condition has been satisfied.</li><li>When the water reaches the HIGH probe, the controller de-energises the contactor and the pump stops. The tank is now full.</li><li>If at any time the sump probe indicates that the sump is empty, the pump is stopped immediately to prevent dry running, which would destroy the pump seal and burn the motor.</li><li>An alarm may be sounded if the tank overflows (a separate overflow probe above the HIGH probe) or if the sump has been empty for a long time.</li></ol><h4>The logic</h4><span class="eq">PUMP ON  =  (LOW probe dry) AND (SUMP has water) AND (HIGH probe dry) AND (not overloaded)<br>PUMP OFF = (HIGH probe wet) OR (SUMP dry) OR (overload trip) OR (E-stop)</span><p>This logic is easily implemented with two relays forming a latching circuit, with a dedicated controller IC, or with a microcontroller. The latching action gives the system <b>hysteresis</b>, exactly like the room heater: the pump does not chatter as the water surface waves near a single probe.</p><h4>Other methods of level control</h4><ul><li><b>Float switches</b> &mdash; a float with a reed switch at each level. Robust, simple and cheap; the most common method in domestic installations. See Topic 4.</li><li><b>Ultrasonic level sensor</b> &mdash; non-contact, measures the level continuously rather than at discrete points, so proportional control is possible. Ideal for corrosive or dirty liquids.</li><li><b>Capacitive probe</b> &mdash; works with non-conducting liquids such as diesel and oils, where conductivity probes fail.</li><li><b>Hydrostatic pressure sensor</b> &mdash; a submersible pressure transducer at the bottom of the tank; pressure is proportional to the height of liquid.</li><li><b>Displacer / servo level gauge</b> &mdash; used in refineries for accurate interface level measurement.</li><li><b>Load cell under the tank</b> &mdash; gives the weight, hence the quantity, of the contents.</li><li><b>Radar / guided wave radar</b> &mdash; non-contact, unaffected by vapour, dust or temperature; used in large industrial tanks.</li></ul><h4>Applications and specifications</h4><p>Automatic water level controllers are used in domestic overhead tank systems, in industrial water storage and treatment plants, in boiler feed water control (a critical safety application, since a boiler running dry can explode), in cooling tower make-up, in chemical dosing tanks, in sewage and drainage pump stations, in swimming pools, in agricultural irrigation sumps and in fire fighting water storage.</p><p>Typical specifications of a domestic controller are: supply 230 V AC 50 Hz, probe voltage 9 V to 12 V AC, contact rating 5 A to 16 A, number of levels 2 to 4, adjustable sensitivity, LED indication of each level, dry-run protection, overload protection through the pump starter's thermal relay, and enclosure rating IP54 or better.</p><div class="warn"><span class="tag">Important</span><p>Never use DC for conductivity probes and never let the probe voltage exceed the safe extra-low voltage limit (about 25 V AC). Probes corrode over time and must be inspected periodically. The pump must always be protected by a thermal overload relay and a dry-run interlock.</p></div><h3 id="sec3"><span class="sec-no">3.</span>Case Study 3 &mdash; Washing Machine System</h3><h4>Requirement</h4><p>A domestic fully automatic washing machine must wash a load of clothes through a programmed sequence of filling, heating, washing, draining, rinsing and spinning, with the correct amount of water at the correct temperature, safely, without any attention from the user.</p><p>This system is interesting because it combines <b>sequential control</b> (the cycle), <b>closed loop control</b> (the water level and the water temperature) and <b>open loop control</b> (the wash timer) all in one machine.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 330" width="880" height="330" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Washing machine &mdash; sequential state diagram</text><rect x="8" y="56" width="164" height="70" rx="8" class="t-box2"/><text x="90" y="76" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">S0 START</text><text x="90" y="96" font-size="9.5" fill="#5b6b7c" text-anchor="middle">wait for start button</text><text x="90" y="110" font-size="9.5" fill="#5b6b7c" text-anchor="middle">and door closed</text><rect x="218" y="56" width="164" height="70" rx="8" class="t-box2"/><text x="300" y="76" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">S1 FILL</text><text x="300" y="96" font-size="9.5" fill="#5b6b7c" text-anchor="middle">open inlet valve until</text><text x="300" y="110" font-size="9.5" fill="#5b6b7c" text-anchor="middle">level switch operates</text><rect x="428" y="56" width="164" height="70" rx="8" class="t-box2"/><text x="510" y="76" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">S2 HEAT</text><text x="510" y="96" font-size="9.5" fill="#5b6b7c" text-anchor="middle">switch heater on until</text><text x="510" y="110" font-size="9.5" fill="#5b6b7c" text-anchor="middle">thermistor reaches set temp</text><rect x="638" y="56" width="164" height="70" rx="8" class="t-box2"/><text x="720" y="76" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">S3 WASH</text><text x="720" y="96" font-size="9.5" fill="#5b6b7c" text-anchor="middle">motor runs CW / CCW</text><text x="720" y="110" font-size="9.5" fill="#5b6b7c" text-anchor="middle">for the programmed time</text><rect x="638" y="186" width="164" height="70" rx="8" class="t-box2"/><text x="720" y="206" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">S4 DRAIN</text><text x="720" y="226" font-size="9.5" fill="#5b6b7c" text-anchor="middle">pump runs until the</text><text x="720" y="240" font-size="9.5" fill="#5b6b7c" text-anchor="middle">tank-empty switch closes</text><rect x="428" y="186" width="164" height="70" rx="8" class="t-box2"/><text x="510" y="206" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">S5 SPIN</text><text x="510" y="226" font-size="9.5" fill="#5b6b7c" text-anchor="middle">motor ramps to high</text><text x="510" y="240" font-size="9.5" fill="#5b6b7c" text-anchor="middle">speed for the spin timer</text><rect x="218" y="186" width="164" height="70" rx="8" class="t-box2"/><text x="300" y="206" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">S6 END</text><text x="300" y="226" font-size="9.5" fill="#5b6b7c" text-anchor="middle">buzzer sounds, door</text><text x="300" y="240" font-size="9.5" fill="#5b6b7c" text-anchor="middle">lock released</text><line x1="172" y1="90" x2="216" y2="90" class="lnk" marker-end="url(#ah)"/><line x1="382" y1="90" x2="426" y2="90" class="lnk" marker-end="url(#ah)"/><line x1="592" y1="90" x2="636" y2="90" class="lnk" marker-end="url(#ah)"/><line x1="720" y1="128" x2="720" y2="184" class="lnk" marker-end="url(#ah)"/><line x1="636" y1="220" x2="594" y2="220" class="lnk" marker-end="url(#ah)"/><line x1="426" y1="220" x2="384" y2="220" class="lnk" marker-end="url(#ah)"/><path d="M 218 220 L 90 220 L 90 126" class="lnk-d" marker-end="url(#ah)"/><text x="150" y="212" font-size="10.5" fill="#5b6b7c" text-anchor="middle">next cycle</text><path d="M 510 124 C 470 165, 470 180, 510 186" class="lnk-d" marker-end="url(#ah)"/><text x="452" y="160" font-size="10.5" fill="#a8232a" text-anchor="end">cold wash:</text><text x="452" y="174" font-size="10.5" fill="#a8232a" text-anchor="end">skip heating</text><text x="440" y="312" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Each transition occurs only when its condition is satisfied, so the machine can never spin with water in the tub or with the door open.</text></svg></div><figcaption><b>Fig. 4:</b> The state diagram of a washing machine cycle. Each transition occurs only when its condition is satisfied, so the machine can never spin with water in the tub or with the door open.</figcaption></figure><h4>The elements</h4><div class="tbl-scroll"><table><caption>Table 17.3 &mdash; Elements of a washing machine</caption><thead><tr><th>Subsystem</th><th>Sensors</th><th>Controller</th><th>Actuators</th></tr></thead><tbody><tr><td>Water filling</td><td>Water level pressure switch or float switch</td><td>Microcontroller</td><td>Inlet solenoid valve (one or two, for hot and cold)</td></tr><tr><td>Water heating</td><td>NTC thermistor or thermostat</td><td>Microcontroller with on-off or PID control</td><td>Immersion heater with thermal cut-out</td></tr><tr><td>Washing</td><td>Motor tachometer (in some models)</td><td>Microcontroller</td><td>Wash motor with belt or direct drive, driving the drum alternately clockwise and anticlockwise</td></tr><tr><td>Draining</td><td>Empty-level switch, sometimes a turbidity sensor</td><td>Microcontroller</td><td>Drain pump and drain valve</td></tr><tr><td>Spinning</td><td>Motor speed feedback, out-of-balance sensor</td><td>Microcontroller ramps the speed up gradually</td><td>Motor at high speed (800 to 1400 rpm)</td></tr><tr><td>Safety</td><td>Door lock switch, thermal cut-out, overflow switch</td><td>Microcontroller inhibits all action if unsafe</td><td>Door lock solenoid, buzzer, drain pump</td></tr><tr><td>User interface</td><td>Program selector, keypad, sometimes a load weight sensor</td><td>Microcontroller stores the programs</td><td>LCD or LED display, buzzer</td></tr></tbody></table></div><h4>Working of a typical cycle</h4><ol><li><b>Door lock.</b> The user closes the door and presses start. The controller first energises the <b>door lock solenoid</b>, which mechanically locks the door and, through a switch, confirms to the controller that the door is locked. No other action can start until this confirmation is received.</li><li><b>Water filling.</b> The inlet solenoid valve opens and water enters the tub. The level is measured by a <b>pressure switch</b>: as the water rises, air trapped in a small tube connected to the bottom of the tub is compressed, and when the pressure reaches a set value the switch operates. Alternatively a float switch is used. The valve closes when the set level is reached. This is a <b>closed loop</b> control of level.</li><li><b>Heating.</b> If a warm wash is selected, the immersion heater is switched on and the <b>thermistor</b> is monitored until the set temperature is reached, when the heater is switched off. A separate thermal cut-out is a safety device that operates if the controller fails. This is another <b>closed loop</b> control.</li><li><b>Washing.</b> The motor turns the drum slowly (about 50 rpm) alternately clockwise for a few seconds, pauses, then anticlockwise. This agitation, together with the detergent, loosens the dirt. The duration is fixed by the program, so this part is <b>open loop</b> (timed). Some advanced machines have a <b>turbidity sensor</b> that measures how dirty the water is, making it closed loop.</li><li><b>Draining.</b> The drain pump runs until the empty-level switch indicates that the tub is empty.</li><li><b>Rinsing.</b> Clean water is filled, the drum is agitated again, and the water is drained. The number of rinses depends on the program.</li><li><b>Spinning.</b> The motor accelerates the drum gradually to 800 rpm to 1400 rpm to extract water by centrifugal force. The acceleration is ramped slowly, and if an <b>out-of-balance</b> condition is detected (from the motor current or a dedicated sensor), the controller slows down, redistributes the clothes by rocking the drum, and tries again. This protects the bearings and the suspension.</li><li><b>End.</b> The buzzer sounds, the door lock is released after a short delay (so that the drum has fully stopped), and the machine returns to the idle state.</li></ol><h4>Why this is a good mechatronic example</h4><ul><li>It uses every key element: sensors (level, temperature, door, speed, out-of-balance), signal conditioning, a digital controller with a stored program, several actuators (valve, heater, motor, pump, door lock solenoid), and a mechanical plant (drum, tub, suspension, belt).</li><li>It shows the combination of sequential control for the cycle and closed loop control for level and temperature.</li><li>It shows how <b>software provides the flexibility</b>: the mechanical hardware is identical for all models, but different programs, different spin speeds and different features are simply different software.</li><li>It shows the importance of <b>safety interlocks</b>: the machine physically cannot spin with the door unlocked or with water in the tub.</li><li>Modern machines add <b>fuzzy logic</b> to decide the water quantity from the weight and absorbency of the clothes, <b>inverter drives</b> with brushless motors for quiet and efficient spinning, <b>auto-dosing</b> of detergent, and <b>Wi-Fi connectivity</b> for remote monitoring.</li></ul><h4>Other similar mechatronic case studies</h4><p>The same reasoning can be applied to a <b>dishwasher</b> (fill, heat, spray, drain, dry), a <b>microwave oven</b> (timer plus humidity or temperature sensor plus magnetron power control), an <b>automatic car park barrier</b>, a <b>vending machine</b>, a <b>photocopier</b>, an <b>elevator</b>, a <b>CNC machine</b> and an <b>industrial robot</b>. Each one is a combination of sensors, a controller and actuators working together through a mechanical structure &mdash; which is exactly what mechatronics means.</p><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>Room heating is a closed loop system: set point, thermostat comparator, contactor, heater, room as the plant, and a temperature sensor as the measurement element.</li><li>On-off control with a hysteresis band is the simplest form; the band prevents contact chatter. Proportional and PID control give a closer and smoother regulation.</li><li>A bimetal strip naturally provides hysteresis because its own heater warms it when the contacts close.</li><li>Automatic water level control uses two or more probes or float switches in the tank plus a sump probe, a relay or microcontroller, and a pump contactor.</li><li>Conductivity probes must be driven with low-voltage AC, never DC, to avoid electrolytic corrosion.</li><li>The pump logic is latched, giving hysteresis, and includes a dry-run interlock and an overload trip.</li><li>A washing machine combines sequential control of the cycle with closed loop control of water level and temperature, and open loop timed control of the wash period.</li><li>Its safety interlocks ensure that the door must be locked before any action and that the drum cannot spin with water in the tub.</li><li>In all three systems the intelligence lies in the controller and the software, while the mechanical hardware stays simple.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Draw the block diagram of a room heating system and identify every element.</li><li>Explain on-off control. Why is a hysteresis band necessary and how is it obtained in a bimetallic thermostat?</li><li>Compare on-off, proportional and PID control of room temperature.</li><li>With a neat sketch, explain the working of an automatic water level controller for an overhead tank.</li><li>Write the logic expression for switching the pump ON and OFF, including all safety interlocks.</li><li>Why must conductivity probes be supplied with AC rather than DC?</li><li>List any six other methods of measuring liquid level with one advantage of each.</li><li>Draw the state diagram of a washing machine cycle and specify the transition condition for every step.</li><li>Which parts of a washing machine cycle are sequential, which are closed loop and which are open loop?</li><li>Explain how the door lock and the out-of-balance detection contribute to safety in a washing machine.</li><li>Give three other mechatronic case studies and identify their sensors, controller and actuators.</li></ol></div><div class="pager"><a class="prev" href="16-sequential-controllers.html"><span class="dir">&larr; Previous topic</span><span class="ttl">16. Sequential Controllers</span></a><a class="next" href="18-robotics-history-classification-coordinate-system.html"><span class="dir">Next topic &rarr;</span><span class="ttl">18. Introduction to Robotics &mdash; Brief History and Classification by Coordinate System</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

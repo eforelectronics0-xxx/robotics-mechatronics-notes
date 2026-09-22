@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Basic Elements of an Open Loop System | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="A detailed look at each element of an open loop control system, with worked examples such as a toaster, a traffic light, a stepper motor drive and an ">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit II &middot; Topic 14 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit II &rsaquo; Topic 14</nav><div class="unit-tag">Unit II</div><h2 class="page-title"><span class="topic-no">14</span>Basic Elements of an Open Loop System</h2><p class="lede">A detailed look at each element of an open loop control system, with worked examples such as a toaster, a traffic light, a stepper motor drive and an automatic washing machine timer.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Structure of an Open Loop System</a></li><li><a href="#sec2">Worked Examples of Open Loop Systems</a></li><li><a href="#sec3">Advantages, Limitations and When to Use an Open Loop System</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Structure of an Open Loop System</h3><p>An open loop control system has a signal path that goes in one direction only, from the input to the output. There is <b>no measuring element</b> and <b>no comparison point</b>. The system assumes that the output will be whatever the input commanded, and it has no way of knowing whether that actually happened.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 210" width="880" height="210" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Basic elements of an open loop system</text><rect x="40" y="70" width="130" height="70" rx="8" class="t-box3"/><text x="105.0" y="96.5" class="t-lbl" style="font-size:11.5px">Input</text><text x="105.0" y="113.5" class="t-lbl" style="font-size:11.5px">(command)</text><rect x="210" y="70" width="130" height="70" rx="8" class="t-box2"/><text x="275.0" y="96.5" class="t-lbl" style="font-size:11.5px">Controller</text><text x="275.0" y="113.5" class="t-lbl" style="font-size:11.5px">(decision)</text><rect x="380" y="70" width="130" height="70" rx="8" class="t-box4"/><text x="445.0" y="96.5" class="t-lbl" style="font-size:11.5px">Actuator</text><text x="445.0" y="113.5" class="t-lbl" style="font-size:11.5px">(action)</text><rect x="550" y="70" width="130" height="70" rx="8" class="t-box2"/><text x="615.0" y="96.5" class="t-lbl" style="font-size:11.5px">Plant / process</text><text x="615.0" y="113.5" class="t-lbl" style="font-size:11.5px">(work done)</text><rect x="720" y="70" width="130" height="70" rx="8" class="t-box3"/><text x="785.0" y="96.5" class="t-lbl" style="font-size:11.5px">Output</text><text x="785.0" y="113.5" class="t-lbl" style="font-size:11.5px">(result)</text><line x1="170" y1="105" x2="208" y2="105" class="lnk" marker-end="url(#ah)"/><line x1="340" y1="105" x2="378" y2="105" class="lnk" marker-end="url(#ah)"/><line x1="510" y1="105" x2="548" y2="105" class="lnk" marker-end="url(#ah)"/><line x1="680" y1="105" x2="718" y2="105" class="lnk" marker-end="url(#ah)"/><text x="440" y="176" font-size="12" fill="#12283d" text-anchor="middle" font-weight="600">Signal flows in one direction only. There is no measuring element and no comparison point.</text><text x="440" y="196" font-size="11.5" fill="#a8232a" text-anchor="middle">Output does not influence the input in any way.</text></svg></div><figcaption><b>Fig. 1:</b> The basic elements of an open loop system. Information flows in one direction; the output is never measured and never compared with the input.</figcaption></figure><p>The elements are as follows.</p><ol><li><b>Input / command / reference</b> &mdash; the desired output expressed in terms the controller can understand. It may be a dial setting, a keypad entry, a switch closure, a pulse train or a stored program. The input is usually low power, so it needs amplification.</li><li><b>Controller</b> &mdash; the decision-making element. It interprets the input and produces a command for the actuator. It may be a cam-and-lever mechanism, a timer, an electronic circuit, a microcontroller running a fixed program, or a PLC executing a sequence.</li><li><b>Actuator / final control element</b> &mdash; the device that actually applies energy to the plant: a heater element, a motor, a solenoid valve, a lamp, a relay or a contactor.</li><li><b>Plant / process</b> &mdash; the physical system being controlled: the bread in a toaster, the traffic at a junction, the water in a tank, the table of a machine.</li><li><b>Output / controlled variable</b> &mdash; the result: the colour of the toast, the state of the traffic lights, the position of the table.</li><li><b>Power supply and interconnections</b> &mdash; the energy source for the actuator and the wiring that carries the command signals.</li></ol><div class="note"><span class="tag">Note</span><p>The defining feature is the <b>absence</b> of a feedback path. If the output is disturbed, the system continues exactly as before and the output simply drifts away from the desired value.</p></div><h3 id="sec2"><span class="sec-no">2.</span>Worked Examples of Open Loop Systems</h3><h4>Example 1 &mdash; Electric toaster</h4><p>The user sets a browning dial which adjusts the length of time for which the heater is energised. The controller is a bimetallic strip and a spring mechanism (or an electronic timer). The actuator is the nichrome heating element. The plant is the slice of bread. The output is the toasted bread.</p><p>There is no temperature sensor looking at the bread. If the bread is cold, thick or damp, or if the mains voltage is low, or if several slices are toasted one after another so that the toaster is already hot, the result will be different from what the dial setting implies. The system cannot detect or correct this. That is why the first slice from a cold toaster is often lighter than the second.</p><h4>Example 2 &mdash; Traffic light with fixed timing</h4><p>A timer circuit or a PLC program switches the lights in a fixed sequence with fixed durations. The input is the timing program, the controller is the timer, the actuator is the relay driving the lamps, the plant is the traffic junction and the output is the light colour. The system does not know how many vehicles are waiting. During a traffic jam the green time may be too short, and during the night the lights may be red when no one is there.</p><h4>Example 3 &mdash; Stepper motor position control</h4><p>A microcontroller sends N pulses to a stepper motor driver, expecting the shaft to turn by N times the step angle. No encoder is fitted. This works very well as long as the motor is never overloaded, never accelerates too fast and never hits resonance, because then it would lose steps and the actual position would differ from the calculated one &mdash; and nobody would know.</p><h4>Example 4 &mdash; Automatic washing machine on a timed cycle</h4><p>The programmer advances through fill, wash, rinse and spin on the basis of time alone. The water level may be checked by a switch (which is a partial feedback), but the <i>cleanliness</i> of the clothes is never measured, so the cycle always takes the same time however dirty the load is.</p><h4>Example 5 &mdash; Others</h4><p>Immersion water heater on a timer; automatic lawn sprinkler on a timer; a DC motor run from a fixed-voltage supply; a printing press feeding paper at a set rate; a microwave oven with a time setting; an assembly robot that moves to fixed taught positions without checking; a music system volume control; a bench drill press.</p><div class="tbl-scroll"><table><caption>Table 14.1 &mdash; Elements of some open loop systems</caption><thead><tr><th>System</th><th>Input</th><th>Controller</th><th>Actuator</th><th>Plant</th><th>Output</th></tr></thead><tbody><tr><td>Toaster</td><td>Browning dial (time setting)</td><td>Bimetal timer / electronic timer</td><td>Nichrome heater</td><td>Slice of bread</td><td>Toasted bread</td></tr><tr><td>Fixed-time traffic light</td><td>Timing program</td><td>Timer / PLC</td><td>Relay and lamps</td><td>Traffic junction</td><td>Light colour</td></tr><tr><td>Stepper positioning</td><td>Number of pulses</td><td>Microcontroller + driver</td><td>Stepper motor</td><td>Lead screw and table</td><td>Table position</td></tr><tr><td>Clothes iron (manual dial)</td><td>Dial setting</td><td>Thermostat calibrated for a fabric, but no measurement of the actual iron temperature in the manual type</td><td>Heater element</td><td>Sole plate and cloth</td><td>Iron temperature</td></tr><tr><td>Sprinkler on a timer</td><td>Timer setting</td><td>Timer</td><td>Solenoid valve</td><td>Garden</td><td>Watering</td></tr></tbody></table></div><h3 id="sec3"><span class="sec-no">3.</span>Advantages, Limitations and When to Use an Open Loop System</h3><ul><li><b>Advantages:</b> simple in construction and easy to design; low cost because there is no sensor, no comparator and no complex controller; easy to maintain and to troubleshoot; inherently stable &mdash; there is no feedback, so it cannot oscillate; convenient when the output is difficult, dangerous or expensive to measure; gives good results when the input-output relationship is well known, repeatable and the disturbance is negligible.</li><li><b>Limitations:</b> inaccurate; the output cannot be corrected when a disturbance occurs or when the plant parameters change with ageing, temperature or wear; periodic recalibration is needed; requires an accurately known and stable relationship between input and output; performance varies with the load; cannot adapt to changing conditions; a fault may go undetected, which can be dangerous.</li></ul><p>Despite the limitations, open loop control is used very widely because for many applications the accuracy obtained is perfectly adequate and the cost saving is large. Good engineering means using the simplest arrangement that meets the specification, not always adding feedback.</p><p>A common and effective compromise is <b>calibrated open loop control</b>: the system is open loop during operation, but a sensor is used occasionally to recalibrate it. For example, a 3D printer with a stepper motor is open loop, but it has limit switches that are used at start-up to establish a known zero position, removing the accumulated error.</p><div class="example"><span class="tag">Example</span><p><b>Choosing between the two.</b> Consider controlling the water flow through a pipe. If the pump runs at a constant speed and the downstream pressure is constant, the flow is essentially constant and an open loop system is adequate and cheap. If the downstream pressure varies (for example other taps are opened), the flow will vary too and a closed loop system with a flow meter becomes necessary. The decision depends entirely on whether the disturbances are significant compared with the accuracy required.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>An open loop system has a one-way signal path with no measuring element and no comparison point.</li><li>Its basic elements are the input/command, the controller, the actuator (final control element), the plant or process, the output, and the power supply.</li><li>The output is never measured, so any disturbance or any change in plant parameters produces an error that cannot be corrected.</li><li>Advantages are simplicity, low cost, easy maintenance and guaranteed stability.</li><li>Limitations are inaccuracy, the need for periodic calibration, sensitivity to load and parameter changes, and undetected faults.</li><li>Typical examples are a toaster, a fixed-time traffic light, a stepper motor drive without an encoder, a sprinkler on a timer and a manually set clothes iron.</li><li>Open loop control is appropriate when the input-output relationship is well known, stable and repeatable, and when the required accuracy is modest.</li><li>Calibrated open loop control, such as homing a stepper-driven machine against limit switches at start-up, is a useful compromise.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Define an open loop control system and draw its block diagram.</li><li>List and explain the basic elements of an open loop system.</li><li>Why is an open loop system inherently stable?</li><li>Explain the working of an electric toaster as an open loop system and identify each element.</li><li>Why is a stepper motor drive considered an open loop system? What could go wrong?</li><li>State four advantages and four limitations of open loop control systems.</li><li>Give six practical examples of open loop systems found in everyday life.</li><li>When should an engineer choose an open loop system instead of a closed loop system?</li><li>What is calibrated open loop control? Give an example.</li></ol></div><div class="pager"><a class="prev" href="13-control-systems-feedback-open-closed-loop.html"><span class="dir">&larr; Previous topic</span><span class="ttl">13. Control Systems &mdash; Feedback, Open Loop and Closed Loop Systems</span></a><a class="next" href="15-basic-elements-of-closed-loop-system.html"><span class="dir">Next topic &rarr;</span><span class="ttl">15. Basic Elements of a Closed Loop System</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

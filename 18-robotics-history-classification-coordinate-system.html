@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Introduction to Robotics &mdash; Brief History and Classification by Coordinate System | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="Where the word robot came from, how robots developed from remote manipulators to today's intelligent machines, and the five main geometric configurati">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit III &middot; Topic 18 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit III &rsaquo; Topic 18</nav><div class="unit-tag">Unit III</div><h2 class="page-title"><span class="topic-no">18</span>Introduction to Robotics &mdash; Brief History and Classification by Coordinate System</h2><p class="lede">Where the word robot came from, how robots developed from remote manipulators to today's intelligent machines, and the five main geometric configurations classified by their coordinate system and work envelope.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Definition of a Robot</a></li><li><a href="#sec2">Brief History of Robotics</a></li><li><a href="#sec3">Classification of Robots by Coordinate System (Geometry)</a></li><li><a href="#sec4">Other Ways of Classifying Robots</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Definition of a Robot</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>robot</b> is a <b>reprogrammable, multifunctional manipulator</b> designed to move material, parts, tools or specialised devices through variable programmed motions for the performance of a variety of tasks. This is the definition given by the <b>Robot Institute of America (RIA)</b>, and it contains three essential words: <b>reprogrammable</b> (its motion can be changed by changing the program, not the hardware), <b>multifunctional</b> (it can do more than one task) and <b>manipulator</b> (it physically handles things).</p></div><p>The <b>International Organization for Standardization (ISO 8373)</b> defines an industrial robot as an <i>automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which may be either fixed in place or mobile for use in industrial automation applications</i>.</p><p>The word <b>robot</b> first appeared in 1920 in the play <i>R.U.R.</i> (Rossum's Universal Robots) by the Czech writer <b>Karel Capek</b>. It comes from the Czech word <i>robota</i>, meaning forced labour or drudgery. In the play, artificial workers are manufactured to serve humans and eventually rebel. The word <b>robotics</b> itself was coined by the science fiction writer <b>Isaac Asimov</b> in 1942, and he also proposed the famous <b>Three Laws of Robotics</b>.</p><div class="note"><span class="tag">Note</span><p>The Three Laws of Robotics (Asimov): (1) A robot may not injure a human being or, through inaction, allow a human being to come to harm. (2) A robot must obey orders given by human beings except where such orders would conflict with the First Law. (3) A robot must protect its own existence as long as such protection does not conflict with the First or Second Law. These are fiction, but they anticipate the real ethical and safety questions engineers face today.</p></div><h3 id="sec2"><span class="sec-no">2.</span>Brief History of Robotics</h3><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 230" width="880" height="230" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="22" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Brief history of robotics</text><line x1="50" y1="118" x2="830" y2="118" class="lnk" stroke-width="2.6"/><circle cx="75" cy="118" r="5.5" class="cmp-y"/><text x="75" y="100" font-size="11.5" fill="#0a4377" text-anchor="middle" font-weight="700">1920</text><text x="75" y="140" font-size="9" fill="#4a5b6d" text-anchor="middle">Karel Capek's play</text><text x="75" y="154" font-size="9" fill="#4a5b6d" text-anchor="middle">R.U.R. coins the</text><text x="75" y="168" font-size="9" fill="#4a5b6d" text-anchor="middle">word 'robot'</text><circle cx="168" cy="118" r="5.5" class="cmp-y"/><text x="168" y="100" font-size="11.5" fill="#0a4377" text-anchor="middle" font-weight="700">1940s</text><text x="168" y="140" font-size="9" fill="#4a5b6d" text-anchor="middle">Asimov's Three</text><text x="168" y="154" font-size="9" fill="#4a5b6d" text-anchor="middle">Laws; first</text><text x="168" y="168" font-size="9" fill="#4a5b6d" text-anchor="middle">remote manipulators</text><circle cx="262" cy="118" r="5.5" class="cmp-y"/><text x="262" y="100" font-size="11.5" fill="#0a4377" text-anchor="middle" font-weight="700">1954</text><text x="262" y="140" font-size="9" fill="#4a5b6d" text-anchor="middle">George Devol patents</text><text x="262" y="154" font-size="9" fill="#4a5b6d" text-anchor="middle">the first</text><text x="262" y="168" font-size="9" fill="#4a5b6d" text-anchor="middle">programmable robot</text><circle cx="356" cy="118" r="5.5" class="cmp-y"/><text x="356" y="100" font-size="11.5" fill="#0a4377" text-anchor="middle" font-weight="700">1961</text><text x="356" y="140" font-size="9" fill="#4a5b6d" text-anchor="middle">Unimate installed</text><text x="356" y="154" font-size="9" fill="#4a5b6d" text-anchor="middle">at GM &mdash; first</text><text x="356" y="168" font-size="9" fill="#4a5b6d" text-anchor="middle">industrial robot</text><circle cx="450" cy="118" r="5.5" class="cmp-y"/><text x="450" y="100" font-size="11.5" fill="#0a4377" text-anchor="middle" font-weight="700">1969</text><text x="450" y="140" font-size="9" fill="#4a5b6d" text-anchor="middle">Stanford Arm;</text><text x="450" y="154" font-size="9" fill="#4a5b6d" text-anchor="middle">first robots with</text><text x="450" y="168" font-size="9" fill="#4a5b6d" text-anchor="middle">vision and touch</text><circle cx="545" cy="118" r="5.5" class="cmp-y"/><text x="545" y="100" font-size="11.5" fill="#0a4377" text-anchor="middle" font-weight="700">1974</text><text x="545" y="140" font-size="9" fill="#4a5b6d" text-anchor="middle">FANUC and ASEA</text><text x="545" y="154" font-size="9" fill="#4a5b6d" text-anchor="middle">all-electric</text><text x="545" y="168" font-size="9" fill="#4a5b6d" text-anchor="middle">industrial robots</text><circle cx="638" cy="118" r="5.5" class="cmp-y"/><text x="638" y="100" font-size="11.5" fill="#0a4377" text-anchor="middle" font-weight="700">1986</text><text x="638" y="140" font-size="9" fill="#4a5b6d" text-anchor="middle">Honda begins</text><text x="638" y="154" font-size="9" fill="#4a5b6d" text-anchor="middle">humanoid work;</text><text x="638" y="168" font-size="9" fill="#4a5b6d" text-anchor="middle">robots go mobile</text><circle cx="732" cy="118" r="5.5" class="cmp-y"/><text x="732" y="100" font-size="11.5" fill="#0a4377" text-anchor="middle" font-weight="700">2000s</text><text x="732" y="140" font-size="9" fill="#4a5b6d" text-anchor="middle">ASIMO, Roomba,</text><text x="732" y="154" font-size="9" fill="#4a5b6d" text-anchor="middle">da Vinci surgical</text><text x="732" y="168" font-size="9" fill="#4a5b6d" text-anchor="middle">robot, cobots</text><circle cx="812" cy="118" r="5.5" class="cmp-y"/><text x="812" y="100" font-size="11.5" fill="#0a4377" text-anchor="middle" font-weight="700">Now</text><text x="812" y="140" font-size="9" fill="#4a5b6d" text-anchor="middle">AI, collaborative</text><text x="812" y="154" font-size="9" fill="#4a5b6d" text-anchor="middle">and swarm</text><text x="812" y="168" font-size="9" fill="#4a5b6d" text-anchor="middle">robots</text><text x="440" y="214" font-size="11" fill="#5b6b7c" text-anchor="middle">The word 'robot' comes from the Czech 'robota', meaning forced labour or drudgery.</text></svg></div><figcaption><b>Fig. 1:</b> Timeline of the development of robotics from 1920 to the present day.</figcaption></figure><h4>Ancient and early automata</h4><p>The idea of artificial beings is very old. Around 400 BC the Greek mathematician <b>Archytas of Tarentum</b> is said to have built a steam-propelled wooden pigeon. In the 3rd century BC, <b>Ctesibius</b> of Alexandria used water clocks and feedback to regulate the flow of water. In 1206 AD the Arab engineer <b>Al-Jazari</b> described a large number of programmable automata, including a musical robot band and programmable hand-washing devices, in his <i>Book of Knowledge of Ingenious Mechanical Devices</i>. In the 18th century the <b>Jaquet-Droz</b> father-and-son team in Switzerland built astonishing clockwork androids that could write, draw and play music, using stacked cams that acted as a stored program. <b>Leonardo da Vinci</b> had sketched a mechanical knight around 1495, and in 1801 <b>Joseph Marie Jacquard</b> invented the punched-card loom, which is the direct ancestor of computer programming.</p><h4>Twentieth century &mdash; from teleoperation to industry</h4><ul><li><b>1920</b> &mdash; Karel Capek's play <i>R.U.R.</i> introduces the word robot to the world.</li><li><b>1940s</b> &mdash; Isaac Asimov coins <i>robotics</i> and proposes the Three Laws. Meanwhile, real work begins on <b>remote manipulators</b> (teleoperators) for handling radioactive materials at Oak Ridge and Argonne National Laboratories in the USA. These had a master arm operated by a human and a slave arm that copied its movements exactly, but they had no memory and no program.</li><li><b>1954</b> &mdash; <b>George Devol</b> files a patent for a &ldquo;Programmed Article Transfer&rdquo; device, the first true programmable industrial robot.</li><li><b>1956</b> &mdash; Devol meets the engineer <b>Joseph Engelberger</b> at a party. Engelberger recognises the potential, and together they found <b>Unimation</b> (Universal Automation) in 1956. Engelberger is often called the <b>Father of Robotics</b>.</li><li><b>1961</b> &mdash; the first <b>Unimate</b> robot is installed at a General Motors plant in Trenton, New Jersey, to die-cast handling and spot welding of hot metal parts that were dangerous for humans. This is generally regarded as the birth of industrial robotics.</li><li><b>1966</b> &mdash; Unimate is used at General Motors for spot welding of car bodies, which becomes the single largest application of industrial robots for decades.</li><li><b>1967</b> &mdash; the first robot in Europe is installed at Sandvik, Sweden.</li><li><b>1969</b> &mdash; <b>Victor Scheinman</b> at Stanford University designs the <b>Stanford Arm</b>, an all-electric six-axis articulated arm. This configuration became the basis of nearly all modern industrial robots. In the same year, the <b>Shakey</b> robot at SRI International becomes the first mobile robot able to reason about its own actions.</li><li><b>1973</b> &mdash; KUKA builds the <b>Famulus</b>, the first robot with six electromechanically driven axes.</li><li><b>1974</b> &mdash; FANUC (Japan) develops the first robot controlled by a microprocessor, and ASEA (Sweden, later ABB) introduces the <b>IRB 6</b>, the first all-electric microprocessor-controlled industrial robot.</li><li><b>1978</b> &mdash; the <b>PUMA</b> (Programmable Universal Machine for Assembly) is developed by Unimation for General Motors, based on Scheinman's design. It becomes the most popular research and assembly robot of its era and the reference design for decades.</li><li><b>1979</b> &mdash; the <b>SCARA</b> (Selective Compliance Assembly Robot Arm) is developed at Yamanashi University in Japan by Makino and co-workers. Its rigidity in the vertical direction and compliance in the horizontal plane made it ideal for fast assembly, and it is still widely used.</li><li><b>1980s</b> &mdash; rapid growth in Japan and Europe; robots become standard in car manufacture. Honda begins its humanoid research in 1986 with the E0 walking robot.</li><li><b>1990s</b> &mdash; the Internet and better computers bring vision systems and off-line programming. The <b>Sojourner</b> rover explores Mars in 1997. Sony's <b>AIBO</b> robot dog appears in 1999.</li><li><b>2000</b> &mdash; Honda's <b>ASIMO</b> walks, runs and climbs stairs, becoming the public face of humanoid robotics. In 2002 <b>iRobot's Roomba</b> makes the first commercially successful domestic robot.</li><li><b>2000s&ndash;now</b> &mdash; collaborative robots (<b>cobots</b>) such as Universal Robots' UR5 work safely alongside humans without cages. Surgical robots (da Vinci) become routine. Drones, autonomous vehicles, warehouse robots and exoskeletons spread rapidly. Advances in machine learning, computer vision and large language models give robots the ability to perceive, plan and adapt rather than merely repeat.</li></ul><div class="note"><span class="tag">Note</span><p>India's robotics journey began with research at IITs, ISRO and CSIR laboratories. ISRO has used remote manipulators for handling rocket stages, and developed the <b>ROV</b> and the humanoid <b>Vyommitra</b> for the Gaganyaan human spaceflight programme. Indian industry now uses industrial robots extensively in automotive manufacturing, and a growing number of Indian companies design service and agricultural robots.</p></div><h3 id="sec3"><span class="sec-no">3.</span>Classification of Robots by Coordinate System (Geometry)</h3><p>Robots are classified by the shape of the space they can reach, called the <b>work envelope</b> or <b>workspace</b>. The work envelope is determined by the type of joints used and by their arrangement. A joint that slides produces a <b>prismatic (P)</b> axis giving linear motion; a joint that turns produces a <b>revolute (R)</b> axis giving angular motion. The combination of the first three axes (the <b>body-and-arm</b> configuration) defines the coordinate system.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 480" width="880" height="480" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Classification of robots by coordinate system &mdash; work envelopes</text><g><rect x="68" y="68" width="164" height="144" rx="4" class="t-box2"/><line x1="80" y1="180" x2="220" y2="180" class="lnk" stroke-width="1.4" stroke-dasharray="6 4"/><text x="228" y="184" font-size="11" fill="#0f5fa8" text-anchor="start" font-weight="700">X</text><line x1="80" y1="146" x2="220" y2="146" class="lnk" stroke-width="1.4" stroke-dasharray="6 4"/><text x="228" y="150" font-size="11" fill="#0f5fa8" text-anchor="start" font-weight="700">Y</text><line x1="80" y1="112" x2="220" y2="112" class="lnk" stroke-width="1.4" stroke-dasharray="6 4"/><text x="228" y="116" font-size="11" fill="#0f5fa8" text-anchor="start" font-weight="700">Z</text><rect x="120" y="120" width="60" height="26" rx="3" class="mech2"/><text x="150" y="110" font-size="9.5" fill="#5b6b7c" text-anchor="middle">3 prismatic joints</text></g><rect x="45" y="44" width="210" height="196" rx="8" class="t-box"/><g><rect x="68" y="68" width="164" height="144" rx="4" class="t-box2"/><line x1="80" y1="180" x2="220" y2="180" class="lnk" stroke-width="1.4" stroke-dasharray="6 4"/><text x="228" y="184" font-size="11" fill="#0f5fa8" text-anchor="start" font-weight="700">X</text><line x1="80" y1="146" x2="220" y2="146" class="lnk" stroke-width="1.4" stroke-dasharray="6 4"/><text x="228" y="150" font-size="11" fill="#0f5fa8" text-anchor="start" font-weight="700">Y</text><line x1="80" y1="112" x2="220" y2="112" class="lnk" stroke-width="1.4" stroke-dasharray="6 4"/><text x="228" y="116" font-size="11" fill="#0f5fa8" text-anchor="start" font-weight="700">Z</text><rect x="120" y="120" width="60" height="26" rx="3" class="mech2"/><text x="150" y="110" font-size="9.5" fill="#5b6b7c" text-anchor="middle">3 prismatic joints</text></g><text x="150" y="256" font-size="10.5" fill="#0a4377" text-anchor="middle" font-weight="600">Rectangular / Cartesian</text><text x="150" y="271" font-size="10.5" fill="#4a5b6d" text-anchor="middle" font-weight="400">(x, y, z) &mdash; 3 prismatic</text><g><path d="M 370 82 A 70 24 0 0 1 510 82 L 510 198 A 70 24 0 0 1 370 198 Z" class="t-box2"/><ellipse cx="440" cy="82" rx="70" ry="24" fill="none" stroke="#0f5fa8" stroke-width="1.6"/><ellipse cx="440" cy="198" rx="70" ry="24" fill="none" stroke="#0f5fa8" stroke-width="1.6"/><circle cx="440" cy="198" r="16" class="mech2"/><line x1="440" y1="198" x2="440" y2="120" class="cmp" stroke-width="6"/><text x="458" y="128" font-size="11" fill="#a8232a" text-anchor="start" font-weight="700">R</text><path d="M 480 180 A 46 46 0 0 0 456 148" class="lnk" marker-end="url(#ah)"/><text x="496" y="174" font-size="11" fill="#a8232a" text-anchor="start" font-weight="700">&#952;</text><polyline points="448,170 448,110" class="lnk" marker-end="url(#ah)"/><text x="456" y="224" font-size="11" fill="#a8232a" text-anchor="start" font-weight="700">Z</text></g><rect x="335" y="44" width="210" height="196" rx="8" class="t-box"/><g><path d="M 370 82 A 70 24 0 0 1 510 82 L 510 198 A 70 24 0 0 1 370 198 Z" class="t-box2"/><ellipse cx="440" cy="82" rx="70" ry="24" fill="none" stroke="#0f5fa8" stroke-width="1.6"/><ellipse cx="440" cy="198" rx="70" ry="24" fill="none" stroke="#0f5fa8" stroke-width="1.6"/><circle cx="440" cy="198" r="16" class="mech2"/><line x1="440" y1="198" x2="440" y2="120" class="cmp" stroke-width="6"/><text x="458" y="128" font-size="11" fill="#a8232a" text-anchor="start" font-weight="700">R</text><path d="M 480 180 A 46 46 0 0 0 456 148" class="lnk" marker-end="url(#ah)"/><text x="496" y="174" font-size="11" fill="#a8232a" text-anchor="start" font-weight="700">&#952;</text><polyline points="448,170 448,110" class="lnk" marker-end="url(#ah)"/><text x="456" y="224" font-size="11" fill="#a8232a" text-anchor="start" font-weight="700">Z</text></g><text x="440" y="256" font-size="10.5" fill="#0a4377" text-anchor="middle" font-weight="600">Cylindrical</text><text x="440" y="271" font-size="10.5" fill="#4a5b6d" text-anchor="middle" font-weight="400">(&#952;, r, z)</text><g><path d="M 656 192 A 84 84 0 0 1 770 70 L 730 192 Z" class="t-box2"/><circle cx="730" cy="192" r="14" class="mech2"/><line x1="730" y1="192" x2="750" y2="106" class="cmp" stroke-width="6"/><path d="M 788 174 A 76 76 0 0 0 760 134" class="lnk" marker-end="url(#ah)"/><text x="808" y="166" font-size="12" fill="#a8232a" text-anchor="start" font-weight="700">&#966;</text><text x="760" y="94" font-size="11" fill="#a8232a" text-anchor="middle" font-weight="700">R</text><text x="686" y="120" font-size="11" fill="#a8232a" text-anchor="middle" font-weight="700">&#952;</text></g><rect x="625" y="44" width="210" height="196" rx="8" class="t-box"/><g><path d="M 656 192 A 84 84 0 0 1 770 70 L 730 192 Z" class="t-box2"/><circle cx="730" cy="192" r="14" class="mech2"/><line x1="730" y1="192" x2="750" y2="106" class="cmp" stroke-width="6"/><path d="M 788 174 A 76 76 0 0 0 760 134" class="lnk" marker-end="url(#ah)"/><text x="808" y="166" font-size="12" fill="#a8232a" text-anchor="start" font-weight="700">&#966;</text><text x="760" y="94" font-size="11" fill="#a8232a" text-anchor="middle" font-weight="700">R</text><text x="686" y="120" font-size="11" fill="#a8232a" text-anchor="middle" font-weight="700">&#952;</text></g><text x="730" y="256" font-size="10.5" fill="#0a4377" text-anchor="middle" font-weight="600">Spherical / polar</text><text x="730" y="271" font-size="10.5" fill="#4a5b6d" text-anchor="middle" font-weight="400">(&#952;, &#966;, r)</text><g><rect x="80" y="380" width="140" height="20" rx="3" class="mech"/><line x1="120" y1="380" x2="120" y2="300" class="cmp" stroke-width="8"/><line x1="120" y1="300" x2="176" y2="326" class="cmp" stroke-width="7"/><line x1="176" y1="326" x2="208" y2="344" class="cmp" stroke-width="6"/><line x1="208" y1="344" x2="208" y2="374" class="cmp" stroke-width="5"/><circle cx="120" cy="300" r="9" class="cmp-f"/><circle cx="176" cy="326" r="8" class="cmp-f"/><circle cx="208" cy="344" r="7" class="cmp-f"/><text x="220" y="362" font-size="10" fill="#a8232a" text-anchor="start">Z (vertical only)</text><path d="M 142 310 A 30 30 0 0 0 136 282" class="lnk" marker-end="url(#ah)"/></g><rect x="45" y="244" width="210" height="196" rx="8" class="t-box"/><g><rect x="80" y="380" width="140" height="20" rx="3" class="mech"/><line x1="120" y1="380" x2="120" y2="300" class="cmp" stroke-width="8"/><line x1="120" y1="300" x2="176" y2="326" class="cmp" stroke-width="7"/><line x1="176" y1="326" x2="208" y2="344" class="cmp" stroke-width="6"/><line x1="208" y1="344" x2="208" y2="374" class="cmp" stroke-width="5"/><circle cx="120" cy="300" r="9" class="cmp-f"/><circle cx="176" cy="326" r="8" class="cmp-f"/><circle cx="208" cy="344" r="7" class="cmp-f"/><text x="220" y="362" font-size="10" fill="#a8232a" text-anchor="start">Z (vertical only)</text><path d="M 142 310 A 30 30 0 0 0 136 282" class="lnk" marker-end="url(#ah)"/></g><text x="150" y="456" font-size="10.5" fill="#0a4377" text-anchor="middle" font-weight="600">SCARA</text><text x="150" y="471" font-size="10.5" fill="#4a5b6d" text-anchor="middle" font-weight="400">(&#952;, &#952;, z)</text><g><rect x="400" y="384" width="80" height="18" rx="3" class="mech"/><line x1="440" y1="384" x2="450.8114079225235" y2="333.1363247618421" class="cmp" stroke-width="9"/><line x1="450.8114079225235" y1="333.1363247618421" x2="495.9166537202471" y2="316.71935788221003" class="cmp" stroke-width="7"/><line x1="495.9166537202471" y1="316.71935788221003" x2="509.07235041124983" y2="311.93107587565066" class="cmp" stroke-width="4"/><circle cx="509.07235041124983" cy="311.93107587565066" r="8" class="t-box3"/><circle cx="440" cy="384" r="14" class="mech"/><circle cx="450.8114079225235" cy="333.1363247618421" r="10" class="cmp-f"/><circle cx="495.9166537202471" cy="316.71935788221003" r="8" class="cmp-f"/></g><rect x="335" y="244" width="210" height="196" rx="8" class="t-box"/><g><rect x="400" y="384" width="80" height="18" rx="3" class="mech"/><line x1="440" y1="384" x2="450.8114079225235" y2="333.1363247618421" class="cmp" stroke-width="9"/><line x1="450.8114079225235" y1="333.1363247618421" x2="495.9166537202471" y2="316.71935788221003" class="cmp" stroke-width="7"/><line x1="495.9166537202471" y1="316.71935788221003" x2="509.07235041124983" y2="311.93107587565066" class="cmp" stroke-width="4"/><circle cx="509.07235041124983" cy="311.93107587565066" r="8" class="t-box3"/><circle cx="440" cy="384" r="14" class="mech"/><circle cx="450.8114079225235" cy="333.1363247618421" r="10" class="cmp-f"/><circle cx="495.9166537202471" cy="316.71935788221003" r="8" class="cmp-f"/></g><text x="440" y="456" font-size="10.5" fill="#0a4377" text-anchor="middle" font-weight="600">Articulated / revolute</text><text x="440" y="471" font-size="10.5" fill="#4a5b6d" text-anchor="middle" font-weight="400">(&#952;, &#952;, &#952;)</text><g><ellipse cx="730" cy="288" rx="72" ry="20" class="mech"/><line x1="684" y1="288" x2="713.9" y2="334" class="cmp" stroke-width="4"/><line x1="713.9" y1="334" x2="730" y2="368" class="cmp" stroke-width="3"/><circle cx="684" cy="288" r="6" class="cmp-f"/><line x1="730" y1="288" x2="730.0" y2="334" class="cmp" stroke-width="4"/><line x1="730.0" y1="334" x2="730" y2="368" class="cmp" stroke-width="3"/><circle cx="730" cy="288" r="6" class="cmp-f"/><line x1="776" y1="288" x2="746.1" y2="334" class="cmp" stroke-width="4"/><line x1="746.1" y1="334" x2="730" y2="368" class="cmp" stroke-width="3"/><circle cx="776" cy="288" r="6" class="cmp-f"/><circle cx="730" cy="368" r="9" class="t-box3"/><path d="M 674 396 A 62 40 0 0 0 786 396" class="lnk-d"/></g><rect x="625" y="244" width="210" height="196" rx="8" class="t-box"/><g><ellipse cx="730" cy="288" rx="72" ry="20" class="mech"/><line x1="684" y1="288" x2="713.9" y2="334" class="cmp" stroke-width="4"/><line x1="713.9" y1="334" x2="730" y2="368" class="cmp" stroke-width="3"/><circle cx="684" cy="288" r="6" class="cmp-f"/><line x1="730" y1="288" x2="730.0" y2="334" class="cmp" stroke-width="4"/><line x1="730.0" y1="334" x2="730" y2="368" class="cmp" stroke-width="3"/><circle cx="730" cy="288" r="6" class="cmp-f"/><line x1="776" y1="288" x2="746.1" y2="334" class="cmp" stroke-width="4"/><line x1="746.1" y1="334" x2="730" y2="368" class="cmp" stroke-width="3"/><circle cx="776" cy="288" r="6" class="cmp-f"/><circle cx="730" cy="368" r="9" class="t-box3"/><path d="M 674 396 A 62 40 0 0 0 786 396" class="lnk-d"/></g><text x="730" y="456" font-size="10.5" fill="#0a4377" text-anchor="middle" font-weight="600">Delta (parallel)</text><text x="730" y="471" font-size="10.5" fill="#4a5b6d" text-anchor="middle" font-weight="400">(&#952;, &#952;, &#952;)</text></svg></div><figcaption><b>Fig. 2:</b> Work envelopes of the six main robot configurations: Cartesian, cylindrical, spherical, SCARA, articulated and delta.</figcaption></figure><h4>1. Rectangular / Cartesian / Gantry robot (PPP)</h4><p>All three body axes are <b>prismatic</b>, so the arm moves in three linear directions X, Y and Z, all at right angles to each other. This is exactly the coordinate system used in mathematics and in a CNC milling machine.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 240" width="880" height="240" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Cartesian (gantry) robot &mdash; three linear axes at right angles</text><line x1="120" y1="200" x2="700" y2="200" class="cmp" stroke-width="4"/><line x1="120" y1="200" x2="120" y2="60" class="cmp" stroke-width="4"/><line x1="700" y1="200" x2="700" y2="60" class="cmp" stroke-width="4"/><line x1="120" y1="60" x2="700" y2="60" class="cmp" stroke-width="4"/><line x1="120" y1="100" x2="700" y2="100" class="cmp" stroke-width="3"/><rect x="300" y="88" width="90" height="24" rx="3" class="mech2"/><text x="345" y="104" font-size="10" fill="#12283d" text-anchor="middle" font-weight="700">Y carriage</text><line x1="345" y1="112" x2="345" y2="150" class="cmp" stroke-width="5"/><rect x="330" y="150" width="32" height="26" rx="3" class="mech2"/><text x="346" y="167" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="700">Z</text><rect x="336" y="176" width="20" height="16" rx="2" class="t-box3"/><polyline points="180,100 280,100" class="lnk" marker-end="url(#ah)"/><text x="230" y="88" font-size="11" fill="#a8232a" text-anchor="middle" font-weight="700">X axis</text><polyline points="410,100 470,76" class="lnk" marker-end="url(#ah)"/><text x="480" y="74" font-size="11" fill="#a8232a" text-anchor="start" font-weight="700">Y axis</text><polyline points="360,150 360,128" class="lnk" marker-end="url(#ah)"/><text x="374" y="140" font-size="11" fill="#a8232a" text-anchor="start" font-weight="700">Z axis</text><text x="410" y="226" font-size="11" fill="#5b6b7c" text-anchor="middle">Used in CNC machines, 3D printers, pick-and-place gantries and coordinate measuring machines</text></svg></div><figcaption><b>Fig. 3:</b> A Cartesian (gantry) robot: three linear slides arranged at right angles.</figcaption></figure><ul><li><b>Work envelope:</b> a rectangular box.</li><li><b>Advantages:</b> simplest to understand and to program because the coordinates are directly linear; very rigid and accurate; the accuracy does not depend on the position within the workspace; large payloads are possible; easy to visualise the motion.</li><li><b>Disadvantages:</b> occupies a large floor area; the linear slides need seals and protection from dust; cannot reach around obstacles; relatively slow; the moving gantry has large inertia.</li><li><b>Applications:</b> CNC machine tools, 3D printers, coordinate measuring machines (CMM), gantry-type pick and place, dispensing, large-scale cutting and welding of flat plates, palletising in a rectangular area.</li></ul><h4>2. Cylindrical robot (RPP)</h4><p>The first axis is a <b>revolute</b> joint at the base that rotates the whole arm about a vertical axis; the second is a <b>prismatic</b> joint that extends and retracts the arm radially; the third is a <b>prismatic</b> joint that moves the arm up and down vertically. Position is described by the cylindrical coordinates (&#952;, r, z).</p><ul><li><b>Work envelope:</b> a hollow cylinder (a portion of a cylinder, usually about 300&deg;).</li><li><b>Advantages:</b> good reach and rigidity; simple control; the vertical and radial motions are independent; suitable for machine loading.</li><li><b>Disadvantages:</b> the radial slide needs protection from dust and chips; cannot reach above itself or behind the base; less flexible than an articulated arm; the wrist is usually limited.</li><li><b>Applications:</b> loading and unloading of machine tools, die casting machines and injection moulding machines; assembly; handling of cylindrical workpieces; spot welding in confined spaces. Examples: Versatran, Cincinnati Milacron T3.</li></ul><h4>3. Spherical / Polar robot (RRP)</h4><p>Two revolute joints at the base (one for rotation about the vertical axis and one for elevation, like the shoulder) plus one prismatic joint for the radial extension. Position is described by the spherical coordinates (&#952;, &#966;, r). The arm works like a turret of a tank or a radar antenna.</p><ul><li><b>Work envelope:</b> a portion of a hollow sphere.</li><li><b>Advantages:</b> the largest work volume for a given arm length; can reach above and around obstacles; good for long reach.</li><li><b>Disadvantages:</b> the control mathematics is more complex; accuracy decreases towards the outer edge of the sphere because a small angular error produces a large linear error at a long radius; the sliding member needs protection.</li><li><b>Applications:</b> spot welding, die casting, machine loading, and historically in the Unimate. Now largely replaced by articulated robots, but the configuration survives in radar antennas, telescope mounts and camera cranes.</li></ul><h4>4. SCARA robot (RRP with a vertical prismatic joint)</h4><p>SCARA stands for <b>Selective Compliance Assembly Robot Arm</b>. It has two parallel revolute joints working in the horizontal plane (like a human arm's shoulder and elbow) and one prismatic joint moving vertically. The structure is very rigid in the vertical direction, which is what is needed to press a part in, but <b>compliant</b> in the horizontal plane, which allows a peg to be guided into a hole even if the alignment is slightly wrong. This selective compliance is the origin of the name.</p><ul><li><b>Work envelope:</b> a cylinder with a characteristic kidney-shaped inner dead zone.</li><li><b>Advantages:</b> very fast in the horizontal plane; excellent repeatability (often better than &plusmn;0.02 mm); high rigidity in the vertical direction; good for assembly; relatively cheap; clean because there are no exposed slides.</li><li><b>Disadvantages:</b> limited to about 4 axes plus a wrist; cannot reach all round itself; the payload is limited; not suitable for heavy or long-reach work.</li><li><b>Applications:</b> high-speed assembly of electronic components, insertion of pins and connectors, screwdriving, pick and place, dispensing, labelling, packaging. Extremely common in the electronics industry.</li></ul><h4>5. Articulated / Revolute / Anthropomorphic robot (RRR)</h4><p>This is the configuration most like a human arm: a rotating base (waist), a shoulder joint and an elbow joint, all revolute, plus usually a three-axis wrist, giving six axes in total. The word <b>anthropomorphic</b> means human-like.</p><ul><li><b>Work envelope:</b> a complex, roughly spherical shape with a hollow centre.</li><li><b>Advantages:</b> the most flexible configuration; the largest usable work volume relative to the floor space it occupies; can reach around and over obstacles and into confined spaces; the most general-purpose, so the same robot can be reprogrammed for many different tasks; well suited to a wrist with three axes.</li><li><b>Disadvantages:</b> the most difficult to program and to control because the kinematics are non-linear; accuracy varies across the workspace and is worst at full reach; the structure is less rigid than a Cartesian one; costlier.</li><li><b>Applications:</b> the most widely used industrial robot type. Arc welding, spot welding, spray painting, assembly, machine loading, material handling, palletising, deburring, grinding, sealing and dispensing. Examples: FANUC, ABB IRB, KUKA KR, Yaskawa Motoman, Kawasaki, Nachi.</li></ul><h4>6. Parallel / Delta robot</h4><p>A newer configuration in which three (or more) arms connect a fixed base to a single moving platform, all in parallel. Because the motors are mounted on the fixed base, the moving parts are very light, so the accelerations are enormous. The most common form is the <b>Delta</b> robot, invented by Reymond Clavel at EPFL in 1985, which uses three parallel pantograph arms.</p><ul><li><b>Work envelope:</b> an inverted cone or dome.</li><li><b>Advantages:</b> extremely high speed (up to 5 m/s and 10 picks per second); very high accuracy and rigidity because the errors of the three arms average out; the motors are on the base, so the moving inertia is tiny.</li><li><b>Disadvantages:</b> small work volume; limited payload (usually under 8 kg); the inverse kinematics is complex; not flexible for general tasks.</li><li><b>Applications:</b> high-speed pick and place of food items, chocolates, biscuits, pharmaceutical blisters and electronic components; packaging lines; flight simulators (Stewart platform); precision machining and 3D printing.</li></ul><div class="tbl-scroll"><table><caption>Table 18.1 &mdash; Robot configurations compared</caption><thead><tr><th>Configuration</th><th>Axis notation</th><th>Work envelope</th><th>Main advantage</th><th>Main limitation</th><th>Typical use</th></tr></thead><tbody><tr><td>Cartesian / gantry</td><td>PPP</td><td>Rectangular box</td><td>Very rigid and accurate; easy to program</td><td>Large floor area; cannot reach around obstacles</td><td>CNC, 3D printing, CMM</td></tr><tr><td>Cylindrical</td><td>RPP</td><td>Hollow cylinder</td><td>Good reach and rigidity</td><td>Cannot reach above itself</td><td>Machine loading, die casting</td></tr><tr><td>Spherical / polar</td><td>RRP</td><td>Part of a hollow sphere</td><td>Large volume for a given length</td><td>Accuracy poor at full reach</td><td>Spot welding, handling</td></tr><tr><td>SCARA</td><td>RRP (horizontal)</td><td>Cylinder with kidney dead zone</td><td>Very fast; excellent repeatability</td><td>Limited axes and payload</td><td>Electronics assembly, pick and place</td></tr><tr><td>Articulated (6-axis)</td><td>RRR</td><td>Complex spherical</td><td>Most flexible; largest useful volume</td><td>Hardest to control; accuracy varies</td><td>Welding, painting, assembly, handling</td></tr><tr><td>Delta / parallel</td><td>RRR (parallel)</td><td>Inverted cone</td><td>Extremely high speed</td><td>Small volume; light payload</td><td>High-speed food and pharma packaging</td></tr><tr><td>6-axis articulated + wrist</td><td>RRR + RRR</td><td>Spherical with orientation freedom</td><td>Any position and any orientation</td><td>Complex and costly</td><td>General industry, robots in cells</td></tr></tbody></table></div><h3 id="sec4"><span class="sec-no">4.</span>Other Ways of Classifying Robots</h3><ul><li><b>By number of axes:</b> 2-axis, 3-axis, 4-axis (SCARA), 5-axis, 6-axis (the standard industrial robot) and 7-axis or more (redundant, used to reach around obstacles).</li><li><b>By drive type:</b> electric (the most common, using DC, BLDC, stepper or AC servo motors), hydraulic (very high force and speed, used for heavy loads and in hazardous areas), and pneumatic (cheap and fast but inaccurate, used for simple pick and place).</li><li><b>By control method:</b> manual, limited-sequence, point-to-point, continuous path, playback, numerical control and intelligent (covered in Topic 19).</li><li><b>By mobility:</b> fixed-base (stationary) or mobile (wheeled, tracked, legged, flying, underwater).</li><li><b>By mounting:</b> floor mounted, wall mounted, inverted (ceiling) mounted, or rail mounted.</li><li><b>By application:</b> industrial, service, medical, military, domestic, space, underwater and educational.</li><li><b>By generation:</b> first generation (playback, no sensors), second generation (with sensors and off-line programming), third generation (with machine intelligence and autonomy).</li><li><b>By power:</b> battery powered, mains powered or tethered.</li></ul><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A robot is a reprogrammable, multifunctional manipulator that moves material, parts or tools through variable programmed motions (RIA definition).</li><li>The word 'robot' was introduced by Karel Capek in 1920 and 'robotics' by Isaac Asimov in 1942.</li><li>George Devol patented the first programmable robot in 1954; with Joseph Engelberger he founded Unimation, and the first Unimate was installed at General Motors in 1961.</li><li>The Stanford Arm (1969), the PUMA (1978) and the SCARA (1979) established the configurations still used today.</li><li>Modern developments include cobots, surgical robots, domestic robots, drones, humanoid robots and the use of artificial intelligence.</li><li>Robots are classified by coordinate system: Cartesian (PPP), cylindrical (RPP), spherical (RRP), SCARA, articulated (RRR) and parallel/Delta.</li><li>The work envelope is a box, a cylinder, part of a sphere, a cylinder with a kidney dead zone, a complex spherical shape, and an inverted cone respectively.</li><li>Articulated robots are the most flexible and the most widely used; Cartesian robots are the most rigid and accurate; SCARA is fastest for vertical assembly; Delta is fastest for light pick and place.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Define a robot according to the Robot Institute of America and according to ISO 8373.</li><li>What is the origin of the words 'robot' and 'robotics'? State Asimov's Three Laws.</li><li>Describe briefly the historical development of robotics, mentioning any eight milestones.</li><li>Who were George Devol, Joseph Engelberger and Victor Scheinman, and what did each contribute?</li><li>What is meant by the work envelope of a robot?</li><li>Classify robots by coordinate system and describe the work envelope of each type.</li><li>Compare Cartesian, cylindrical and spherical robots on the basis of axes, envelope, advantage and application.</li><li>What does SCARA stand for? Explain the idea of selective compliance and list the applications.</li><li>Why is the articulated robot the most widely used configuration despite being the most difficult to control?</li><li>Describe the Delta (parallel) robot and explain why it is so fast.</li><li>List any six other bases on which robots can be classified.</li></ol></div><div class="pager"><a class="prev" href="17-examples-room-heating-water-level-washing-machine.html"><span class="dir">&larr; Previous topic</span><span class="ttl">17. Examples of Mechatronic Systems &mdash; Room Heating, Water Level Control and Washing Machine</span></a><a class="next" href="19-classification-control-method-major-components.html"><span class="dir">Next topic &rarr;</span><span class="ttl">19. Classification by Control Method and Major Components of a Robot</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

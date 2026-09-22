@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kinematic Chains &mdash; The Manipulator | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="How the geometry of a robot arm is described mathematically: links, joints, open and closed chains, the Denavit-Hartenberg convention, forward and inv">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit IV &middot; Topic 28 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit IV &rsaquo; Topic 28</nav><div class="unit-tag">Unit IV</div><h2 class="page-title"><span class="topic-no">28</span>Kinematic Chains &mdash; The Manipulator</h2><p class="lede">How the geometry of a robot arm is described mathematically: links, joints, open and closed chains, the Denavit-Hartenberg convention, forward and inverse kinematics, workspace and singularities.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">The Manipulator as a Kinematic Chain</a></li><li><a href="#sec2">The Denavit-Hartenberg (DH) Convention</a></li><li><a href="#sec3">Forward and Inverse Kinematics</a></li><li><a href="#sec4">Workspace, Dexterity and Singularities</a></li><li><a href="#sec5">Worked Example &mdash; Forward Kinematics of a Two-Link Planar Arm</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>The Manipulator as a Kinematic Chain</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>manipulator</b> is an open-loop kinematic chain of rigid links connected by joints, one end of which is fixed to the base and the other end of which carries the end effector. Because the chain is <b>open</b>, the position of the end effector depends on the angles (or extensions) of all the joints before it, and there is no closed loop of constraints.</p></div><p>Each joint provides one degree of freedom, so the number of joints equals the number of degrees of freedom of the arm. Six degrees of freedom are needed to place and orient a rigid body arbitrarily in space: three for position (x, y, z) and three for orientation (roll, pitch, yaw). A robot with exactly six axes can therefore reach any position and orientation within its workspace. A robot with <b>more than six</b> axes is called <b>redundant</b>; the extra freedom can be used to avoid obstacles, to avoid singularities or to keep the elbow away from the work. A robot with <b>fewer than six</b> axes cannot orient the tool arbitrarily, which is acceptable for tasks such as pick-and-place and palletising.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 330" width="880" height="330" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Kinematic chain of a 6-axis articulated manipulator</text><rect x="120" y="270" width="110" height="24" rx="2" class="hatch"/><circle cx="170" cy="262" r="22" class="mech"/><circle cx="170" cy="262" r="7" class="cmp-f"/><path d="M 196 250 A 30 30 0 0 1 200 274" class="lnk" marker-end="url(#ah)"/><text x="216" y="262" font-size="11" fill="#a8232a" text-anchor="start">&#952;1 (waist, Z1)</text><rect x="156" y="170" width="28" height="96" rx="6" class="mech2"/><circle cx="170" cy="170" r="16" class="cmp-f"/><text x="120" y="210" font-size="11" fill="#0f5fa8" text-anchor="end">link 1</text><text x="118" y="168" font-size="11" fill="#a8232a" text-anchor="end">&#952;2 (shoulder)</text><line x1="170" y1="170" x2="276.48976575756893" y2="95.43506327436401" class="cmp" stroke-width="16"/><circle cx="276.48976575756893" cy="95.43506327436401" r="13" class="cmp-f"/><text x="250" y="100" font-size="11" fill="#0f5fa8" text-anchor="middle">link 2 (a2)</text><text x="282.48976575756893" y="75.43506327436401" font-size="11" fill="#a8232a" text-anchor="start">&#952;3 (elbow)</text><line x1="276.48976575756893" y1="95.43506327436401" x2="371.6520833964172" y2="139.80998075713745" class="cmp" stroke-width="11"/><circle cx="371.6520833964172" cy="139.80998075713745" r="11" class="cmp-f"/><text x="367.6520833964172" y="121.80998075713745" font-size="11" fill="#157a4b" text-anchor="end">&#952;4 (wrist pitch)</text><line x1="371.6520833964172" y1="139.80998075713745" x2="401.4780580866716" y2="182.405887060165" class="cmp" stroke-width="8"/><circle cx="401.4780580866716" cy="182.405887060165" r="9" class="cmp-f"/><text x="413.4780580866716" y="176.405887060165" font-size="11" fill="#157a4b" text-anchor="start">&#952;5 (wrist yaw)</text><line x1="401.4780580866716" y1="182.405887060165" x2="439.0657629181079" y2="196.08669279319176" class="cmp" stroke-width="7"/><circle cx="439.0657629181079" cy="196.08669279319176" r="8" class="cmp-f"/><text x="447.0657629181079" y="218.08669279319176" font-size="11" fill="#157a4b" text-anchor="start">&#952;6 (tool roll)</text><line x1="439.0657629181079" y1="196.08669279319176" x2="471.0153120248288" y2="207.7153776662645" class="cmp" stroke-width="5"/><rect x="457.0153120248288" y="195.7153776662645" width="30" height="22" rx="4" class="t-box3"/><text x="511.0153120248288" y="201.7153776662645" font-size="11" fill="#e07b00" text-anchor="start">end effector</text><text x="511.0153120248288" y="219.7153776662645" font-size="10" fill="#5b6b7c" text-anchor="start">TCP (tool centre point)</text><path d="M 124 154 L 114 154 L 114 125.43506327436401 L 124 125.43506327436401" class="lnk" stroke-width="1.3"/><text x="110" y="250" font-size="11.5" fill="#0a4377" text-anchor="end" font-weight="700">ARM</text><text x="470" y="190" font-size="11.5" fill="#157a4b" text-anchor="middle" font-weight="700">WRIST</text><rect x="520" y="55" width="330" height="240" rx="8" class="t-box2"/><text x="685" y="82" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">Denavit-Hartenberg parameters</text><rect x="540" y="96" width="44" height="24" rx="4" class="t-box3"/><text x="562" y="112" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">a i</text><text x="596" y="109" font-size="10" fill="#12283d" text-anchor="start">link length &mdash; distance along X i from Z i to Z i+1</text><rect x="540" y="128" width="44" height="24" rx="4" class="t-box3"/><text x="562" y="144" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">&#945; i</text><text x="596" y="141" font-size="10" fill="#12283d" text-anchor="start">link twist &mdash; angle about X i from Z i to Z i+1</text><rect x="540" y="160" width="44" height="24" rx="4" class="t-box3"/><text x="562" y="176" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">d i</text><text x="596" y="173" font-size="10" fill="#12283d" text-anchor="start">link offset &mdash; distance along Z i from X i-1 to X i</text><rect x="540" y="192" width="44" height="24" rx="4" class="t-box3"/><text x="562" y="208" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">&#952; i</text><text x="596" y="205" font-size="10" fill="#12283d" text-anchor="start">joint angle &mdash; angle about Z i from X i-1 to X i</text><text x="685" y="254" font-size="10.5" fill="#5b6b7c" text-anchor="middle">Four parameters per link fully define the geometry</text><text x="685" y="272" font-size="10.5" fill="#5b6b7c" text-anchor="middle">&#952; is the variable for a revolute joint;</text><text x="685" y="288" font-size="10.5" fill="#5b6b7c" text-anchor="middle">d is the variable for a prismatic joint.</text></svg></div><figcaption><b>Fig. 1:</b> Kinematic chain of a six-axis articulated manipulator, showing the joints, the links and the Denavit-Hartenberg parameters that describe each link.</figcaption></figure><h4>Terminology</h4><ul><li><b>Link</b> &mdash; a rigid body between two joints. Links are numbered 0 (the base) to n (the last link carrying the tool).</li><li><b>Joint</b> &mdash; the connection between two links. <b>Revolute (R)</b> joints rotate; <b>prismatic (P)</b> joints slide. These are <b>lower pairs</b> with one degree of freedom each.</li><li><b>Joint variable</b> &mdash; the quantity that changes: &#952; for a revolute joint and d for a prismatic joint.</li><li><b>Arm</b> &mdash; the first three joints, which position the wrist centre in space.</li><li><b>Wrist</b> &mdash; the last three joints, which orient the tool. A <b>spherical wrist</b> has its three axes intersecting at one point, which decouples position from orientation and greatly simplifies the inverse kinematics.</li><li><b>Tool Centre Point (TCP)</b> &mdash; the point on the tool whose position and orientation are controlled, for example the tip of a welding electrode or the centre of a gripper.</li><li><b>Base frame</b> &mdash; the fixed coordinate system attached to the robot base.</li><li><b>Workspace</b> &mdash; the volume that the TCP can reach.</li><li><b>Pose</b> &mdash; the position and orientation of the TCP, described by six numbers.</li></ul><h4>Open and closed chains</h4><p>Most industrial robots are <b>open (serial) chains</b>. <b>Closed (parallel) chains</b> connect the moving platform to the base by several independent limbs &mdash; the Delta robot and the Stewart platform are examples. Closed chains are much stiffer and more accurate because the errors of the limbs average out and because the motors can be mounted on the fixed base, but their workspace is small and their kinematics are far more complex. <b>Hybrid</b> (or tree) structures combine both, as in a dual-arm robot on a mobile base.</p><div class="tbl-scroll"><table><caption>Table 28.1 &mdash; Serial and parallel manipulators compared</caption><thead><tr><th>Feature</th><th>Serial (open chain)</th><th>Parallel (closed chain)</th></tr></thead><tbody><tr><td>Stiffness</td><td>Low &mdash; errors accumulate along the chain</td><td>High &mdash; errors average out</td></tr><tr><td>Accuracy</td><td>Moderate</td><td>High</td></tr><tr><td>Workspace</td><td>Large</td><td>Small, and often of an awkward shape</td></tr><tr><td>Moving mass</td><td>High &mdash; motors are on the moving links</td><td>Low &mdash; motors are on the fixed base</td></tr><tr><td>Speed and acceleration</td><td>Moderate</td><td>Very high</td></tr><tr><td>Degrees of freedom</td><td>Equal to the number of joints</td><td>Usually 6 (or 3) with 6 limbs</td></tr><tr><td>Kinematics</td><td>Forward easy, inverse hard</td><td>Forward hard, inverse easy</td></tr><tr><td>Singularity problems</td><td>At the workspace boundary</td><td>Also inside the workspace</td></tr><tr><td>Cost and complexity</td><td>Lower</td><td>Higher</td></tr><tr><td>Examples</td><td>Articulated, SCARA, Cartesian arms</td><td>Delta, Stewart platform, hexapod</td></tr></tbody></table></div><h3 id="sec2"><span class="sec-no">2.</span>The Denavit-Hartenberg (DH) Convention</h3><p>To calculate where the tool is, the position and orientation of every link must be described mathematically. The <b>Denavit-Hartenberg convention</b>, proposed in 1955, does this with just <b>four numbers per link</b>. A coordinate frame is attached to every link according to a fixed set of rules, and the transformation from one frame to the next is then completely described by four parameters.</p><h4>Rules for assigning the frames</h4><ol><li>The <b>Z axis</b> of frame i is placed along the axis of joint i+1 (the axis of motion of the joint).</li><li>The <b>origin</b> of frame i is placed where the common normal between Z<sub>i-1</sub> and Z<sub>i</sub> meets Z<sub>i</sub>. If the axes intersect, the origin is at the intersection. If they are parallel, the origin is chosen conveniently.</li><li>The <b>X axis</b> of frame i lies along the common normal, pointing from Z<sub>i-1</sub> towards Z<sub>i</sub>. If the axes intersect, X is chosen perpendicular to the plane containing both.</li><li>The <b>Y axis</b> completes a right-handed coordinate system: Y = Z &times; X.</li><li>Frame 0 is fixed to the base and frame n is fixed to the tool.</li></ol><h4>The four DH parameters</h4><div class="tbl-scroll"><table><caption>Table 28.2 &mdash; Denavit-Hartenberg parameters</caption><thead><tr><th>Symbol</th><th>Name</th><th>Definition</th><th>Joint variable?</th></tr></thead><tbody><tr><td>&#952;<sub>i</sub></td><td>Joint angle</td><td>Angle measured about Z<sub>i-1</sub> from X<sub>i-1</sub> to X<sub>i</sub></td><td>Yes, for a revolute joint</td></tr><tr><td>d<sub>i</sub></td><td>Link offset</td><td>Distance measured along Z<sub>i-1</sub> from X<sub>i-1</sub> to X<sub>i</sub></td><td>Yes, for a prismatic joint</td></tr><tr><td>a<sub>i</sub></td><td>Link length</td><td>Distance measured along X<sub>i</sub> from Z<sub>i-1</sub> to Z<sub>i</sub></td><td>No &mdash; fixed by the geometry</td></tr><tr><td>&#945;<sub>i</sub></td><td>Link twist</td><td>Angle measured about X<sub>i</sub> from Z<sub>i-1</sub> to Z<sub>i</sub></td><td>No &mdash; fixed by the geometry</td></tr></tbody></table></div><h4>The link transformation matrix</h4><p>The transformation from frame i&minus;1 to frame i is obtained by four simple motions performed in a fixed order: rotate about Z by &#952;, translate along Z by d, translate along X by a, and rotate about X by &#945;.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 240" width="880" height="240" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Homogeneous transformation and forward kinematics</text><rect x="60" y="55" width="340" height="150" rx="8" class="t-box2"/><text x="230" y="84" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">4 &times; 4 homogeneous transform</text><line x1="88" y1="102" x2="88" y2="186" class="cmp" stroke-width="1.6"/><line x1="364" y1="102" x2="364" y2="186" class="cmp" stroke-width="1.6"/><text x="130" y="120" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">c&#952;</text><text x="196" y="120" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">&minus;s&#952; c&#945;</text><text x="262" y="120" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">s&#952; s&#945;</text><text x="328" y="120" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">a c&#952;</text><text x="130" y="141" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">s&#952;</text><text x="196" y="141" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">c&#952; c&#945;</text><text x="262" y="141" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">&minus;c&#952; s&#945;</text><text x="328" y="141" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">a s&#952;</text><text x="130" y="162" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">0</text><text x="196" y="162" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">s&#945;</text><text x="262" y="162" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">c&#945;</text><text x="328" y="162" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">d</text><text x="130" y="183" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">0</text><text x="196" y="183" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">0</text><text x="262" y="183" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">0</text><text x="328" y="183" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">1</text><text x="230" y="196" font-size="10.5" fill="#5b6b7c" text-anchor="middle">T = Rot(z,&#952;) Trans(z,d) Trans(x,a) Rot(x,&#945;)</text><text x="470" y="90" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Forward kinematics</text><text x="470" y="124" font-size="16" fill="#12283d" text-anchor="middle" font-weight="700" font-family="Consolas,Menlo,monospace">T<sub>0</sub><sup>6</sup> = T<sub>1</sub> T<sub>2</sub> T<sub>3</sub> T<sub>4</sub> T<sub>5</sub> T<sub>6</sub></text><text x="470" y="156" font-size="11.5" fill="#157a4b" text-anchor="middle">joint angles &#952;1 &hellip; &#952;6  &rarr;  tool position and orientation</text><text x="470" y="186" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Inverse kinematics</text><text x="470" y="214" font-size="11.5" fill="#a8232a" text-anchor="middle">desired tool pose  &rarr;  joint angles (may have several solutions or none)</text></svg></div><figcaption><b>Fig. 2:</b> The 4 &times; 4 homogeneous transformation matrix and the chain of multiplications that gives forward kinematics.</figcaption></figure><span class="eq">A<sub>i</sub> = Rot(z, &#952;<sub>i</sub>) &middot; Trans(z, d<sub>i</sub>) &middot; Trans(x, a<sub>i</sub>) &middot; Rot(x, &#945;<sub>i</sub>)</span><p>Written out in full, using c for cosine and s for sine:</p><span class="eq">A<sub>i</sub> = [ c&#952;  &minus;s&#952; c&#945;   s&#952; s&#945;   a c&#952; ]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ s&#952;   c&#952; c&#945;  &minus;c&#952; s&#945;   a s&#952; ]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ 0     s&#945;       c&#945;      d    ]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ 0     0         0        1    ]</span><p>The upper-left 3 &times; 3 block is the <b>rotation matrix</b> giving the orientation of the link; the right-hand 3 &times; 1 column is the <b>position vector</b> of the link origin. The last row is always [0 0 0 1], which is what makes the matrix <b>homogeneous</b> and allows rotation and translation to be combined in a single multiplication.</p><h3 id="sec3"><span class="sec-no">3.</span>Forward and Inverse Kinematics</h3><h4>Forward kinematics</h4><p>Forward (or direct) kinematics answers the question: <b>given all the joint angles, where is the tool?</b> The link transformations are simply multiplied together in order:</p><span class="eq">T<sub>0</sub><sup>n</sup> = A<sub>1</sub> A<sub>2</sub> A<sub>3</sub> &hellip; A<sub>n</sub></span><p>This is always straightforward and always has a unique answer. For a six-axis robot it involves multiplying six 4 &times; 4 matrices, which a modern controller does in microseconds. The result gives the position (x, y, z) of the TCP and its orientation, usually expressed as a rotation matrix, as Euler angles (roll, pitch, yaw) or as a quaternion.</p><h4>Inverse kinematics</h4><p>Inverse kinematics answers the opposite and much more important question: <b>given the desired position and orientation of the tool, what joint angles are required?</b> This is needed for Cartesian motion, for off-line programming from a CAD model, and for every vision-guided move.</p><ul><li><b>It is much harder than the forward problem.</b> The equations are non-linear, coupled and transcendental (they involve sines and cosines of sums of angles), so there is no general closed-form method.</li><li><b>There may be several solutions.</b> A six-axis arm generally has up to <b>eight</b> distinct solutions for a given pose, corresponding to combinations of arm-up/arm-down, elbow-forward/elbow-backward and wrist-flip/wrist-no-flip. All eight reach the same tool pose but the arm takes a completely different shape.</li><li><b>There may be no solution</b>, if the target is outside the workspace or if the required orientation cannot be achieved at that position.</li><li><b>Solution methods:</b> <b>closed-form (analytical)</b> solutions exist for arms with special geometry, notably when three wrist axes intersect at a point (a spherical wrist), which is why almost all industrial robots are designed this way. Otherwise <b>numerical iterative</b> methods such as Newton-Raphson are used. <b>Geometric</b> methods solve the problem by trigonometry, link by link, and are the easiest to understand for a six-axis arm.</li></ul><div class="note"><span class="tag">Note</span><p><b>Pieper's criterion:</b> a closed-form solution exists for any six-revolute robot in which three consecutive axes intersect at a single point, or in which three consecutive axes are parallel. This is satisfied by virtually all industrial robots, which is why they can be programmed in Cartesian space.</p></div><h4>Solution selection and continuity</h4><p>When several solutions exist, the controller must choose one. It normally chooses the solution <b>nearest to the current joint configuration</b>, to minimise the movement. It must also stay on the same <b>branch</b> throughout a path, because switching branch in the middle of a move would cause a sudden large motion &mdash; a wrist flip or an elbow flip &mdash; which is dangerous. Robot languages allow the branch to be specified explicitly using configuration codes such as <code>NUT/TURN</code>, <code>ELBOW UP/DOWN</code> or <code>W1/W2</code>.</p><h3 id="sec4"><span class="sec-no">4.</span>Workspace, Dexterity and Singularities</h3><h4>Workspace</h4><p>The workspace is the volume that the TCP can reach. It is divided into the <b>reachable workspace</b> (all points the TCP can reach in at least one orientation) and the <b>dexterous workspace</b> (the smaller set of points that can be reached in <b>every</b> orientation). The shape depends on the configuration, on the link lengths and on the joint limits. It is normally specified as a set of cross-section drawings in the datasheet.</p><h4>Dexterity and manipulability</h4><p><b>Dexterity</b> is a measure of how easily the robot can move the tool in arbitrary directions at a given point. It is high in the middle of the workspace and falls towards the edges. A common quantitative measure is the <b>manipulability index</b>, defined as the square root of the determinant of JJ<sup>T</sup>:</p><span class="eq">w = &#8730;det( J J<sup>T</sup> )</span><p>This index is zero at a singularity and largest where the robot is most dexterous. It can be plotted as a map over the workspace and is used when siting a robot in a cell so that the working points lie in the region of highest dexterity.</p><h4>Singularities</h4><div class="defbox"><span class="tag">Definition</span><p>A <b>singularity</b> is a configuration in which the robot loses one or more degrees of freedom of tool motion. Mathematically, the <b>Jacobian matrix</b> J, which relates joint velocities to tool velocities (&#7819; = J&#952;&#775;), becomes <b>rank deficient</b> and its determinant becomes zero. The inverse J<sup>&minus;1</sup> does not exist, so a finite tool velocity would require an infinite joint velocity.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 230" width="880" height="230" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Singularities and reach limits</text><text x="180" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(a) Shoulder / elbow singularity</text><rect x="50" y="70" width="280" height="130" rx="6" class="t-box"/><circle cx="110" cy="170" r="12" class="mech"/><line x1="110" y1="170" x2="190" y2="170" class="cmp" stroke-width="8"/><line x1="190" y1="170" x2="270" y2="170" class="cmp" stroke-width="7"/><circle cx="190" cy="170" r="8" class="cmp-f"/><circle cx="270" cy="170" r="8" class="cmp-f"/><text x="190" y="156" font-size="10.5" fill="#a8232a" text-anchor="middle">arm fully stretched</text><text x="190" y="120" font-size="10" fill="#5b6b7c" text-anchor="middle">&#952;3 = 0 &rarr; one direction of motion</text><text x="190" y="134" font-size="10" fill="#5b6b7c" text-anchor="middle">is lost; joint speeds go to infinity</text><text x="500" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(b) Wrist singularity</text><rect x="370" y="70" width="280" height="130" rx="6" class="t-box"/><line x1="400" y1="170" x2="470" y2="130" class="cmp" stroke-width="8"/><circle cx="470" cy="130" r="9" class="cmp-f"/><line x1="470" y1="130" x2="560" y2="108" class="cmp" stroke-width="6"/><circle cx="560" cy="108" r="8" class="cmp-f"/><line x1="560" y1="108" x2="620" y2="96" class="cmp" stroke-width="5"/><circle cx="620" cy="96" r="7" class="cmp-f"/><text x="530" y="168" font-size="10" fill="#5b6b7c" text-anchor="middle">&#952;5 = 0 &rarr; axes 4 and 6 become</text><text x="530" y="182" font-size="10" fill="#5b6b7c" text-anchor="middle">co-linear and one is redundant</text><rect x="670" y="70" width="180" height="130" rx="8" class="t-box3"/><text x="760" y="96" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">How to avoid</text><text x="760" y="122" font-size="10" fill="#4a5b6d" text-anchor="middle">Do not program paths</text><text x="760" y="138" font-size="10" fill="#4a5b6d" text-anchor="middle">through a singularity</text><text x="760" y="154" font-size="10" fill="#4a5b6d" text-anchor="middle">Offset the tool slightly</text><text x="760" y="170" font-size="10" fill="#4a5b6d" text-anchor="middle">Use a 7-axis robot</text><text x="760" y="186" font-size="10" fill="#4a5b6d" text-anchor="middle">Limit joint velocities</text><text x="440" y="220" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">At a singularity the Jacobian matrix becomes singular (its determinant is zero) and the inverse kinematics has no unique solution.</text></svg></div><figcaption><b>Fig. 3:</b> Shoulder/elbow singularity when the arm is fully stretched, and wrist singularity when two wrist axes become collinear.</figcaption></figure><ul><li><b>Shoulder (arm-extension) singularity</b> &mdash; occurs when the wrist centre lies on the axis of joint 1, that is, directly above the base. Joint 1 rotation no longer moves the wrist centre, so one direction of motion is lost.</li><li><b>Elbow singularity</b> &mdash; occurs when the arm is fully stretched out (elbow angle 180&deg;) or fully folded. The tool can no longer move radially.</li><li><b>Wrist singularity</b> &mdash; occurs in a spherical wrist when the axis of joint 4 becomes collinear with the axis of joint 6, which happens when joint 5 is at zero. Two joints then produce the same motion, so one degree of freedom is lost and the two joints can spin rapidly in opposite directions without moving the tool. This is the singularity most often seen in practice, and controllers limit the wrist speed to avoid it.</li><li><b>Boundary singularity</b> &mdash; at the extreme edge of the workspace.</li><li><b>Internal singularity</b> &mdash; in parallel robots, singularities can occur inside the workspace, which is one of their main disadvantages.</li></ul><p><b>Consequences and remedies.</b> Near a singularity the joint velocities demanded for a given Cartesian velocity become very large, the motors may saturate, the following error grows and the motion becomes jerky or stops with an error. Remedies are: avoid programming paths through singularities; offset the tool or the workpiece slightly so that the path misses them; reduce the Cartesian speed near a singularity; use a controller that automatically detects and slows down; or use a seven-axis redundant robot, which can pass through a singularity by moving the redundant joint.</p><h4>The Jacobian</h4><p>The Jacobian is the matrix of first partial derivatives that relates the rates of the joint variables to the linear and angular velocity of the tool:</p><span class="eq">&#7819; = J(&#952;) &#952;&#775;        and for static forces        &#964; = J<sup>T</sup>(&#952;) F</span><p>where &#7819; is the 6 &times; 1 tool velocity vector (three linear and three angular components), &#952;&#775; the n &times; 1 vector of joint velocities, &#964; the joint torque vector and F the force and torque applied at the tool. The Jacobian is therefore the bridge between joint space and Cartesian space, and it is used for Cartesian velocity control, for force control, for manipulability analysis and for singularity detection. It is configuration dependent, so it must be recomputed continuously during motion.</p><h3 id="sec5"><span class="sec-no">5.</span>Worked Example &mdash; Forward Kinematics of a Two-Link Planar Arm</h3><p>This is the simplest complete example and shows exactly how the method works. Consider a planar arm with two revolute joints, link lengths L<sub>1</sub> and L<sub>2</sub>, and joint angles &#952;<sub>1</sub> and &#952;<sub>2</sub>.</p><p>The position of the elbow and of the tool tip is found by simple trigonometry:</p><span class="eq">x<sub>1</sub> = L<sub>1</sub> cos &#952;<sub>1</sub> ,   y<sub>1</sub> = L<sub>1</sub> sin &#952;<sub>1</sub><br>x = L<sub>1</sub> cos &#952;<sub>1</sub> + L<sub>2</sub> cos(&#952;<sub>1</sub> + &#952;<sub>2</sub>)<br>y = L<sub>1</sub> sin &#952;<sub>1</sub> + L<sub>2</sub> sin(&#952;<sub>1</sub> + &#952;<sub>2</sub>)</span><p>The <b>inverse</b> problem is solved as follows. From the two equations,</p><span class="eq">x&#178; + y&#178; = L<sub>1</sub>&#178; + L<sub>2</sub>&#178; + 2 L<sub>1</sub> L<sub>2</sub> cos &#952;<sub>2</sub></span><span class="eq">cos &#952;<sub>2</sub> = (x&#178; + y&#178; &minus; L<sub>1</sub>&#178; &minus; L<sub>2</sub>&#178;) / (2 L<sub>1</sub> L<sub>2</sub>)     and     &#952;<sub>2</sub> = &plusmn; cos<sup>&minus;1</sup>( ... )</span><p>The two signs of &#952;<sub>2</sub> are the <b>elbow-up</b> and <b>elbow-down</b> solutions. Once &#952;<sub>2</sub> is known, &#952;<sub>1</sub> follows from</p><span class="eq">&#952;<sub>1</sub> = tan<sup>&minus;1</sup>(y/x) &minus; tan<sup>&minus;1</sup>[ L<sub>2</sub> sin &#952;<sub>2</sub> / (L<sub>1</sub> + L<sub>2</sub> cos &#952;<sub>2</sub>) ]</span><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> Let L<sub>1</sub> = 0.4 m and L<sub>2</sub> = 0.3 m, and let the required tool position be x = 0.5 m, y = 0.3 m. Then x&#178; + y&#178; = 0.25 + 0.09 = 0.34. cos &#952;<sub>2</sub> = (0.34 &minus; 0.16 &minus; 0.09)/(2 &times; 0.4 &times; 0.3) = 0.09/0.24 = 0.375, so &#952;<sub>2</sub> = 67.98&deg; (elbow down) or &minus;67.98&deg; (elbow up). For the elbow-down solution, sin &#952;<sub>2</sub> = 0.927, so &#952;<sub>1</sub> = tan<sup>&minus;1</sup>(0.3/0.5) &minus; tan<sup>&minus;1</sup>[(0.3 &times; 0.927)/(0.4 + 0.3 &times; 0.375)] = 30.96&deg; &minus; tan<sup>&minus;1</sup>(0.2781/0.5125) = 30.96&deg; &minus; 28.44&deg; = <b>2.52&deg;</b>. Checking: x = 0.4 cos 2.52&deg; + 0.3 cos 70.5&deg; = 0.3996 + 0.1003 = 0.500 m &#10003; and y = 0.4 sin 2.52&deg; + 0.3 sin 70.5&deg; = 0.0176 + 0.2825 = 0.300 m &#10003;.</p></div><div class="note"><span class="tag">Note</span><p>Notice that a solution exists only if the target is within the workspace, that is, if L<sub>1</sub> &minus; L<sub>2</sub> &le; r &le; L<sub>1</sub> + L<sub>2</sub> where r = &#8730;(x&#178;+y&#178;). Here r = 0.583 m, which lies between 0.1 m and 0.7 m, so the point is reachable. If r were greater than 0.7 m the value of cos &#952;<sub>2</sub> would exceed 1 and no solution would exist.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A manipulator is an open kinematic chain of rigid links joined by revolute or prismatic joints, with the base fixed and the end effector at the far end.</li><li>Six degrees of freedom are needed to position and orient a rigid body arbitrarily; more than six makes the robot redundant.</li><li>The first three joints (the arm) position the wrist centre and the last three (the wrist) orient the tool.</li><li>The Denavit-Hartenberg convention describes each link with four parameters: &#952; (joint angle), d (link offset), a (link length) and &#945; (link twist). &#952; is the variable for a revolute joint and d for a prismatic joint.</li><li>Each link is described by a 4 &times; 4 homogeneous transformation matrix A<sub>i</sub> = Rot(z,&#952;) Trans(z,d) Trans(x,a) Rot(x,&#945;).</li><li>Forward kinematics multiplies the matrices: T = A<sub>1</sub>A<sub>2</sub>&hellip;A<sub>n</sub>. It is simple and unique.</li><li>Inverse kinematics is non-linear and may have up to eight solutions or none; closed-form solutions exist when three consecutive axes intersect (Pieper's criterion).</li><li>The controller must select a solution branch and must not switch branch during a move.</li><li>The workspace is divided into the reachable workspace and the smaller dexterous workspace.</li><li>A singularity is a configuration in which the Jacobian becomes rank deficient and a degree of freedom is lost; the shoulder, elbow and wrist singularities are the three common types.</li><li>The Jacobian relates joint velocities to tool velocities (&#7819; = J&#952;&#775;) and tool forces to joint torques (&#964; = J<sup>T</sup>F).</li><li>Serial robots have a large workspace but low stiffness; parallel robots are stiffer and faster but have a small workspace.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Define a manipulator. Why is it called an open kinematic chain?</li><li>Why are six degrees of freedom normally required? What is a redundant robot and what advantage does it give?</li><li>Explain the terms link, joint, joint variable, arm, wrist, TCP and pose.</li><li>Compare serial and parallel manipulators on any six points.</li><li>State the rules for assigning coordinate frames in the Denavit-Hartenberg convention.</li><li>List the four DH parameters and indicate which of them is the joint variable for a revolute and for a prismatic joint.</li><li>Write the 4 &times; 4 homogeneous transformation matrix for a link and explain its parts.</li><li>What is forward kinematics and what is inverse kinematics? Which is more difficult and why?</li><li>State Pieper's criterion for a closed-form inverse kinematic solution.</li><li>Why may inverse kinematics have up to eight solutions? What is meant by a wrist flip?</li><li>Define workspace and dexterous workspace. Define the manipulability index.</li><li>What is a singularity? Describe the shoulder, elbow and wrist singularities and explain how they are avoided.</li><li>Write the expressions relating joint velocities to tool velocity and tool force to joint torque using the Jacobian.</li><li>Derive the forward and inverse kinematics of a two-link planar arm.</li><li>A two-link planar arm has L1 = 0.5 m and L2 = 0.4 m. Find whether the point (0.8, 0.4) is reachable and, if so, find both solutions for the joint angles.</li></ol></div><div class="pager"><a class="prev" href="27-joint-space-schemes-via-points-real-world-problems.html"><span class="dir">&larr; Previous topic</span><span class="ttl">27. Joint Space Schemes, Via Points and Problems with Real-World Components</span></a><a class="next" href="29-end-effectors-force-control-constraints-stiffness-compliance.html"><span class="dir">Next topic &rarr;</span><span class="ttl">29. End Effectors and Force Control &mdash; Static Force/Torque, Constraints, Stiffness and Compliance</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

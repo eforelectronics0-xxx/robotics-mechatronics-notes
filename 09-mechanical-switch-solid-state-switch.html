@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electrical Actuation Systems &mdash; Mechanical and Solid State Switches | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="How a mechatronic system switches power on and off: mechanical switches with their contacts, ratings and bounce, and solid state switches built from t">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit II &middot; Topic 9 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit II &rsaquo; Topic 9</nav><div class="unit-tag">Unit II</div><h2 class="page-title"><span class="topic-no">09</span>Electrical Actuation Systems &mdash; Mechanical and Solid State Switches</h2><p class="lede">How a mechatronic system switches power on and off: mechanical switches with their contacts, ratings and bounce, and solid state switches built from transistors, MOSFETs, triacs, relays and opto-isolators.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Why Switches are Needed</a></li><li><a href="#sec2">Mechanical Switches</a></li><li><a href="#sec3">Solid State Switches</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Why Switches are Needed</h3><p>A controller output from a microcontroller pin can supply only a few tens of milliamperes at 5 V. An actuator such as a motor, a solenoid, a heater or a lamp may need several amperes at 12 V, 24 V or even 230 V AC. A <b>switch</b> is the device that sits between the two and allows a small control signal to control a much larger power flow. Switches are of two broad kinds: <b>mechanical switches</b>, which have moving contacts, and <b>solid state switches</b>, which have no moving parts and use semiconductor devices.</p><h3 id="sec2"><span class="sec-no">2.</span>Mechanical Switches</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>mechanical switch</b> is an electromechanical device in which two or more metal contacts are brought together or separated by a mechanical force, thereby making or breaking an electric circuit.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 275" width="880" height="275" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Mechanical switch symbols with clearly identified terminals</text><text x="100" y="60" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">SPST-NO</text><circle cx="70" cy="105" r="3.3" class="dot" fill="#12283d"/><circle cx="130" cy="105" r="3.3" class="dot" fill="#12283d"/><line x1="70" y1="105" x2="120" y2="80" class="cmp" stroke-width="2.4"/><text x="100" y="135" font-size="10.5" fill="#5b6b7c" text-anchor="middle">open</text><text x="315" y="60" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">SPST-NC</text><circle cx="285" cy="105" r="3.3" class="dot" fill="#12283d"/><circle cx="345" cy="105" r="3.3" class="dot" fill="#12283d"/><line x1="285" y1="105" x2="345" y2="105" class="cmp" stroke-width="2.4"/><text x="315" y="135" font-size="10.5" fill="#5b6b7c" text-anchor="middle">closed</text><text x="145" y="160" font-size="10.5" fill="#5b6b7c" text-anchor="middle">one circuit, normally open</text><text x="360" y="160" font-size="10.5" fill="#5b6b7c" text-anchor="middle">one circuit, normally closed</text><text x="590" y="60" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">SPDT changeover</text><circle cx="530" cy="115" r="3.3" class="dot" fill="#12283d"/><text x="528" y="106" class="t-lbl-s" fill="#5b6b7c">COM</text><circle cx="620" cy="78" r="3.3" class="dot" fill="#12283d"/><text x="626" y="71" class="t-lbl-s" fill="#5b6b7c">NO</text><circle cx="620" cy="152" r="3.3" class="dot" fill="#12283d"/><text x="626" y="169" class="t-lbl-s" fill="#5b6b7c">NC</text><line x1="530" y1="115" x2="612" y2="84" class="cmp" stroke-width="2.4"/><line x1="620" y1="78" x2="680" y2="78" class="wire"/><line x1="620" y1="152" x2="680" y2="152" class="wire"/><text x="690" y="82" font-size="10.5" fill="#5b6b7c" text-anchor="start">load A</text><text x="690" y="156" font-size="10.5" fill="#5b6b7c" text-anchor="start">load B</text><text x="185" y="218" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">push button</text><circle cx="155" cy="245" r="3.3" class="dot" fill="#12283d"/><circle cx="215" cy="245" r="3.3" class="dot" fill="#12283d"/><line x1="155" y1="245" x2="205" y2="220" class="cmp" stroke-width="2.4"/><line x1="185" y1="220" x2="185" y2="195" class="cmp" stroke-width="2.4"/><rect x="170" y="185" width="30" height="10" rx="2" class="mech2"/><polyline points="185,178 185,160" class="lnk" marker-end="url(#ah)"/><text x="220" y="170" font-size="10.5" fill="#a8232a" text-anchor="start">finger force</text><text x="440" y="255" font-size="11.5" fill="#12283d" text-anchor="middle">NO closes when actuated; NC opens when actuated. Contact ratings must include both voltage and current.</text></svg></div><figcaption><b>Fig. 1:</b> Common mechanical switch symbols: SPST normally open, SPST normally closed, SPDT changeover and a push button.</figcaption></figure><h4>Switch terminology</h4><ul><li><b>Pole</b> &mdash; the number of separate circuits the switch controls. Single pole (SP), double pole (DP), three pole (3P).</li><li><b>Throw</b> &mdash; the number of connections each pole can make. Single throw (ST) has one connection; double throw (DT) has two.</li><li><b>Normally open (NO)</b> &mdash; the contacts are open when the switch is not operated; they close when it is pressed. Also called a <i>make</i> contact.</li><li><b>Normally closed (NC)</b> &mdash; the contacts are closed when the switch is not operated; they open when it is pressed. Also called a <i>break</i> contact.</li><li><b>Changeover (CO)</b> or <b>break-before-make</b> &mdash; a common terminal that switches between an NC and an NO contact.</li><li><b>Momentary</b> &mdash; the switch returns to its normal state when released, as in a push button. <b>Maintained (latching)</b> &mdash; it stays in the new position, as in a toggle or rocker switch.</li><li><b>Contact rating</b> &mdash; the maximum voltage and current the contacts can switch, for example 250 V AC / 6 A or 30 V DC / 5 A. DC ratings are always lower than AC ratings because a DC arc is not extinguished naturally at each zero crossing.</li><li><b>Contact resistance</b> &mdash; the small resistance of closed contacts, typically 10 m&#937; to 100 m&#937;. It grows as the contacts corrode.</li><li><b>Insulation resistance</b> &mdash; the resistance between open contacts and to the body, typically over 100 M&#937;.</li><li><b>Dielectric strength</b> &mdash; the voltage the open contacts can withstand without breaking down.</li><li><b>Electrical life</b> &mdash; the number of operations under rated load, typically 10<sup>4</sup> to 10<sup>6</sup>. <b>Mechanical life</b> without load is much higher, up to 10<sup>7</sup> to 10<sup>8</sup>.</li></ul><h4>Types of mechanical switch</h4><ul><li><b>Push button</b> &mdash; momentary, NO or NC. Used for start/stop commands.</li><li><b>Toggle and rocker</b> &mdash; maintained, used for mains ON/OFF.</li><li><b>Slide switch</b> &mdash; maintained, common in small battery-powered equipment.</li><li><b>Rotary and wafer switch</b> &mdash; selects one of many positions, as in a range selector.</li><li><b>Limit switch</b> &mdash; operated by the movement of a machine part; used to detect the end of travel in machine tools, lifts and robot joints. Often has a roller lever arm.</li><li><b>Proximity switch</b> &mdash; contactless operation, but its output is usually a relay contact.</li><li><b>Microswitch</b> &mdash; a very small snap-action switch with a precise operating point and a short travel; used inside appliances, in mouse buttons and as end stops.</li><li><b>Reed switch</b> &mdash; two thin ferromagnetic reeds sealed in a glass tube with an inert gas; a nearby magnet closes them. Used in float switches, door alarms and cylinder position sensing.</li><li><b>Relay</b> &mdash; a switch operated electromagnetically rather than by hand (described below).</li><li><b>Mercury switch</b> &mdash; a pool of mercury makes or breaks contact as the tube tilts; used for tilt detection, now largely replaced for environmental reasons.</li><li><b>Selector, key-operated and emergency stop (mushroom head)</b> switches &mdash; used in industrial control panels. An emergency stop is always NC so that a broken wire causes a safe shutdown.</li></ul><h4>Contact bounce</h4><p>When two metal contacts close they do not settle immediately. They <b>bounce</b> apart and together several times over a period of 1 ms to 10 ms because of their elasticity and the impact. To a human this is invisible, but to a microcontroller running at millions of instructions per second it looks like the switch being pressed many times. This causes wrong counts, skipped states and erratic behaviour.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 270" width="880" height="270" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">Contact bounce and a correctly wired RC debounce circuit</text><text x="205" y="55" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(a) Bouncing waveform</text><rect x="40" y="68" width="330" height="145" rx="6" class="t-box"/><line x1="70" y1="190" x2="70" y2="85" class="ax" marker-end="url(#ah)"/><line x1="70" y1="190" x2="340" y2="190" class="ax" marker-end="url(#ah)"/><text x="346" y="194" font-size="11.5" fill="#5b6b7c" text-anchor="start">time</text><text x="64" y="79" font-size="11.5" fill="#5b6b7c" text-anchor="start">V</text><path d="M 70 190 L 120 190 L 120 90 L 132 90 L 132 190 L 142 190 L 142 102 L 150 102 L 150 190 L 158 190 L 158 88 L 168 88 L 168 190 L 176 190 L 176 96 L 184 96 L 184 190 L 340 190" class="lnk" stroke-width="1.8"/><text x="170" y="78" font-size="10.5" fill="#a8232a" text-anchor="middle">contact bounce</text><text x="630" y="55" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(b) RC hardware debounce</text><text x="500" y="78" font-size="11.5" fill="#a8232a" text-anchor="middle" font-weight="700">+5 V</text><polyline points="540,84 540,100" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 540.000,100.000 L 540.000,106.500 L 548.000,112.380 L 532.000,119.100 L 548.000,125.820 L 532.000,132.540 L 548.000,139.260 L 540.000,148.500 L 540.000,155.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="566" y="132" font-size="10.5" fill="#5b6b7c" text-anchor="start">10 kΩ</text><polyline points="540,155 540,175" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="540" cy="175" r="3.3" class="dot" fill="#12283d"/><text x="555" y="170" font-size="10" fill="#157a4b" text-anchor="start">debounced input</text><polyline points="600,175 600,195" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="589" y1="195" x2="611" y2="195" class="wire" stroke-width="2.4"/><line x1="589" y1="202" x2="611" y2="202" class="wire" stroke-width="2.4"/><polyline points="600,202 600,235" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="600" y1="235" x2="600" y2="245" class="wire"/><line x1="587" y1="245" x2="613" y2="245" class="wire"/><line x1="592" y1="250" x2="608" y2="250" class="wire"/><line x1="596.5" y1="255" x2="603.5" y2="255" class="wire"/><polyline points="540,175 600,175" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="618" y="215" font-size="10.5" fill="#5b6b7c" text-anchor="start">100 nF</text><polyline points="540,175 480,175 480,195" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="480" cy="195" r="3.3" class="dot" fill="#12283d"/><circle cx="480" cy="220" r="3.3" class="dot" fill="#12283d"/><line x1="480" y1="195" x2="520" y2="212" class="cmp" stroke-width="2.3"/><polyline points="480,220 480,235" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="480" y1="235" x2="480" y2="245" class="wire"/><line x1="467" y1="245" x2="493" y2="245" class="wire"/><line x1="472" y1="250" x2="488" y2="250" class="wire"/><line x1="476.5" y1="255" x2="483.5" y2="255" class="wire"/><text x="430" y="214" font-size="10.2" fill="#5b6b7c" text-anchor="end">push button</text><polyline points="540,175 730,175" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="730" y="148" width="105" height="54" rx="6" class="t-box2"/><text x="782" y="169" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">MCU input</text><text x="782" y="187" font-size="9.5" fill="#5b6b7c" text-anchor="middle">sample after 20 ms</text><text x="650" y="255" font-size="11" fill="#12283d" text-anchor="middle">τ = R C = 10 kΩ × 100 nF = 1 ms; software can add a second 20 ms confirmation.</text></svg></div><figcaption><b>Fig. 2:</b> Contact bounce (left) and the two standard ways of removing it: an RC filter plus Schmitt trigger, or software debouncing (right).</figcaption></figure><ul><li><b>Hardware debouncing</b> &mdash; an RC low-pass filter (for example 10 k&#937; and 100 nF, giving &#964; = 1 ms) followed by a Schmitt trigger such as the 74HC14; or an SR latch built from two NAND gates, which responds to the first edge only and then ignores everything until the contacts settle.</li><li><b>Software debouncing</b> &mdash; read the input, wait 10 ms to 30 ms, read it again, and accept the value only if both readings agree. Alternatively, use a timer interrupt to sample the input every 5 ms and require the same value in three consecutive samples.</li><li><b>Mechanical reduction</b> &mdash; use a snap-action switch, add a small capacitor of 10 nF to 100 nF directly across the contacts, or use a mercury-wetted contact.</li></ul><h4>Relay</h4><p>A <b>relay</b> is an electrically operated switch. A coil of many turns wound on a soft iron core produces a magnetic field when current flows. The field attracts a soft iron armature which carries the moving contact, so the contact closes (or opens). When the coil is de-energised a spring returns the armature.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 270" width="880" height="270" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Electromechanical relay: coil, flyback diode and changeover contacts</text><text x="190" y="60" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Coil / driver side</text><text x="100" y="82" font-size="11" fill="#a8232a" text-anchor="middle" font-weight="700">+12 V</text><polyline points="145,88 145,100" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="105" y="100" width="90" height="45" rx="5" class="t-box2"/><text x="150" y="128" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">COIL</text><polyline points="150,145 150,175" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="142.2" y1="210" x2="169.2" y2="210" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="169.2" y1="188.4" x2="169.2" y2="231.6" class="cmp" stroke="#12283d" stroke-width="2.3"/><line x1="181.8" y1="203.7" x2="207.0" y2="181.2" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="181.8" y1="216.3" x2="207.0" y2="238.8" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="197.1" y1="228.0" x2="202.5" y2="234.3" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" marker-end="url(#ah)"/><text x="145.79999999999998" y="201.9" class="t-lbl-s" fill="#5b6b7c">B</text><text x="211.5" y="179.39999999999998" class="t-lbl-s" fill="#5b6b7c">C</text><text x="211.5" y="250.5" class="t-lbl-s" fill="#5b6b7c">E</text><polyline points="207,181 207,175 150,175" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="207,239 207,252" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="207" y1="252" x2="207" y2="262" class="wire"/><line x1="194" y1="262" x2="220" y2="262" class="wire"/><line x1="199" y1="267" x2="215" y2="267" class="wire"/><line x1="203.5" y1="272" x2="210.5" y2="272" class="wire"/><polyline points="20,210 35,210" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="142,210 85,210" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 35.000,210.000 L 41.000,210.000 L 46.320,202.000 L 52.400,218.000 L 58.480,202.000 L 64.560,218.000 L 70.640,202.000 L 79.000,210.000 L 85.000,210.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="60" y="197" font-size="9.7" fill="#5b6b7c" text-anchor="middle">base resistor</text><text x="20" y="213" font-size="10" fill="#157a4b" text-anchor="start">MCU</text><line x1="230" y1="145" x2="230" y2="133.5" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="220,133.5 240,133.5 230,115.5" class="cmp-f" fill="#e7f1fb" stroke="#12283d" stroke-width="1.8"/><line x1="218" y1="115.5" x2="242" y2="115.5" class="cmp" stroke="#12283d" stroke-width="1.8"/><line x1="230" y1="115.5" x2="230" y2="100" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="230,100 195,100" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="230,145 230,175 207,175" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="250" y="127" font-size="9.7" fill="#5b6b7c" text-anchor="start">flyback</text><text x="650" y="60" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Changeover contact side</text><text x="510" y="98" font-size="10.5" fill="#5b6b7c" text-anchor="end">COM</text><circle cx="535" cy="95" r="3.3" class="dot" fill="#12283d"/><circle cx="620" cy="70" r="3.3" class="dot" fill="#12283d"/><circle cx="620" cy="120" r="3.3" class="dot" fill="#12283d"/><line x1="535" y1="95" x2="612" y2="74" class="cmp" stroke-width="2.4"/><text x="635" y="74" font-size="10.5" fill="#157a4b" text-anchor="start">NO</text><text x="635" y="124" font-size="10.5" fill="#a8232a" text-anchor="start">NC</text><polyline points="620,70 700,70" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="620,120 700,120" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="710" y="74" font-size="10" fill="#5b6b7c" text-anchor="start">load A</text><text x="710" y="124" font-size="10" fill="#5b6b7c" text-anchor="start">load B</text><path d="M 545 82 A 45 35 0 0 1 575 55" class="lnk-d" marker-end="url(#ah)"/><text x="555" y="45" font-size="9.8" fill="#a8232a" text-anchor="middle">coil energises</text><text x="440" y="252" font-size="11.5" fill="#12283d" text-anchor="middle">The contacts can switch a separate supply; only the magnetic field couples them to the coil.</text></svg></div><figcaption><b>Fig. 3:</b> Relay construction: a 12 V coil pulls the armature and changes over the contacts. The coil circuit and the contact circuit are galvanically isolated from each other.</figcaption></figure><p>Relays are widely used because they provide <b>complete galvanic isolation</b> between the low-voltage control circuit and the high-voltage load circuit, and they can switch both AC and DC with the same contacts. Typical ratings are 12 V DC coil and 250 V AC / 10 A contacts. A <b>latching relay</b> has two coils or a permanent magnet so that it holds its position without continuous coil current, saving power.</p><div class="warn"><span class="tag">Important</span><p>A relay coil is a large inductor. When the current is switched off, the collapsing magnetic field generates a voltage spike of several hundred volts that can destroy the driving transistor. A <b>flyback (freewheeling) diode</b> such as a 1N4007 must always be connected in reverse bias across the coil. For AC coils a varistor (MOV) or an RC snubber is used instead.</p></div><h4>Advantages and disadvantages of mechanical switches</h4><ul><li><b>Advantages:</b> very low on-resistance, so almost no voltage drop and no heat; complete isolation when open; can switch AC or DC, high voltage and high current; immune to electromagnetic interference and to static discharge; simple, cheap and easy to understand; no leakage current when off.</li><li><b>Disadvantages:</b> slow (5 ms to 20 ms operating time); mechanical wear limits the life; contacts bounce; arcing causes erosion, radio interference and a fire risk in explosive atmospheres; larger and heavier than a semiconductor; sensitive to dust, moisture and vibration; cannot be switched at high frequency.</li></ul><h3 id="sec3"><span class="sec-no">3.</span>Solid State Switches</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>solid state switch</b> is an electronic switch built from semiconductor devices such as a diode, a bipolar transistor, a MOSFET, an IGBT, a thyristor, a TRIAC or a photo-coupled device. It has no moving parts and no contacts.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" width="900" height="360" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="450" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Solid-state switches: complete transistor, MOSFET and opto-triac connections</text><text x="160" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(a) NPN relay driver</text><text x="105" y="78" font-size="10.8" fill="#a8232a" text-anchor="middle" font-weight="700">+12 V</text><polyline points="145,84 145,98" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="105" y="98" width="80" height="42" rx="5" class="mech2"/><text x="145" y="124" font-size="10.2" fill="#12283d" text-anchor="middle" font-weight="700">RELAY</text><polyline points="145,140 145,163 205,163" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="133.0" y1="195" x2="163.0" y2="195" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="163.0" y1="171.0" x2="163.0" y2="219.0" class="cmp" stroke="#12283d" stroke-width="2.3"/><line x1="177.0" y1="188.0" x2="205.0" y2="163.0" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="177.0" y1="202.0" x2="205.0" y2="227.0" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="194.0" y1="215.0" x2="200.0" y2="222.0" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" marker-end="url(#ah)"/><text x="137.0" y="186.0" class="t-lbl-s" fill="#5b6b7c">B</text><text x="210.0" y="161.0" class="t-lbl-s" fill="#5b6b7c">C</text><text x="210.0" y="240.0" class="t-lbl-s" fill="#5b6b7c">E</text><polyline points="205,227 205,260" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="205" y1="260" x2="205" y2="270" class="wire"/><line x1="192" y1="270" x2="218" y2="270" class="wire"/><line x1="197" y1="275" x2="213" y2="275" class="wire"/><line x1="201.5" y1="280" x2="208.5" y2="280" class="wire"/><polyline points="20,195 30,195" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="133,195 85,195" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 30.000,195.000 L 36.500,195.000 L 42.380,187.000 L 49.100,203.000 L 55.820,187.000 L 62.540,203.000 L 69.260,187.000 L 78.500,195.000 L 85.000,195.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="58" y="182" font-size="9.5" fill="#5b6b7c" text-anchor="middle">1 kΩ</text><text x="20" y="198" font-size="9.8" fill="#157a4b" text-anchor="start">MCU</text><line x1="220" y1="140" x2="220" y2="130.0" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="210,130.0 230,130.0 220,112.0" class="cmp-f" fill="#e7f1fb" stroke="#12283d" stroke-width="1.8"/><line x1="208" y1="112.0" x2="232" y2="112.0" class="cmp" stroke="#12283d" stroke-width="1.8"/><line x1="220" y1="112.0" x2="220" y2="98" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="220,98 185,98" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="220,140 220,163 205,163" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="236" y="124" font-size="9.2" fill="#5b6b7c" text-anchor="start">flyback</text><text x="160" y="292" font-size="9.4" fill="#12283d" text-anchor="middle">coil diode clamps flyback</text><text x="450" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(b) N-channel MOSFET motor driver</text><text x="400" y="78" font-size="10.8" fill="#a8232a" text-anchor="middle" font-weight="700">+12 V</text><polyline points="455,84 455,98" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="455" cy="115" r="22" class="cmp-f"/><text x="455" y="120" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">M</text><polyline points="455,137 455,150 507,150" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="437.0" y1="184" x2="464.0" y2="184" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="464.0" y1="159.0" x2="464.0" y2="209.0" class="cmp" stroke="#12283d" stroke-width="2.3"/><line x1="476.0" y1="164.0" x2="476.0" y2="204.0" class="cmp" stroke="#12283d" stroke-width="2.8"/><line x1="476.0" y1="171.0" x2="507.0" y2="150.0" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="476.0" y1="197.0" x2="507.0" y2="218.0" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="439.0" y="175.0" class="t-lbl-s" fill="#5b6b7c">G</text><text x="511.0" y="148.0" class="t-lbl-s" fill="#5b6b7c">D</text><text x="511.0" y="231.0" class="t-lbl-s" fill="#5b6b7c">S</text><polyline points="507,218 507,260" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="507" y1="260" x2="507" y2="270" class="wire"/><line x1="494" y1="270" x2="520" y2="270" class="wire"/><line x1="499" y1="275" x2="515" y2="275" class="wire"/><line x1="503.5" y1="280" x2="510.5" y2="280" class="wire"/><polyline points="320,184 335,184" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="437,184 390,184" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 335.000,184.000 L 341.500,184.000 L 347.380,176.000 L 354.100,192.000 L 360.820,176.000 L 367.540,192.000 L 374.260,176.000 L 383.500,184.000 L 390.000,184.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="362" y="171" font-size="9.2" fill="#5b6b7c" text-anchor="middle">100 Ω gate</text><text x="320" y="187" font-size="9.8" fill="#157a4b" text-anchor="end">PWM</text><line x1="535" y1="140" x2="535" y2="130.0" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="525,130.0 545,130.0 535,112.0" class="cmp-f" fill="#e7f1fb" stroke="#12283d" stroke-width="1.8"/><line x1="523" y1="112.0" x2="547" y2="112.0" class="cmp" stroke="#12283d" stroke-width="1.8"/><line x1="535" y1="112.0" x2="535" y2="98" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="535,98 455,98" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="535,140 535,150 507,150" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="550" y="124" font-size="9.2" fill="#5b6b7c" text-anchor="start">flyback</text><text x="450" y="292" font-size="9.4" fill="#12283d" text-anchor="middle">+12 → motor → drain → source → ground</text><text x="750" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(c) Opto-triac AC switch</text><text x="610" y="82" font-size="10.2" fill="#0f5fa8" text-anchor="middle" font-weight="700">N</text><polyline points="620,112 650,112" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="650" y="95" width="70" height="35" rx="4" class="t-box5"/><text x="685" y="117" font-size="9.2" fill="#12283d" text-anchor="middle" font-weight="700">TRIAC</text><polyline points="720,112 760,112" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="760" y="95" width="70" height="35" rx="4" class="mech2"/><text x="795" y="117" font-size="9.2" fill="#12283d" text-anchor="middle" font-weight="700">LOAD</text><polyline points="830,112 850,112" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="850" y="82" font-size="10.2" fill="#a8232a" text-anchor="middle" font-weight="700">L</text><rect x="650" y="200" width="100" height="55" rx="7" class="t-box2"/><text x="700" y="222" font-size="10.2" fill="#12283d" text-anchor="middle" font-weight="700">MOC3021</text><text x="700" y="239" font-size="9.2" fill="#5b6b7c" text-anchor="middle">opto-triac</text><text x="600" y="222" font-size="9.8" fill="#a8232a" text-anchor="middle" font-weight="700">+5 V</text><polyline points="600,230 615,230" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 615.000,230.000 L 621.000,230.000 L 624.220,222.000 L 627.900,238.000 L 631.580,222.000 L 635.260,238.000 L 638.940,222.000 L 644.000,230.000 L 650.000,230.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="632" y="220" font-size="8.8" fill="#5b6b7c" text-anchor="middle">330 Ω</text><polyline points="700,255 700,270" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="700" y1="270" x2="700" y2="280" class="wire"/><line x1="687" y1="280" x2="713" y2="280" class="wire"/><line x1="692" y1="285" x2="708" y2="285" class="wire"/><line x1="696.5" y1="290" x2="703.5" y2="290" class="wire"/><text x="715" y="270" font-size="8.8" fill="#5b6b7c" text-anchor="start">GND_L</text><polyline points="750,230 740,230 740,145 720,145" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="744" y="180" font-size="8.8" fill="#a8232a" text-anchor="start">isolated gate</text><text x="750" y="292" font-size="9.4" fill="#12283d" text-anchor="middle">isolated gate; L–N current stays on mains side</text><text x="450" y="340" font-size="10.5" fill="#a8232a" text-anchor="middle" font-weight="600">Use a rated transistor/diode/triac, adequate heat sinking and fusing; the mains panel is hazardous and is shown for theory only.</text></svg></div><figcaption><b>Fig. 4:</b> Three practical solid state switching arrangements: an NPN transistor driving a relay with a flyback diode, an N-channel MOSFET switching a motor on the low side, and an opto-isolated triac switching a 230 V AC load.</figcaption></figure><h4>Bipolar junction transistor (BJT) as a switch</h4><p>A transistor works as a switch between two states: <b>cut-off</b> (no base current, so no collector current &mdash; the switch is OFF and the collector voltage equals the supply) and <b>saturation</b> (enough base current that the collector-emitter voltage falls to about 0.2 V &mdash; the switch is ON). The active region in between is used for amplification, not for switching.</p><p>To ensure saturation, the base current must satisfy I<sub>B</sub> &ge; I<sub>C(sat)</sub> / &#946;, and in practice a forced &#946; of 10 is used for reliable switching. For example, to switch a 12 V relay coil of 100 &#937; (I<sub>C</sub> = 120 mA) using a BC548 with &#946; = 100, I<sub>B</sub> should be at least 12 mA, and the base resistor from a 5 V microcontroller pin is R<sub>B</sub> = (5 &minus; 0.7) / 0.012 = <b>358 &#937;</b>, so 330 &#937; is used.</p><span class="eq">I<sub>B</sub> = (V<sub>control</sub> &minus; V<sub>BE</sub>) / R<sub>B</sub> ,   V<sub>BE</sub> &#8776; 0.7 V ,   I<sub>C(sat)</sub> = V<sub>CC</sub> / R<sub>load</sub></span><h4>MOSFET as a switch</h4><p>A power MOSFET is now the preferred switch for DC loads. Its gate is insulated from the channel, so it draws essentially <b>zero steady gate current</b> &mdash; only the capacitance has to be charged each time it switches. When the gate-source voltage exceeds the threshold, the channel turns on and behaves like a small resistance R<sub>DS(on)</sub>, typically a few milliohms. The conduction loss is I&#178;R<sub>DS(on)</sub>, which is very small.</p><ul><li>A <b>logic-level MOSFET</b> such as the IRLZ44N turns fully on with a 4.5 V to 5 V gate drive and can therefore be driven directly from a microcontroller. A standard MOSFET such as the IRF540 needs 10 V and requires a gate driver.</li><li>An <b>N-channel</b> MOSFET is placed on the <b>low side</b> (between the load and ground), which is the simplest arrangement. A <b>P-channel</b> MOSFET is used for <b>high-side</b> switching.</li><li>A gate pull-down resistor of 10 k&#937; to 100 k&#937; keeps the MOSFET off while the microcontroller pin is floating during start-up.</li><li>Fast switching needs a low-impedance gate drive; a small series gate resistor of 10 &#937; to 100 &#937; damps ringing.</li><li>An inductive load such as a motor or a solenoid always needs a freewheeling diode across it.</li></ul><h4>IGBT</h4><p>The <b>Insulated Gate Bipolar Transistor</b> combines the easy gate drive of a MOSFET with the low saturation voltage of a bipolar transistor. It is used for high voltage (600 V to 6500 V) and high current (tens to thousands of amperes) applications such as variable frequency drives for AC motors, traction, induction heating, welding sets and servo amplifiers. It switches at moderate frequency (a few kHz to 20 kHz).</p><h4>Thyristor (SCR) and TRIAC</h4><p>A <b>thyristor</b> (silicon controlled rectifier, SCR) is a four-layer device with three terminals: anode, cathode and gate. Once triggered by a short gate pulse it stays ON (latches) until the anode current falls below the <b>holding current</b>. It conducts in only one direction, so it is used for DC power control and for phase control of AC (two SCRs back-to-back). A <b>TRIAC</b> conducts in both directions and is therefore ideal for AC power control of lamps, heaters and small motors. A <b>DIAC</b> is used to trigger a TRIAC symmetrically, as in a light dimmer.</p><h4>Opto-isolator and solid state relay (SSR)</h4><p>An <b>opto-isolator</b> (opto-coupler) contains an LED and a phototransistor (or phototriac) in one package, coupled only by light. The input and output circuits are therefore completely electrically separated, with typical isolation ratings of 2500 V to 7500 V. This protects the delicate microcontroller from mains transients and from ground loops.</p><p>A <b>solid state relay (SSR)</b> combines an opto-isolator with a power triac or MOSFET and a heat sink in a single package, giving a device that looks like a relay from outside but has no moving parts. Mains SSRs usually include <b>zero-crossing switching</b>, which turns the triac on only at the instant the AC voltage passes through zero; this minimises inrush current and radio interference.</p><div class="tbl-scroll"><table><caption>Table 9.1 &mdash; Electromechanical relay versus solid state relay</caption><thead><tr><th>Feature</th><th>Electromechanical relay</th><th>Solid state relay</th></tr></thead><tbody><tr><td>Switching speed</td><td>5 ms to 20 ms</td><td>0.1 ms to 10 ms (and can switch at kHz rates)</td></tr><tr><td>Life</td><td>10<sup>5</sup> to 10<sup>6</sup> operations</td><td>10<sup>9</sup> or more operations</td></tr><tr><td>Contact bounce</td><td>Present</td><td>Absent</td></tr><tr><td>Noise</td><td>Audible click</td><td>Silent</td></tr><tr><td>On-state voltage drop</td><td>About 50 mV (very low)</td><td>0.7 V to 2 V &mdash; so heat is generated</td></tr><tr><td>Off-state leakage</td><td>Zero</td><td>A few milliamps (mA)</td></tr><tr><td>Load type</td><td>AC and DC, any waveform</td><td>AC or DC only &mdash; specific types</td></tr><tr><td>Isolation</td><td>Magnetic / mechanical</td><td>Optical, usually better</td></tr><tr><td>Sensitivity to shock and vibration</td><td>Poor</td><td>Excellent</td></tr><tr><td>Overload and surge capability</td><td>Very good</td><td>Poor &mdash; fails short circuit</td></tr><tr><td>Cost</td><td>Low</td><td>Higher</td></tr><tr><td>Need for a heat sink</td><td>No</td><td>Yes above a few amperes</td></tr><tr><td>Failure mode</td><td>Usually open circuit (safe)</td><td>Usually short circuit (unsafe)</td></tr></tbody></table></div><h4>Advantages and disadvantages of solid state switches</h4><ul><li><b>Advantages:</b> no moving parts, so very long life and high reliability; extremely fast switching, enabling pulse width modulation at kilohertz frequencies; silent operation; no contact bounce and no arcing; small size and light weight; immune to shock and vibration; low control power; can be integrated directly onto a printed circuit board; compatible with logic levels.</li><li><b>Disadvantages:</b> a voltage drop when on (0.2 V for a BJT, 0.7 V to 2 V for a triac), so power is dissipated as heat and a heat sink is needed; leakage current flows even when off, so the load is never truly isolated; sensitive to over-voltage transients, over-current and over-temperature; can be damaged by static electricity; most types switch only AC or only DC, not both; failure is usually a short circuit, which is unsafe; generates electrical noise during fast switching.</li></ul><div class="example"><span class="tag">Example</span><p><b>Design example.</b> A microcontroller pin at 5 V must switch a 12 V, 24 W DC fan. Fan current I = 24/12 = 2 A. Choose an IRLZ44N logic-level N-channel MOSFET with R<sub>DS(on)</sub> = 22 m&#937;. Conduction loss = I&#178;R = 4 &times; 0.022 = 0.088 W &mdash; negligible, so no heat sink is needed. Connect the fan between +12 V and the drain, the source to ground, the gate to the microcontroller pin through 100 &#937;, a 10 k&#937; pull-down from gate to ground, and a 1N4007 diode in reverse bias across the fan to absorb the back-EMF when the fan is switched off.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A switch lets a low-power control signal govern a high-power actuator circuit.</li><li>Switch terminology: pole (number of circuits), throw (number of connections), NO, NC, changeover, momentary and maintained.</li><li>Important switch ratings are contact voltage and current, contact resistance, insulation resistance, dielectric strength and electrical life.</li><li>Contact bounce lasts 1 ms to 10 ms and must be removed by an RC filter with a Schmitt trigger, by an SR latch, or by software re-reading after a delay.</li><li>A relay is an electrically operated switch giving complete isolation; its coil must always have a flyback diode to absorb the inductive voltage spike.</li><li>A BJT switch works between cut-off and saturation; design for I<sub>B</sub> &ge; I<sub>C</sub>/10.</li><li>A MOSFET switch needs no steady gate current, has very low R<sub>DS(on)</sub> and is preferred for DC loads; logic-level types can be driven directly from 5 V.</li><li>IGBTs are used for high-voltage high-current motor drives; SCRs and TRIACs are used for AC power control.</li><li>Opto-isolators and solid state relays give electrical isolation with no moving parts; SSRs use zero-crossing switching to reduce interference.</li><li>Mechanical switches have very low on-resistance and true isolation but are slow and wear out; solid state switches are fast and long-lived but drop voltage, leak current and usually fail short circuit.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Explain the terms pole, throw, normally open, normally closed, momentary and maintained as applied to a switch.</li><li>List any six specifications of a mechanical switch and explain each briefly.</li><li>What is contact bounce? Explain any two methods of debouncing a switch.</li><li>Describe the construction and working of an electromechanical relay. Why is a flyback diode essential across the coil?</li><li>Compare an electromechanical relay with a solid state relay on any six points.</li><li>Explain how a BJT is used as a switch. Calculate the base resistor needed to switch a 12 V, 120 mA relay from a 5 V pin using a forced &#946; of 10. (Answer: 358 &#937;)</li><li>Why is a MOSFET preferred over a BJT for switching DC loads? What is a logic-level MOSFET?</li><li>Explain the working of an opto-isolator and of a zero-crossing solid state relay.</li><li>State four advantages and four disadvantages of solid state switches over mechanical switches.</li><li>Design a MOSFET interface for a 12 V, 24 W DC fan driven from a 5 V microcontroller pin.</li></ol></div><div class="pager"><a class="prev" href="08-cams-gears-ratchet-belts-bearings.html"><span class="dir">&larr; Previous topic</span><span class="ttl">08. Kinematic Chains, Cams, Gears, Ratchet and Pawl, Belt and Chain Drives, Bearings</span></a><a class="next" href="10-solenoid-dc-motor-stepper-motor.html"><span class="dir">Next topic &rarr;</span><span class="ttl">10. Solenoids, Brushed DC Motor and Stepper Motor</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

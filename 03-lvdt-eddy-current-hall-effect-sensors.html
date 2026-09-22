@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LVDT, Eddy Current Proximity Sensor and Hall Effect Sensor | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="Three important displacement and position sensors: the linear variable differential transformer for accurate linear displacement, the eddy current pro">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit I &middot; Topic 3 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit I &rsaquo; Topic 3</nav><div class="unit-tag">Unit I</div><h2 class="page-title"><span class="topic-no">03</span>LVDT, Eddy Current Proximity Sensor and Hall Effect Sensor</h2><p class="lede">Three important displacement and position sensors: the linear variable differential transformer for accurate linear displacement, the eddy current probe for non-contact metal detection, and the Hall effect sensor for magnetic field and speed measurement.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Linear Variable Differential Transformer (LVDT)</a></li><li><a href="#sec2">Eddy Current Proximity Sensor</a></li><li><a href="#sec3">Hall Effect Sensor</a></li><li><a href="#sec4">Comparison of the Three Sensors</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Linear Variable Differential Transformer (LVDT)</h3><h4>Construction</h4><p>LVDT stands for <b>Linear Variable Differential Transformer</b>. It is an inductive transducer that converts linear displacement into an alternating voltage. Its construction is very simple and robust. A <b>hollow cylindrical former</b>, made of a non-magnetic material such as glass-reinforced plastic or ceramic, carries three windings. A single <b>primary winding P</b> is placed at the centre, and two identical <b>secondary windings S1 and S2</b> are wound on either side of it. The two secondaries are connected in series opposition, meaning that their voltages oppose each other.</p><p>A separate <b>soft iron core</b>, usually made of nickel-iron alloy, slides freely inside the hollow former. The core is attached to the object whose displacement is to be measured. There is <b>no mechanical contact</b> between the core and the windings, which is a great advantage because there is no friction and no wear.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 315" width="880" height="315" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="25" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">LVDT construction and electrical connections</text><rect x="205" y="72" width="470" height="125" rx="5" class="t-box"/><rect x="315" y="116" width="260" height="36" rx="3" class="mech2"/><rect x="245" y="88" width="90" height="93" rx="4" class="t-box2"/><text x="290" y="126" font-size="16" fill="#12283d" text-anchor="middle" font-weight="700">S1</text><text x="290" y="148" font-size="10.5" fill="#5b6b7c" text-anchor="middle">secondary 1</text><rect x="400" y="88" width="90" height="93" rx="4" class="t-box3"/><text x="445" y="126" font-size="16" fill="#12283d" text-anchor="middle" font-weight="700">P</text><text x="445" y="148" font-size="10.5" fill="#5b6b7c" text-anchor="middle">primary</text><rect x="555" y="88" width="90" height="93" rx="4" class="t-box2"/><text x="600" y="126" font-size="16" fill="#12283d" text-anchor="middle" font-weight="700">S2</text><text x="600" y="148" font-size="10.5" fill="#5b6b7c" text-anchor="middle">secondary 2</text><text x="445" y="139" font-size="10.2" fill="#12283d" text-anchor="middle" font-weight="700">movable magnetic core</text><polyline points="445,112 445,63" class="lnk" marker-end="url(#ah)"/><text x="465" y="62" font-size="10.5" fill="#a8232a" text-anchor="start">core displacement x</text><circle cx="110" cy="135" r="18" class="cmp-f" fill="#e7f1fb" stroke="#12283d" stroke-width="1.8"/><path d="M 100.1 135 q 5.040000000000001 -12.6 9.9 0 q 5.040000000000001 12.6 9.9 0" class="wire" fill="none" stroke="#12283d" stroke-width="1.5"/><polyline points="110,117 170,117 170,45 445,45 445,88" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="110,153 170,153 170,230 445,230 445,181" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="170" cy="117" r="3.3" class="dot" fill="#12283d"/><text x="165" y="110" class="t-lbl-s" fill="#a8232a">+</text><circle cx="170" cy="153" r="3.3" class="dot" fill="#12283d"/><text x="165" y="170" class="t-lbl-s" fill="#0f5fa8">−</text><text x="110" y="184" font-size="10.5" fill="#0f5fa8" text-anchor="middle">AC excitation</text><polyline points="290,88 290,60 230,60" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="290,181 290,245 230,245" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="600,88 600,60 670,60" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="600,181 600,245 670,245" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="230" cy="60" r="3.3" class="dot" fill="#12283d"/><text x="228" y="53" class="t-lbl-s" fill="#0f5fa8">V1+</text><circle cx="230" cy="245" r="3.3" class="dot" fill="#12283d"/><text x="228" y="262" class="t-lbl-s" fill="#0f5fa8">V1−</text><circle cx="670" cy="60" r="3.3" class="dot" fill="#12283d"/><text x="672" y="53" class="t-lbl-s" fill="#0f5fa8">V2+</text><circle cx="670" cy="245" r="3.3" class="dot" fill="#12283d"/><text x="672" y="262" class="t-lbl-s" fill="#0f5fa8">V2−</text><text x="230" y="260" font-size="10.5" fill="#5b6b7c" text-anchor="middle">differential output 1</text><text x="670" y="260" font-size="10.5" fill="#5b6b7c" text-anchor="middle">differential output 2</text><text x="440" y="292" font-size="11.5" fill="#12283d" text-anchor="middle">The core changes the mutual inductance: when it moves toward S1, V1 rises and V2 falls; the phase difference gives direction.</text></svg></div><figcaption><b>Fig. 1:</b> Construction of an LVDT: one primary winding at the centre, two secondaries connected in series opposition, and a freely sliding soft iron core.</figcaption></figure><h4>Working principle</h4><p>An alternating voltage, typically 1 V to 24 V at 50 Hz to 20 kHz, is applied to the primary winding. This produces an alternating magnetic flux inside the former, which links with both secondary windings and induces voltages V1 in S1 and V2 in S2.</p><ul><li><b>Null or central position.</b> When the core is exactly at the centre, the flux linking both secondaries is equal, so V1 = V2. Because the windings are in opposition, the net output V<sub>out</sub> = V1 &minus; V2 = 0. This is called the <b>null position</b>.</li><li><b>Core moved to the left.</b> More flux links S1 than S2, so V1 &gt; V2 and the output is a positive alternating voltage.</li><li><b>Core moved to the right.</b> More flux links S2, so V2 &gt; V1 and the output is an alternating voltage of the same magnitude but <b>reversed in phase by 180&deg;</b>.</li></ul><p>Therefore the <b>magnitude</b> of the output voltage tells us <i>how far</i> the core has moved and the <b>phase</b> tells us <i>in which direction</i>. This is why the word <i>differential</i> appears in the name.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 240" width="880" height="240" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><line x1="300" y1="190" x2="300" y2="40" class="ax" marker-end="url(#ah)"/><line x1="300" y1="190" x2="620" y2="190" class="ax" marker-end="url(#ah)"/><text x="626" y="194" font-size="11.5" fill="#5b6b7c" text-anchor="start">core position</text><text x="294" y="34" font-size="11.5" fill="#5b6b7c" text-anchor="start">output voltage</text><line x1="460" y1="40" x2="460" y2="200" class="ax" stroke-dasharray="6 4"/><text x="460" y="212" font-size="11" fill="#5b6b7c" text-anchor="middle">null position</text><path d="M 305 55 L 460 190 L 615 55" class="lnk" stroke-width="2"/><text x="370" y="100" font-size="11.5" fill="#0f5fa8" text-anchor="middle">phase A</text><text x="550" y="100" font-size="11.5" fill="#a8232a" text-anchor="middle">phase reversed (180&#176;)</text><text x="440" y="228" font-size="11.5" fill="#12283d" text-anchor="middle">magnitude gives displacement, phase gives direction</text></svg></div><figcaption><b>Fig. 2:</b> Output characteristic of an LVDT. Magnitude gives the displacement, and the 180&deg; phase reversal across the null point gives the direction.</figcaption></figure><div class="formula"><span class="tag">Formula</span><p><b>Output of an LVDT</b><span class='eq'>V<sub>out</sub> = V1 &minus; V2  =  S &times; x</span>where S is the sensitivity in mV/mm and x is the displacement of the core from the null position.</p></div><h4>Signal conditioning</h4><p>Because the output is an alternating voltage, it cannot be read directly by a microcontroller. A <b>demodulator</b> circuit is used: the AC output is first rectified, then filtered and finally converted into a DC voltage whose polarity indicates direction. Many commercial LVDT modules include this conditioning, or a dedicated IC such as the AD598 or AD698 is used.</p><h4>Characteristics, advantages and limitations</h4><div class="tbl-scroll"><table><caption>Table 3.1 &mdash; LVDT features</caption><thead><tr><th>Feature</th><th>Typical value / description</th></tr></thead><tbody><tr><td>Measuring range</td><td>&plusmn;2 mm to &plusmn;400 mm (rotary versions called RVDT also exist)</td></tr><tr><td>Sensitivity</td><td>0.1 mV/V/mm to 10 mV/V/mm of core travel</td></tr><tr><td>Linearity</td><td>Better than &plusmn;0.1 % over the working range</td></tr><tr><td>Resolution</td><td>Theoretically infinite, since it is an analogue device</td></tr><tr><td>Friction</td><td>None &mdash; the core does not touch the windings</td></tr><tr><td>Life</td><td>Very long, because there is no wear</td></tr><tr><td>Ruggedness</td><td>Withstands shock and vibration well</td></tr><tr><td>Disadvantage</td><td>Output is AC, so demodulation is needed; stray magnetic fields and temperature affect it</td></tr><tr><td>Applications</td><td>Machine tool position feedback, thickness measurement, hydraulic cylinder position, tensile testing machines, aircraft control surface position, vibration measurement</td></tr></tbody></table></div><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> An LVDT has a sensitivity of 2.5 mV/mm and is supplied from a 3 V, 5 kHz source. The core is displaced by 8 mm to the right. Find the output voltage. <b>Solution:</b> V<sub>out</sub> = S &times; x = 2.5 &times; 8 = <b>20 mV</b>, and because the movement is to the right its phase is reversed by 180&deg; with respect to the left-side reference.</p></div><h3 id="sec2"><span class="sec-no">2.</span>Eddy Current Proximity Sensor</h3><h4>Principle</h4><p>The eddy current sensor works on <b>Faraday's law of electromagnetic induction</b> and <b>Lenz's law</b>. When a coil carrying a high-frequency alternating current is brought near a conducting object, the alternating magnetic field of the coil cuts the conductor and induces circulating currents inside it. These swirling currents are called <b>eddy currents</b>. By Lenz's law, the eddy currents create their own magnetic field which <b>opposes</b> the original field of the coil. This opposition reduces the effective inductance of the coil and increases its effective resistance, so the <b>impedance of the coil changes</b>. The change in impedance depends on the distance to the target, and this is what is measured.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="25" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">Eddy-current proximity sensor: coil circuit and response</text><text x="240" y="57" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Excited probe coil</text><circle cx="92" cy="112" r="18" class="cmp-f" fill="#e7f1fb" stroke="#12283d" stroke-width="1.8"/><path d="M 82.1 112 q 5.040000000000001 -12.6 9.9 0 q 5.040000000000001 12.6 9.9 0" class="wire" fill="none" stroke="#12283d" stroke-width="1.5"/><polyline points="92,94 155,94 155,78 250,78" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 250 78 a 12 12 0 0 1 24 0" class="cmp"/><path d="M 274 78 a 12 12 0 0 1 24 0" class="cmp"/><path d="M 298 78 a 12 12 0 0 1 24 0" class="cmp"/><path d="M 322 78 a 12 12 0 0 1 24 0" class="cmp"/><path d="M 346 78 a 12 12 0 0 1 24 0" class="cmp"/><path d="M 370 78 a 12 12 0 0 1 24 0" class="cmp"/><polyline points="394,78 455,78 455,130 92,130 92,130" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="155" cy="94" r="3.3" class="dot" fill="#12283d"/><text x="144" y="86" class="t-lbl-s" fill="#0f5fa8">AC</text><text x="322" y="105" font-size="10.5" fill="#5b6b7c" text-anchor="middle">high-frequency oscillator</text><rect x="180" y="172" width="285" height="35" rx="3" class="mech"/><text x="322" y="195" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">conducting target (metal)</text><ellipse cx="250" cy="188" rx="20" ry="8" fill="none" stroke="#a8232a" stroke-width="1.6" stroke-dasharray="4 3"/><ellipse cx="340" cy="188" rx="20" ry="8" fill="none" stroke="#a8232a" stroke-width="1.6" stroke-dasharray="4 3"/><polyline points="322,150 322,168" class="lnk" marker-end="url(#ah)"/><text x="338" y="160" font-size="10.5" fill="#12283d" text-anchor="start">gap d</text><text x="322" y="226" font-size="10.5" fill="#a8232a" text-anchor="middle">eddy currents oppose the coil field; closer metal changes coil impedance</text><rect x="530" y="52" width="300" height="173" rx="6" class="t-box"/><text x="680" y="43" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Output characteristic</text><line x1="565" y1="195" x2="565" y2="75" class="ax" marker-end="url(#ah)"/><line x1="565" y1="195" x2="795" y2="195" class="ax" marker-end="url(#ah)"/><text x="801" y="199" font-size="11.5" fill="#5b6b7c" text-anchor="start">distance d</text><text x="559" y="69" font-size="11.5" fill="#5b6b7c" text-anchor="start">V out</text><path d="M 565 75 C 625 82, 700 140, 795 190" class="lnk" stroke-width="2"/><text x="645" y="116" font-size="10.5" fill="#0f5fa8" text-anchor="middle">near target: strong coupling</text><text x="680" y="250" font-size="11" fill="#12283d" text-anchor="middle">The sensor is non-contact and detects conductive targets only.</text></svg></div><figcaption><b>Fig. 3:</b> Eddy current sensor principle (left) and the way the output varies with distance (right). Closer target means stronger eddy currents and larger impedance change.</figcaption></figure><h4>Construction</h4><p>The sensing head contains a small coil wound on a ferrite core, housed in a stainless steel barrel with an active face. A built-in <b>oscillator</b> produces a high frequency, typically 100 Hz to 1 MHz (most industrial sensors use around 1 kHz to 20 kHz), and feeds it to the coil. A <b>detector</b> or trigger circuit monitors the amplitude of oscillation. When a metal target approaches, the oscillation amplitude falls (or the coil impedance changes) and a <b>Schmitt trigger</b> produces a clean digital output. Many versions also give an analogue output proportional to distance.</p><h4>Working</h4><ol><li>The oscillator drives an alternating current through the coil, creating an alternating magnetic field in front of the sensing face.</li><li>A conductive target enters this field and eddy currents are induced on its surface.</li><li>The eddy currents produce an opposing field which loads the coil; energy is drawn from the oscillator.</li><li>The amplitude of oscillation decreases. The detector senses this decrease.</li><li>When the target comes within the <b>sensing distance</b>, the trigger flips and the output changes state.</li><li>When the target moves away, the oscillation recovers and the output returns to its original state.</li></ol><h4>Important terms</h4><ul><li><b>Sensing distance (Sn)</b> &mdash; the maximum distance at which a standard mild steel target is detected, usually 1 mm to 40 mm.</li><li><b>Hysteresis</b> &mdash; the difference between the operate and release distances, typically 5 % to 20 % of Sn. It prevents the output from chattering when the target is exactly at the boundary.</li><li><b>Repeat accuracy</b> &mdash; how consistently the sensor switches at the same distance, typically 1 % to 3 % of Sn.</li><li><b>Response frequency</b> &mdash; how many switching cycles per second the sensor can perform, typically 200 Hz to 5 kHz.</li><li><b>Output configuration</b> &mdash; PNP (sources current) or NPN (sinks current), normally open or normally closed, two-wire, three-wire or four-wire.</li></ul><div class="note"><span class="tag">Note</span><p>The response of an eddy current sensor depends strongly on the <b>material of the target</b>. Ferrous metals (iron, steel) give the full rated distance. Non-ferrous metals such as aluminium, copper and brass give a much shorter distance, often only 40 % to 70 % of the rated value, and a <b>reduction factor</b> is published by the manufacturer. Non-conductors such as plastic, wood and glass are not detected at all.</p></div><h4>Advantages, disadvantages and applications</h4><ul><li><b>Advantages:</b> completely non-contact, no wear; unaffected by dust, oil, water, dirt and light; very high switching frequency; can measure small displacements with high resolution; works through non-metallic barriers.</li><li><b>Disadvantages:</b> detects metals only; sensing distance is short; output depends on the target material, size and shape; affected by strong external magnetic fields and by temperature.</li><li><b>Applications:</b> counting and detecting metal parts on a conveyor; measuring shaft vibration and axial displacement in turbines; checking runout of a rotating shaft; metal detection in food and pharmaceutical packaging; measuring thickness of metal sheets; position feedback in precision machine tools; non-destructive crack testing.</li></ul><div class="example"><span class="tag">Example</span><p>An eddy current proximity sensor has a rated sensing distance of 8 mm for mild steel and a reduction factor of 0.4 for aluminium. The largest distance at which it will detect an aluminium target is 8 &times; 0.4 = <b>3.2 mm</b>.</p></div><h3 id="sec3"><span class="sec-no">3.</span>Hall Effect Sensor</h3><h4>The Hall effect</h4><p>The Hall effect was discovered by Edwin Hall in 1879. When a current-carrying conductor or semiconductor is placed in a magnetic field that is <b>perpendicular</b> to the direction of current, the charge carriers experience a force and are pushed to one side of the material. This causes a build-up of charge on the two opposite faces and produces a small voltage across the material, perpendicular to both the current and the field. This voltage is called the <b>Hall voltage</b>.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="25" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">Hall-effect sensor: separate current, field and Hall-voltage terminals</text><text x="245" y="55" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Analog Hall element</text><rect x="105" y="90" width="280" height="100" rx="3" class="cmp-y"/><text x="245" y="140" font-size="12" fill="#12283d" text-anchor="middle" font-weight="600">thin semiconductor slab</text><text x="245" y="160" font-size="10.5" fill="#5b6b7c" text-anchor="middle">current I  +  magnetic field B</text><polyline points="55,140 105,140" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="55" y1="140" x2="100" y2="140" class="lnk" marker-end="url(#aho)"/><polyline points="385,140 435,140" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="55" y="128" font-size="11" fill="#0f5fa8" text-anchor="start" font-weight="700">I in</text><text x="435" y="128" font-size="11" fill="#0f5fa8" text-anchor="start" font-weight="700">I out</text><circle cx="165" cy="72" r="9" fill="none" stroke="#a8232a" stroke-width="1.6"/><circle cx="165" cy="72" r="2.2" fill="#a8232a"/><circle cx="245" cy="72" r="9" fill="none" stroke="#a8232a" stroke-width="1.6"/><circle cx="245" cy="72" r="2.2" fill="#a8232a"/><circle cx="325" cy="72" r="9" fill="none" stroke="#a8232a" stroke-width="1.6"/><circle cx="325" cy="72" r="2.2" fill="#a8232a"/><text x="245" y="48" font-size="11" fill="#a8232a" text-anchor="middle">B out of the page</text><polyline points="175,90 175,62 95,62" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="315,190 315,225 395,225" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="95" cy="62" r="3.3" class="dot" fill="#12283d"/><text x="92" y="55" class="t-lbl-s" fill="#a8232a">VH+</text><circle cx="395" cy="225" r="3.3" class="dot" fill="#12283d"/><text x="397" y="242" class="t-lbl-s" fill="#0f5fa8">VH−</text><text x="245" y="248" font-size="11" fill="#12283d" text-anchor="middle">VH ∝ I × B; Hall terminals are a differential measurement, not a ground connection.</text><text x="685" y="55" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Digital Hall switch</text><rect x="545" y="85" width="220" height="115" rx="8" class="t-box2"/><rect x="565" y="105" width="78" height="42" rx="5" class="t-box"/><text x="604.0" y="117.5" class="t-lbl" style="font-size:10.5px">Hall</text><text x="604.0" y="134.5" class="t-lbl" style="font-size:10.5px">element</text><rect x="665" y="105" width="80" height="42" rx="5" class="t-box"/><text x="705.0" y="117.5" class="t-lbl" style="font-size:10.5px">Schmitt</text><text x="705.0" y="134.5" class="t-lbl" style="font-size:10.5px">trigger</text><line x1="645" y1="126" x2="663" y2="126" class="lnk" marker-end="url(#ah)"/><text x="685" y="181" font-size="9.5" fill="#5b6b7c" text-anchor="middle">open-collector output stage</text><polyline points="655,200 655,230" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="655" y1="230" x2="655" y2="240" class="wire"/><line x1="642" y1="240" x2="668" y2="240" class="wire"/><line x1="647" y1="245" x2="663" y2="245" class="wire"/><line x1="651.5" y1="250" x2="658.5" y2="250" class="wire"/><polyline points="705,85 705,65 790,65" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 790.000,65.000 L 790.000,71.000 L 798.000,75.620 L 782.000,80.900 L 798.000,86.180 L 782.000,91.460 L 798.000,96.740 L 790.000,104.000 L 790.000,110.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="810" y="91" font-size="9.2" fill="#5b6b7c" text-anchor="start">10 kΩ pull-up</text><polyline points="790,110 790,126" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="790" cy="126" r="3.3" class="dot" fill="#12283d"/><circle cx="790" cy="65" r="3.3" class="dot" fill="#12283d"/><text x="792" y="58" class="t-lbl-s" fill="#a8232a">+5 V</text><polyline points="745,126 850,126" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="850" cy="126" r="3.3" class="dot" fill="#12283d"/><text x="848" y="119" class="t-lbl-s" fill="#157a4b">OUT</text><text x="685" y="270" font-size="10.8" fill="#12283d" text-anchor="middle">S pole present → output LOW; no field → pull-up makes output HIGH</text></svg></div><figcaption><b>Fig. 4:</b> Hall effect element (left): current I flows through a thin slab in a magnetic field B, producing a Hall voltage V<sub>H</sub> across the slab. A practical digital Hall switch (right) contains a Hall element, a Schmitt trigger and an open-collector output.</figcaption></figure><div class="formula"><span class="tag">Formula</span><p><b>Hall voltage</b><span class='eq'>V<sub>H</sub> = (B &times; I) / (n &times; q &times; t)</span>where B = flux density (tesla), I = control current (A), n = charge carrier density, q = electron charge, t = thickness of the slab. Since the quantity 1/(nqt) is constant for a given material, we write V<sub>H</sub> = K<sub>H</sub> &times; B &times; I, so <b>the Hall voltage is directly proportional to both the field strength and the control current</b>.</p></div><p>Metals have a very large carrier density n, so their Hall voltage is extremely small. <b>Semiconductors</b> such as gallium arsenide (GaAs), indium antimonide (InSb), indium arsenide (InAs) and silicon have a much smaller n and therefore give a much larger Hall voltage. This is why Hall elements are made from semiconductor materials and are very thin.</p><h4>Types of Hall sensor</h4><ul><li><b>Linear (analogue) Hall sensor</b> &mdash; the output voltage is directly proportional to the magnetic flux density. Used where the strength of the field must be measured, for example in a current clamp meter or a brushless DC motor for commutation. Example: A1302, SS49E.</li><li><b>Digital (switching) Hall sensor</b> &mdash; contains a Schmitt trigger, so the output is either HIGH or LOW. It switches when the field exceeds a certain <b>operate point</b> and releases when it falls below a certain <b>release point</b>. Used for position, speed and limit sensing. Example: A3144, US1881.</li><li><b>Latching Hall sensor</b> &mdash; switches ON with one magnetic polarity (south) and OFF with the opposite polarity (north). Ideal for brushless motor commutation and for detecting the poles of a rotating ring magnet.</li></ul><h4>Working and interfacing</h4><p>In a digital Hall switch, the Hall element output is amplified and fed to a Schmitt trigger. The output stage is usually an <b>open-collector NPN transistor</b>, so an external <b>pull-up resistor</b> (typically 1 k&#937; to 10 k&#937;) must be connected between the output pin and the positive supply. When a south pole of a magnet comes close, the output transistor saturates and the pin goes LOW; when the magnet is removed, the output goes HIGH through the pull-up. This gives a clean square wave that a microcontroller can count.</p><h4>Speed measurement using a Hall sensor</h4><p>This is the most common industrial application. A small magnet is fixed on the rotating shaft or a toothed ferrous wheel is used with a Hall switch placed near it. Each time a magnet or tooth passes, one pulse is produced. If N pulses are counted in T seconds and the wheel has P teeth,</p><span class="eq">Speed in revolutions per second = N / (P &times; T)     and    Speed in rpm = 60 &times; N / (P &times; T)</span><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> A shaft carries a disc with 20 teeth and a Hall sensor produces 1500 pulses in 10 seconds. Speed = 60 &times; 1500 / (20 &times; 10) = 90000 / 200 = <b>450 rpm</b>.</p></div><h4>Advantages, disadvantages and applications</h4><ul><li><b>Advantages:</b> solid state, so no contacts, no wear and no bouncing; works at very high speed; immune to dust, dirt, water, oil and vibration; small size and low cost; can sense through non-magnetic walls; provides a digital output directly.</li><li><b>Disadvantages:</b> requires a magnet or a magnetic target, so it cannot sense non-magnetic materials directly; affected by stray magnetic fields and by high temperature; the sensing gap is limited to a few millimetres; needs a pull-up resistor.</li><li><b>Applications:</b> speed and position sensing in brushless DC motors (for commutation); wheel speed sensing in ABS and in tachometers; crankshaft and camshaft position in automobiles; detecting the position of a pneumatic cylinder piston through a non-magnetic barrel; brushless DC fan and pump control; current sensing (the current-carrying conductor produces a field which the Hall element measures); joysticks and throttle pedals; proximity switches, door switches and level indicators with a floating magnet.</li></ul><h3 id="sec4"><span class="sec-no">4.</span>Comparison of the Three Sensors</h3><div class="tbl-scroll"><table><caption>Table 3.2 &mdash; LVDT versus eddy current versus Hall sensor</caption><thead><tr><th>Parameter</th><th>LVDT</th><th>Eddy current sensor</th><th>Hall effect sensor</th></tr></thead><tbody><tr><td>Principle</td><td>Mutual induction / transformer action</td><td>Induced eddy currents oppose the coil field</td><td>Force on moving charge in a magnetic field</td></tr><tr><td>Measured quantity</td><td>Linear displacement</td><td>Proximity / displacement of a conductor</td><td>Magnetic field / position of a magnet</td></tr><tr><td>Contact type</td><td>Non-contact (core moves freely inside)</td><td>Non-contact</td><td>Non-contact</td></tr><tr><td>Target material</td><td>Soft iron core attached to the object</td><td>Any electrically conducting metal</td><td>Magnet or ferromagnetic part</td></tr><tr><td>Output</td><td>AC voltage (amplitude + phase)</td><td>Analogue voltage or digital switch</td><td>Analogue voltage or digital switch</td></tr><tr><td>Range</td><td>&plusmn;2 mm to &plusmn;400 mm</td><td>1 mm to 40 mm</td><td>A few mm (depends on magnet)</td></tr><tr><td>Linearity</td><td>Excellent, better than 0.1 %</td><td>Non-linear near the limit, linear in a short zone</td><td>Linear type is good; switch type is digital</td></tr><tr><td>Speed of response</td><td>Moderate</td><td>Very high (up to several kHz)</td><td>Very high (up to 100 kHz)</td></tr><tr><td>Typical use</td><td>Precision position feedback, testing machines</td><td>Counting metal parts, vibration and runout measurement</td><td>Motor commutation, rpm measurement, ABS wheel speed</td></tr></tbody></table></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>An LVDT has one primary and two secondaries connected in series opposition, with a sliding soft iron core. Output magnitude gives displacement and phase gives direction; output is zero at the null position.</li><li>LVDT advantages are infinite resolution, no friction, long life and excellent linearity; its drawback is that the output is AC and needs demodulation.</li><li>An eddy current sensor uses a high-frequency coil. Eddy currents induced in a nearby conductor oppose the coil field and change its impedance, which is detected as a change in oscillation amplitude.</li><li>Eddy current sensors detect metals only, are non-contact and immune to contamination, and their sensing distance depends on the target material through a reduction factor.</li><li>The Hall effect produces a voltage V<sub>H</sub> = K<sub>H</sub> B I across a thin current-carrying semiconductor placed in a perpendicular magnetic field.</li><li>Hall sensors are available as linear (analogue), digital switching and latching types; digital types need an external pull-up resistor.</li><li>Speed from a Hall sensor: rpm = 60 N / (P T), where N is the number of pulses, P the number of teeth or poles and T the time in seconds.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>With a neat sketch, explain the construction and working of an LVDT. Why is its output zero at the null position?</li><li>How does an LVDT indicate the direction of displacement? What signal conditioning is needed before a microcontroller can use it?</li><li>State the principle of an eddy current proximity sensor and explain its construction and working with a diagram.</li><li>Why does the sensing distance of an eddy current sensor change with the material of the target? What is a reduction factor?</li><li>Explain the Hall effect and derive an expression for the Hall voltage.</li><li>Differentiate between linear, digital and latching Hall sensors. Why does a digital Hall sensor need a pull-up resistor?</li><li>A shaft carries a 12-tooth wheel and a Hall sensor produces 2400 pulses in 8 seconds. Calculate the shaft speed in rpm. (Answer: 1500 rpm)</li><li>Compare LVDT, eddy current and Hall sensors with respect to principle, range, linearity and typical applications.</li></ol></div><div class="pager"><a class="prev" href="02-sensors-transducers-performance-terminology.html"><span class="dir">&larr; Previous topic</span><span class="ttl">02. Sensors and Transducers &mdash; Performance Terminology</span></a><a class="next" href="04-strain-gauge-load-cell-tactile-float-sensor.html"><span class="dir">Next topic &rarr;</span><span class="ttl">04. Strain Gauge Load Cell, Tactile Sensor and Float Sensor</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

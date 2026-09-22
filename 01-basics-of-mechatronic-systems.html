@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Basics of Mechatronic Systems | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="What mechatronics really means, the key elements that make up a mechatronic system, the design process an engineer follows, and worked examples such a">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit I &middot; Topic 1 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit I &rsaquo; Topic 1</nav><div class="unit-tag">Unit I</div><h2 class="page-title"><span class="topic-no">01</span>Basics of Mechatronic Systems</h2><p class="lede">What mechatronics really means, the key elements that make up a mechatronic system, the design process an engineer follows, and worked examples such as a washing machine and an anti-lock braking system.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">What is Mechatronics?</a></li><li><a href="#sec2">Key Elements of a Mechatronic System</a></li><li><a href="#sec3">The Mechatronic Design Process</a></li><li><a href="#sec4">Examples of Mechatronic Systems</a></li><li><a href="#sec5">Advantages and Disadvantages</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>What is Mechatronics?</h3><p>The word <b>mechatronics</b> was first used in 1969 by Tetsuro Mori of the Japanese company Yaskawa Electric. It is formed from two words, <i>mecha</i> from mechanism and <i>tronics</i> from electronics. In simple language, mechatronics is the <b>synergistic integration of mechanical engineering, electronics, control theory and computer programming</b> in the design of a product or a process.</p><p>The important word here is <b>integration</b>. In the old style of design, a mechanical engineer designed the mechanism, an electrical engineer added a motor and a switch, and the two parts were joined at the end. In mechatronic design, all these disciplines are considered <b>together from the very first day</b>. The mechanism is designed keeping the sensor and the controller in mind, and the controller software is written keeping the mechanism in mind. The result is a product that is simpler, cheaper, lighter, more reliable and far more flexible than the same product built the traditional way.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 330" width="880" height="330" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="225" y="28" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">(a) Traditional design</text><rect x="40" y="60" width="120" height="70" rx="8" class="t-box2"/><text x="100.0" y="86.5" class="t-lbl">Mechanical</text><text x="100.0" y="103.5" class="t-lbl">system</text><rect x="200" y="60" width="120" height="70" rx="8" class="t-box2"/><text x="260.0" y="86.5" class="t-lbl">Electrical /</text><text x="260.0" y="103.5" class="t-lbl">electronic add-on</text><line x1="160" y1="95" x2="198" y2="95" class="lnk" marker-end="url(#ah)"/><text x="225" y="168" font-size="11.5" fill="#12283d" text-anchor="middle">designed separately,</text><text x="225" y="186" font-size="11.5" fill="#12283d" text-anchor="middle">bolted together at the end</text><text x="665" y="28" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">(b) Mechatronic design</text><circle cx="600" cy="130" r="72" fill="#e7f1fb" stroke="#0f5fa8" stroke-width="1.8" opacity="0.9"/><circle cx="700" cy="130" r="72" fill="#fff4e5" stroke="#e07b00" stroke-width="1.8" opacity="0.85"/><circle cx="650" cy="215" r="72" fill="#e8f6ee" stroke="#157a4b" stroke-width="1.8" opacity="0.8"/><text x="565" y="100" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Mechanical</text><text x="742" y="100" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Electronics</text><text x="650" y="268" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Control &amp;</text><text x="650" y="284" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Computing</text><text x="650" y="152" font-size="12.5" fill="#0a4377" text-anchor="middle" font-weight="700">MECHA-</text><text x="650" y="170" font-size="12.5" fill="#0a4377" text-anchor="middle" font-weight="700">TRONICS</text><line x1="450" y1="20" x2="450" y2="310" class="ax" stroke-width="1.2" stroke-dasharray="6 4"/></svg></div><figcaption><b>Fig. 1:</b> Traditional design keeps the disciplines separate and joins them at the end; mechatronic design overlaps them from the beginning.</figcaption></figure><div class="defbox"><span class="tag">Definition</span><p><b>Mechatronics</b> is the design philosophy in which mechanical systems, sensors, actuators, electronics and computer control are integrated from the concept stage itself so that the final product performs a task with greater precision, flexibility and intelligence than a purely mechanical or purely electronic design could achieve.</p></div><div class="note"><span class="tag">Note</span><p>A useful way to remember the idea: <b>Mechatronics = Mechanics + Electronics + Control + Computing</b>. If any one of these four is missing, the system is not truly mechatronic.</p></div><h3 id="sec2"><span class="sec-no">2.</span>Key Elements of a Mechatronic System</h3><p>Every mechatronic system, whether it is a simple automatic water cooler or a complex industrial robot, contains the same five groups of elements. The physical process is sensed, the signal is cleaned up, a decision is taken, an action is produced, and the effect of that action is sensed again. This chain is shown below.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 430" width="880" height="430" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><rect x="20" y="175" width="150" height="90" rx="8" class="t-box3"/><text x="95" y="205" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">Physical</text><text x="95" y="224" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">System /</text><text x="95" y="243" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">Process</text><rect x="225" y="60" width="160" height="78" rx="8" class="t-box2"/><text x="305.0" y="82.0" class="t-lbl">Sensors &amp;</text><text x="305.0" y="99.0" class="t-lbl">Transducers</text><text x="305.0" y="116.0" class="t-lbl-s">measurand &rarr; electrical signal</text><rect x="430" y="60" width="165" height="78" rx="8" class="t-box2"/><text x="512.5" y="82.0" class="t-lbl">Signal</text><text x="512.5" y="99.0" class="t-lbl">Conditioning</text><text x="512.5" y="116.0" class="t-lbl-s">filter / amplify / ADC</text><rect x="640" y="60" width="165" height="78" rx="8" class="t-box2"/><text x="722.5" y="82.0" class="t-lbl">Digital Control</text><text x="722.5" y="99.0" class="t-lbl">System</text><text x="722.5" y="116.0" class="t-lbl-s">microcontroller / PLC / PC</text><rect x="640" y="250" width="165" height="78" rx="8" class="t-box4"/><text x="722.5" y="280.5" class="t-lbl">Actuators</text><text x="722.5" y="297.5" class="t-lbl-s">motor / solenoid / valve / heater</text><polyline points="170,200 305,200 305,142" class="lnk" marker-end="url(#ah)"/><text x="238" y="192" class="t-lbl-s">measured variable</text><line x1="385" y1="99" x2="428" y2="99" class="lnk" marker-end="url(#ah)"/><line x1="595" y1="99" x2="638" y2="99" class="lnk" marker-end="url(#ah)"/><polyline points="722,138 722,248" class="lnk" marker-end="url(#ah)"/><text x="740" y="195" class="t-lbl-s" text-anchor="start">control signal</text><polyline points="640,289 95,289 95,267" class="lnk" marker-end="url(#ah)"/><text x="360" y="281" class="t-lbl-s">actuation force / torque / motion</text><path d="M 305 138 L 305 355 L 95 355 L 95 267" class="lnk-d" marker-end="url(#ah)"/><text x="200" y="348" class="t-lbl-s">feedback path (in a closed loop system)</text><rect x="430" y="330" width="165" height="50" rx="8" class="t-box5"/><text x="512" y="360" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">Power Supply</text><path d="M 512 330 L 512 250 L 640 250" class="lnk-d"/><text x="855" y="415" font-size="10" fill="#12283d" text-anchor="middle"></text></svg></div><figcaption><b>Fig. 2:</b> The key elements of a mechatronic system: sensors, signal conditioning, digital control, actuators and the physical system, all supported by a power supply.</figcaption></figure><h4>1. Sensors and Transducers</h4><p>Sensors are the <b>eyes, ears and skin</b> of the system. A sensor responds to a physical quantity such as temperature, position, force, light, pressure or speed and produces a corresponding electrical signal, usually a voltage, a current, a change in resistance or a change in capacitance. The device that performs this energy conversion is called a <b>transducer</b>. For example, in an automatic washing machine a pressure switch senses the water level and a thermistor senses the water temperature.</p><h4>2. Signal Conditioning</h4><p>The raw output of a sensor is rarely in a form that a controller can use directly. It may be only a few millivolts, it may be sitting on top of electrical noise, or it may be an analogue value while the controller works in digital. <b>Signal conditioning</b> is the stage that converts the sensor output into a clean, properly scaled, usable signal. It normally includes the following operations.</p><ul><li><b>Amplification</b> &mdash; an instrumentation amplifier raises a few millivolts to a few volts.</li><li><b>Filtering</b> &mdash; low-pass, high-pass or band-pass circuits remove unwanted noise, especially the 50 Hz mains hum.</li><li><b>Linearisation</b> &mdash; many sensors are non-linear; a circuit or a software look-up table makes the output proportional to the measured quantity.</li><li><b>Bridge completion and balancing</b> &mdash; needed for strain gauges and other resistive sensors.</li><li><b>Analogue to digital conversion (ADC)</b> &mdash; converts the analogue voltage into a binary number the microcontroller can read.</li><li><b>Isolation</b> &mdash; opto-couplers protect the low-voltage electronics from the high-voltage power side.</li></ul><h4>3. Digital Control System</h4><p>This is the <b>brain</b> of the mechatronic system. It receives the digital values from the signal conditioning stage, compares them with the desired values (the set point), decides what action is required and sends commands to the actuators. Depending on the complexity of the task, the controller may be a simple <b>microcontroller</b> such as the ATmega328 or the 8051, a <b>Programmable Logic Controller (PLC)</b> in a factory, a <b>Digital Signal Processor (DSP)</b> where fast mathematics is needed, or a full <b>industrial computer</b>. The intelligence of the system lies in the program stored in its memory.</p><h4>4. Actuators</h4><p>If sensors are the sense organs, actuators are the <b>muscles</b>. An actuator converts the electrical command from the controller back into physical action &mdash; motion, force, heat or light. Common actuators are DC motors, stepper motors, servo motors, AC induction motors, solenoids, pneumatic and hydraulic cylinders, heaters, valves and relays. The choice of actuator depends on the required speed, torque, accuracy, cost and power source.</p><h4>5. The Physical System / Process</h4><p>This is the mechanical plant that actually does the work &mdash; the drum of a washing machine, the wheels of a car, the arm of a robot, the water in a tank. Everything else in the mechatronic system exists to make this physical system behave in the desired manner.</p><div class="note"><span class="tag">Note</span><p>Besides these five, every real system also needs a <b>power supply</b> (often more than one, for example 24 V for the actuators and 5 V for the logic) and some form of <b>display or user interface</b> such as LEDs, a seven-segment display or an LCD screen.</p></div><div class="tbl-scroll"><table><caption>Table 1.1 &mdash; Key elements at a glance</caption><thead><tr><th>Element</th><th>Function</th><th>Typical devices</th><th>Signal form</th></tr></thead><tbody><tr><td>Sensors / transducers</td><td>Measure a physical variable</td><td>Thermocouple, LVDT, strain gauge, LDR, encoder</td><td>mV, &micro;V, change in R / C / L</td></tr><tr><td>Signal conditioning</td><td>Clean, scale and digitise the signal</td><td>Op-amp, filter, ADC, opto-isolator, bridge</td><td>0&ndash;5 V analogue then digital</td></tr><tr><td>Digital controller</td><td>Take the decision</td><td>Microcontroller, PLC, DSP, PC</td><td>Digital data / program logic</td></tr><tr><td>Actuators</td><td>Produce the physical action</td><td>DC motor, stepper motor, servo, solenoid, heater, valve</td><td>Torque, force, displacement, heat</td></tr><tr><td>Physical system</td><td>Do the useful work</td><td>Machine, robot arm, vehicle, tank of water</td><td>Mechanical / thermal / fluid</td></tr><tr><td>Power supply</td><td>Provide energy</td><td>Transformer-rectifier, SMPS, battery</td><td>5 V, 12 V, 24 V DC or 230 V AC</td></tr></tbody></table></div><h3 id="sec3"><span class="sec-no">3.</span>The Mechatronic Design Process</h3><p>Designing a mechatronic system is not a straight line from idea to product. It is an <b>iterative process</b>, which means the designer keeps going back and improving earlier decisions whenever a later test reveals a problem. The following stages are generally followed.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><rect x="18" y="70" width="128" height="96" rx="8" class="t-box2"/><text x="82.0" y="101.0" class="t-lbl" style="font-size:12.5px">1. Identify</text><text x="82.0" y="118.0" class="t-lbl" style="font-size:12.5px">the need</text><text x="82.0" y="135.0" class="t-lbl-s">problem statement</text><line x1="146" y1="118" x2="170" y2="118" class="lnk" marker-end="url(#ah)"/><rect x="161" y="70" width="128" height="96" rx="8" class="t-box3"/><text x="225.0" y="101.0" class="t-lbl" style="font-size:12.5px">2. Define the</text><text x="225.0" y="118.0" class="t-lbl" style="font-size:12.5px">problem</text><text x="225.0" y="135.0" class="t-lbl-s">specifications, constraints</text><line x1="289" y1="118" x2="313" y2="118" class="lnk" marker-end="url(#ah)"/><rect x="304" y="70" width="128" height="96" rx="8" class="t-box2"/><text x="368.0" y="101.0" class="t-lbl" style="font-size:12.5px">3. Generate</text><text x="368.0" y="118.0" class="t-lbl" style="font-size:12.5px">concepts</text><text x="368.0" y="135.0" class="t-lbl-s">brainstorm, possible solutions</text><line x1="432" y1="118" x2="456" y2="118" class="lnk" marker-end="url(#ah)"/><rect x="447" y="70" width="128" height="96" rx="8" class="t-box3"/><text x="511.0" y="101.0" class="t-lbl" style="font-size:12.5px">4. Model &amp;</text><text x="511.0" y="118.0" class="t-lbl" style="font-size:12.5px">analyse</text><text x="511.0" y="135.0" class="t-lbl-s">mathematical / CAD / simulation</text><line x1="575" y1="118" x2="599" y2="118" class="lnk" marker-end="url(#ah)"/><rect x="590" y="70" width="128" height="96" rx="8" class="t-box2"/><text x="654.0" y="101.0" class="t-lbl" style="font-size:12.5px">5. Build a</text><text x="654.0" y="118.0" class="t-lbl" style="font-size:12.5px">prototype</text><text x="654.0" y="135.0" class="t-lbl-s">breadboard, mock-up</text><line x1="718" y1="118" x2="742" y2="118" class="lnk" marker-end="url(#ah)"/><rect x="733" y="70" width="128" height="96" rx="8" class="t-box3"/><text x="797.0" y="101.0" class="t-lbl" style="font-size:12.5px">6. Test &amp;</text><text x="797.0" y="118.0" class="t-lbl" style="font-size:12.5px">refine</text><text x="797.0" y="135.0" class="t-lbl-s">verify against specification</text><path d="M 1300 166 L 1300 230 L 80 230 L 80 170" class="lnk-d" marker-end="url(#ah)"/><text x="690" y="222" class="t-lbl-s">iteration &mdash; go back and improve whenever a test fails</text><text x="440" y="40" class="t-cap" style="font-size:13px">MECHATRONIC DESIGN PROCESS</text></svg></div><figcaption><b>Fig. 3:</b> The mechatronic design process is iterative &mdash; a failed test sends the designer back to an earlier stage.</figcaption></figure><ol><li><b>Identify the need.</b> Everything begins with a problem or a requirement, for example &ldquo;we need a machine that fills exactly 500 ml of liquid into bottles at 60 bottles per minute.&rdquo;</li><li><b>Define the problem and write the specification.</b> The vague need is turned into measurable numbers: accuracy &plusmn;2 ml, speed 60 bottles/min, cost below a certain limit, power available, space available, safety standards to be met.</li><li><b>Generate concepts.</b> Several possible solutions are drawn on paper. Should the filler use a piston pump, a gravity tank or a peristaltic pump? Should position be sensed with an encoder or a limit switch? All ideas are listed without rejecting any at this stage.</li><li><b>Model and analyse.</b> The chosen concepts are analysed mathematically and by simulation. Free-body diagrams, circuit diagrams, transfer functions and CAD models are made. Software such as MATLAB/Simulink, Proteus or Multisim helps to check the idea before any money is spent on hardware.</li><li><b>Build a prototype.</b> A working model is assembled, usually on a breadboard with a development board and simple mechanical parts.</li><li><b>Test, evaluate and refine.</b> The prototype is tested against the specification written in stage 2. Whatever fails is corrected. The loop repeats until the specification is fully met.</li><li><b>Final design, documentation and manufacture.</b> Drawings, circuit schematics, program listings, a bill of material, a user manual and maintenance instructions are prepared so that the product can be manufactured and supported.</li></ol><div class="note"><span class="tag">Note</span><p>Notice that <b>the specification is written before the design starts</b>. This is the single most important discipline in mechatronic design, because without a written specification there is no objective way to decide whether the finished product is good or bad.</p></div><h3 id="sec4"><span class="sec-no">4.</span>Examples of Mechatronic Systems</h3><p>Mechatronic systems are all around us. Some everyday examples are listed below, followed by two detailed case studies.</p><div class="tbl-scroll"><table><caption>Table 1.2 &mdash; Everyday mechatronic products</caption><thead><tr><th>Product</th><th>Sensing</th><th>Control</th><th>Actuation</th></tr></thead><tbody><tr><td>Automatic washing machine</td><td>Water level, temperature, door lock, motor speed</td><td>Microcontroller with stored wash program</td><td>Inlet valve solenoid, motor, pump, heater</td></tr><tr><td>Anti-lock braking system (ABS)</td><td>Wheel speed sensor at each wheel</td><td>Electronic control unit compares wheel speeds</td><td>Hydraulic modulator valves and pump</td></tr><tr><td>Inkjet / laser printer</td><td>Paper position, cartridge position, toner level</td><td>Printer controller board</td><td>Stepper motors, solenoids, heater fuser</td></tr><tr><td>Digital camera with autofocus</td><td>Image sensor, focus motor position</td><td>Image processor runs focus algorithm</td><td>Voice-coil motor moves the lens</td></tr><tr><td>CNC machine tool</td><td>Linear encoders on each axis, spindle speed</td><td>CNC controller executes G-code</td><td>Servo motors, spindle motor, coolant valve</td></tr><tr><td>Air conditioner</td><td>Room temperature thermistor, humidity sensor</td><td>Microcontroller with fuzzy logic</td><td>Compressor motor, fan motor, louver stepper</td></tr><tr><td>Electronic weighing scale</td><td>Strain gauge load cell</td><td>ADC and microcontroller</td><td>Digital display, buzzer</td></tr><tr><td>Automobile engine management</td><td>Oxygen, knock, crank position, throttle sensors</td><td>Engine control unit (ECU)</td><td>Fuel injectors, ignition coils, idle air valve</td></tr></tbody></table></div><h4>Case study 1 &mdash; The automatic washing machine</h4><p>A fully automatic washing machine is one of the clearest examples of a mechatronic system because it uses every key element. The user selects a program on the input panel; this is the <b>command input</b>. A microcontroller reads the program and starts the sequence. First it opens the water inlet <b>solenoid valve</b> and waits until the <b>water level sensor</b> (usually a pressure switch or a float switch) reports that the tub is full. Then it switches on the <b>heater</b> if a warm wash is selected and monitors a <b>thermistor</b> until the set temperature is reached. Next the <b>motor</b> turns the drum alternately clockwise and anticlockwise for the wash period, and the <b>drain pump</b> empties the tub. Finally the motor spins the drum at high speed to remove water. Throughout the cycle the <b>door lock switch</b> is monitored; if the door is opened the controller stops everything for safety.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" width="880" height="320" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><rect x="30" y="120" width="140" height="80" rx="8" class="t-box3"/><text x="100.0" y="143.0" class="t-lbl">User input</text><text x="100.0" y="160.0" class="t-lbl">panel</text><text x="100.0" y="177.0" class="t-lbl-s">knobs / keypad</text><rect x="215" y="120" width="150" height="80" rx="8" class="t-box2"/><text x="290.0" y="143.0" class="t-lbl">Microcontroller</text><text x="290.0" y="160.0" class="t-lbl">(sequencer)</text><text x="290.0" y="177.0" class="t-lbl-s">timer + program memory</text><rect x="415" y="40" width="145" height="62" rx="8" class="t-box4"/><text x="487.5" y="54.0" class="t-lbl">Water inlet</text><text x="487.5" y="71.0" class="t-lbl">valve</text><text x="487.5" y="88.0" class="t-lbl-s">solenoid</text><rect x="415" y="122" width="145" height="62" rx="8" class="t-box4"/><text x="487.5" y="144.5" class="t-lbl">Motor + pump</text><text x="487.5" y="161.5" class="t-lbl-s">wash / spin drive</text><rect x="415" y="205" width="145" height="62" rx="8" class="t-box4"/><text x="487.5" y="227.5" class="t-lbl">Heater</text><text x="487.5" y="244.5" class="t-lbl-s">immersion type</text><rect x="640" y="40" width="150" height="62" rx="8" class="t-box2"/><text x="715.0" y="54.0" class="t-lbl">Water level</text><text x="715.0" y="71.0" class="t-lbl">sensor</text><text x="715.0" y="88.0" class="t-lbl-s">pressure switch</text><rect x="640" y="122" width="150" height="62" rx="8" class="t-box2"/><text x="715.0" y="136.0" class="t-lbl">Door lock</text><text x="715.0" y="153.0" class="t-lbl">switch</text><text x="715.0" y="170.0" class="t-lbl-s">safety interlock</text><rect x="640" y="205" width="150" height="62" rx="8" class="t-box2"/><text x="715.0" y="219.0" class="t-lbl">Temperature</text><text x="715.0" y="236.0" class="t-lbl">sensor</text><text x="715.0" y="253.0" class="t-lbl-s">thermistor</text><line x1="170" y1="160" x2="213" y2="160" class="lnk" marker-end="url(#ah)"/><polyline points="365,145 390,145 390,71 413,71" class="lnk" marker-end="url(#ah)"/><polyline points="365,160 413,153" class="lnk" marker-end="url(#ah)"/><polyline points="365,175 390,175 390,236 413,236" class="lnk" marker-end="url(#ah)"/><polyline points="640,71 610,71 610,108 390,108 390,132 367,132" class="lnk-d" marker-end="url(#ah)"/><polyline points="640,153 610,153 610,132 367,132" class="lnk-d" marker-end="url(#ah)"/><polyline points="640,236 610,236 610,190 390,190 390,168 367,168" class="lnk-d" marker-end="url(#ah)"/><text x="700" y="300" font-size="11" fill="#5b6b7c" text-anchor="middle">dashed lines = feedback / sensing signals</text><text x="150" y="285" font-size="10" fill="#12283d" text-anchor="middle"></text></svg></div><figcaption><b>Fig. 4:</b> Block diagram of an automatic washing machine showing the controller in the centre, the actuators it drives and the sensors that report back to it.</figcaption></figure><p>Notice what makes this system mechatronic rather than merely electromechanical: the <b>wash sequence is stored as software</b>. Adding a new wash program, changing the spin speed or making the machine decide the water quantity from the weight of the clothes requires no new mechanical parts &mdash; only a change in the program. This flexibility is the great advantage of mechatronics.</p><h4>Case study 2 &mdash; Anti-lock braking system (ABS)</h4><p>When a driver brakes hard on a slippery road, the wheels can lock and stop rotating. A locked wheel has almost no sideways grip, so the vehicle skids and the driver loses steering control. ABS prevents this. A <b>wheel speed sensor</b> at each wheel (a Hall sensor or a variable reluctance sensor working with a toothed ring) continuously reports the rotational speed. The <b>electronic control unit</b> compares the four speeds. If one wheel begins to decelerate much faster than the others, which means it is about to lock, the ECU commands the <b>hydraulic modulator</b> to release the brake pressure on that wheel and then re-apply it. This happens ten to twenty times every second, far faster than any human could pump the brake pedal. The driver feels a pulsing in the pedal and hears a clicking sound, which is normal.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><rect x="20" y="90" width="135" height="70" rx="8" class="t-box3"/><text x="87.5" y="116.5" class="t-lbl">Brake pedal</text><text x="87.5" y="133.5" class="t-lbl">(driver input)</text><rect x="190" y="90" width="135" height="70" rx="8" class="t-box2"/><text x="257.5" y="108.0" class="t-lbl">Wheel speed</text><text x="257.5" y="125.0" class="t-lbl">sensor</text><text x="257.5" y="142.0" class="t-lbl-s">Hall / VR type</text><rect x="360" y="90" width="150" height="70" rx="8" class="t-box2"/><text x="435.0" y="108.0" class="t-lbl">ABS electronic</text><text x="435.0" y="125.0" class="t-lbl">control unit</text><text x="435.0" y="142.0" class="t-lbl-s">compares speeds</text><rect x="545" y="90" width="140" height="70" rx="8" class="t-box4"/><text x="615.0" y="108.0" class="t-lbl">Hydraulic</text><text x="615.0" y="125.0" class="t-lbl">modulator</text><text x="615.0" y="142.0" class="t-lbl-s">valves + pump</text><rect x="720" y="90" width="140" height="70" rx="8" class="t-box4"/><text x="790.0" y="116.5" class="t-lbl">Brake</text><text x="790.0" y="133.5" class="t-lbl">(wheel cylinder)</text><line x1="155" y1="125" x2="188" y2="125" class="lnk" marker-end="url(#ah)"/><line x1="325" y1="125" x2="358" y2="125" class="lnk" marker-end="url(#ah)"/><line x1="510" y1="125" x2="543" y2="125" class="lnk" marker-end="url(#ah)"/><line x1="685" y1="125" x2="718" y2="125" class="lnk" marker-end="url(#ah)"/><path d="M 790 160 L 790 215 L 257 215 L 257 162" class="lnk-d" marker-end="url(#ah)"/><text x="520" y="208" font-size="11.5" fill="#5b6b7c" text-anchor="middle">closed loop feedback &mdash; wheel keeps turning, brake pressure is released and re-applied 10&ndash;20 times/second</text></svg></div><figcaption><b>Fig. 5:</b> ABS is a closed loop mechatronic system: the wheel speed is measured, compared with the other wheels, and the brake pressure is corrected many times per second.</figcaption></figure><p>ABS shows another important mechatronic benefit. The <b>mechanical braking system is unchanged</b>; intelligence has been added purely through sensors, electronics and software. The same idea is used in electronic stability control, traction control and cruise control.</p><h3 id="sec5"><span class="sec-no">5.</span>Advantages and Disadvantages</h3><div class="tbl-scroll"><table><caption>Table 1.3 &mdash; Merits and demerits of mechatronic design</caption><thead><tr><th>Advantages</th><th>Disadvantages</th></tr></thead><tbody><tr><td>Greater flexibility &mdash; function is changed by rewriting software, not by changing hardware</td><td>Higher initial development cost and longer design time</td></tr><tr><td>Higher accuracy, repeatability and precision of control</td><td>Needs a team with mixed skills (mechanical, electronic, programming)</td></tr><tr><td>Fewer moving parts, so less wear, less maintenance and longer life</td><td>Fault diagnosis is more difficult &mdash; the problem may be mechanical, electrical or in the software</td></tr><tr><td>New features such as self-diagnosis, data logging and remote monitoring become possible</td><td>Depends on a reliable power supply; a power failure can stop the whole system</td></tr><tr><td>Smaller size and lighter weight for the same performance</td><td>Electronic components are sensitive to heat, moisture, dust and vibration</td></tr><tr><td>Improved safety through interlocks and emergency stop logic</td><td>Spare parts and servicing require trained personnel</td></tr></tbody></table></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>Mechatronics is the integrated design of mechanics, electronics, control and computing, considered together from the concept stage.</li><li>The five key elements are sensors/transducers, signal conditioning, the digital control system, actuators and the physical system, supported by a power supply.</li><li>Signal conditioning includes amplification, filtering, linearisation, isolation and analogue-to-digital conversion.</li><li>The design process is iterative: identify the need, define the problem and specification, generate concepts, model and analyse, prototype, test and refine, then finalise.</li><li>The specification must be written before design begins so that the finished product can be judged objectively.</li><li>The washing machine and ABS are classic examples: in both, the mechanical hardware is simple and most of the intelligence is provided by sensors, a microcontroller and software.</li><li>The main advantage is flexibility; the main disadvantage is the need for multi-disciplinary skills and a dependable power supply.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Define mechatronics and explain how it differs from the traditional design approach.</li><li>Draw a block diagram of the key elements of a mechatronic system and explain the function of each element.</li><li>Why is signal conditioning necessary between a sensor and a digital controller? List any four operations it performs.</li><li>Describe the mechatronic design process with a neat flow diagram. Why is it called an iterative process?</li><li>With a block diagram, explain the working of an automatic washing machine as a mechatronic system.</li><li>Explain the working of an anti-lock braking system and state why it is a closed loop system.</li><li>List any six everyday mechatronic products along with their sensing, control and actuation elements.</li><li>State four advantages and four disadvantages of mechatronic design.</li></ol></div><div class="pager"><a class="prev" href="../index.html"><span class="dir">&larr; Contents</span><span class="ttl">All topics</span></a><a class="next" href="02-sensors-transducers-performance-terminology.html"><span class="dir">Next topic &rarr;</span><span class="ttl">02. Sensors and Transducers &mdash; Performance Terminology</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

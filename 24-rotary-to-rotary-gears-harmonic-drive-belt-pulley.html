@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motion Conversion &mdash; Rotary to Rotary: Gears, Harmonic Drives, Belt and Pulley Systems | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="How robot joints transmit rotation from motor to link: precision gears, the harmonic drive and cycloidal reducer that give near-zero backlash, and bel">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit IV &middot; Topic 24 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit IV &rsaquo; Topic 24</nav><div class="unit-tag">Unit IV</div><h2 class="page-title"><span class="topic-no">24</span>Motion Conversion &mdash; Rotary to Rotary: Gears, Harmonic Drives, Belt and Pulley Systems</h2><p class="lede">How robot joints transmit rotation from motor to link: precision gears, the harmonic drive and cycloidal reducer that give near-zero backlash, and belt, pulley and tendon drives that keep the arm light.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Why Robot Joints Need Special Transmissions</a></li><li><a href="#sec2">Gears in Robot Joints</a></li><li><a href="#sec3">Harmonic Drive (Strain Wave Gear)</a></li><li><a href="#sec4">Cycloidal Drive (RV Reducer)</a></li><li><a href="#sec5">Belt, Pulley, Chain and Tendon Systems</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Why Robot Joints Need Special Transmissions</h3><p>A robot joint has requirements that an ordinary gearbox rarely satisfies. The transmission must be <b>compact and light</b>, because it sits at the joint and its own mass must be carried by the joints below it. It must have a <b>high reduction ratio</b>, because servo motors run at 3000 rpm to 6000 rpm while a robot joint turns at perhaps 60 rpm. It must have <b>almost zero backlash</b>, because any clearance in the teeth shows up directly as a positioning error at the tool, magnified by the length of the arm. It must be <b>stiff</b>, so that the arm does not deflect under load. It must be <b>efficient</b> and <b>reliable</b> over tens of thousands of hours. And it must be able to <b>hold position</b> when the motor is off.</p><p>These demands have produced a family of specialised transmissions for robotics, described below.</p><h3 id="sec2"><span class="sec-no">2.</span>Gears in Robot Joints</h3><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Gear reductions used in robot joints</text><rect x="24" y="55" width="192" height="150" rx="8" class="t-box"/><text x="120" y="80" font-size="12.5" fill="#0a4377" text-anchor="middle" font-weight="700">Spur / helical</text><text x="120" y="108" font-size="10.5" fill="#4a5b6d" text-anchor="middle">low ratio per stage</text><text x="120" y="128" font-size="10.5" fill="#4a5b6d" text-anchor="middle">1.5:1 to 6:1</text><text x="120" y="148" font-size="10.5" fill="#4a5b6d" text-anchor="middle">backlash present</text><circle cx="98" cy="178" r="20" class="mech2"/><circle cx="142" cy="178" r="14" class="mech2"/><rect x="244" y="55" width="192" height="150" rx="8" class="t-box"/><text x="340" y="80" font-size="12.5" fill="#0a4377" text-anchor="middle" font-weight="700">Planetary</text><text x="340" y="108" font-size="10.5" fill="#4a5b6d" text-anchor="middle">compact, 3:1 to 100:1</text><text x="340" y="128" font-size="10.5" fill="#4a5b6d" text-anchor="middle">small backlash,</text><text x="340" y="148" font-size="10.5" fill="#4a5b6d" text-anchor="middle">high efficiency</text><circle cx="340" cy="178" r="26" fill="none" stroke="#8a5a1c" stroke-width="3"/><circle cx="340" cy="178" r="10" class="mech2"/><circle cx="357.0" cy="178.0" r="7" class="mech3"/><circle cx="331.5" cy="192.72243186433545" r="7" class="mech3"/><circle cx="331.5" cy="163.27756813566455" r="7" class="mech3"/><rect x="464" y="55" width="192" height="150" rx="8" class="t-box"/><text x="560" y="80" font-size="12.5" fill="#0a4377" text-anchor="middle" font-weight="700">Harmonic drive</text><text x="560" y="108" font-size="10.5" fill="#4a5b6d" text-anchor="middle">50:1 to 320:1,</text><text x="560" y="128" font-size="10.5" fill="#4a5b6d" text-anchor="middle">near zero backlash,</text><text x="560" y="148" font-size="10.5" fill="#4a5b6d" text-anchor="middle">high precision</text><circle cx="560" cy="178" r="26" class="mech"/><ellipse cx="560" cy="178" rx="20" ry="13" fill="none" stroke="#157a4b" stroke-width="3"/><circle cx="560" cy="178" r="6" class="mech2"/><rect x="674" y="55" width="192" height="150" rx="8" class="t-box"/><text x="770" y="80" font-size="12.5" fill="#0a4377" text-anchor="middle" font-weight="700">Cycloidal / RV</text><text x="770" y="108" font-size="10.5" fill="#4a5b6d" text-anchor="middle">30:1 to 250:1,</text><text x="770" y="128" font-size="10.5" fill="#4a5b6d" text-anchor="middle">very high stiffness,</text><text x="770" y="148" font-size="10.5" fill="#4a5b6d" text-anchor="middle">shock resistant</text><circle cx="770" cy="178" r="26" class="mech"/><path d="M 750 168 Q 770 158 790 168 Q 796 188 770 196 Q 744 188 750 168" class="mech2"/><text x="440" y="232" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Harmonic and cycloidal drives dominate in industrial robots because backlash must be almost zero.</text></svg></div><figcaption><b>Fig. 1:</b> The four gear reductions used in robot joints: spur/helical, planetary, harmonic and cycloidal.</figcaption></figure><h4>Spur and helical gears</h4><p>Conventional gears give a ratio of about 1.5:1 to 6:1 per stage, so several stages are needed for the high ratios a robot requires. They are cheap, efficient (95 % to 99 %) and readily available, and they are used in the wrists of some robots, in grippers and in low-cost arms. Their disadvantage is <b>backlash</b>, which can be reduced by using precision ground teeth, by <b>preloading</b> two gears against each other with a spring (a split gear or a spring-loaded idler), or by using a <b>double-lead (tapered) worm</b> whose axial position adjusts the mesh. Helical gears run more quietly and carry more load than spur gears, but they produce an axial thrust that must be taken by a thrust bearing.</p><h4>Planetary (epicyclic) gear train</h4><p>A planetary gearbox has a central <b>sun gear</b> driven by the motor, three or four <b>planet gears</b> mounted on a carrier, and an outer <b>ring gear</b> with internal teeth. Usually the ring gear is fixed to the housing, the sun is the input and the carrier is the output, giving a reduction of (1 + Z<sub>ring</sub>/Z<sub>sun</sub>) : 1, typically 3:1 to 10:1 per stage. Two or three stages give 30:1 to 1000:1.</p><ul><li><b>Advantages:</b> compact and coaxial, so it fits neatly inside a joint; the load is shared by several planets, so it transmits high torque for its size; high efficiency (90 % to 97 % per stage); low backlash when precision ground (1 to 3 arc-minutes); readily available as a standard catalogue item.</li><li><b>Disadvantages:</b> backlash is not zero; several stages are needed for a high ratio, which increases length; the bearings of the planets are small and limit the life under shock loads; noise increases with speed.</li><li><b>Use:</b> the standard reducer in medium-duty robots, in collaborative robots, in AGV wheel drives, in servo gearmotors and in 3D printer and CNC axes.</li></ul><span class="eq">Planetary ratio (ring fixed) = 1 + Z<sub>ring</sub> / Z<sub>sun</sub> ;  with three stages, ratios of 100:1 to 500:1 are common.</span><h3 id="sec3"><span class="sec-no">3.</span>Harmonic Drive (Strain Wave Gear)</h3><p>The harmonic drive is the transmission most closely associated with precision robotics. It was invented by C. Walton Musser in 1955 and is manufactured under the trade names Harmonic Drive, Strain Wave Gearing and others. It achieves a very high reduction ratio in a single stage with <b>essentially zero backlash</b>, in a package that is flat, coaxial, light and extremely precise.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Harmonic drive (strain wave gear) &mdash; three components</text><circle cx="230" cy="160" r="112" fill="none" stroke="#4a5b6d" stroke-width="18"/><line x1="330.0" y1="160.0" x2="334.0" y2="160.0" class="cmp" stroke-width="1.6"/><line x1="329.45218953682735" y1="170.45284632676535" x2="333.4302771183004" y2="170.87096017983595" class="cmp" stroke-width="1.6"/><line x1="327.81476007338057" y1="180.79116908177593" x2="331.7273504763158" y2="181.62281584504697" class="cmp" stroke-width="1.6"/><line x1="325.10565162951536" y1="190.90169943749473" x2="328.909877694696" y2="192.13776741499453" class="cmp" stroke-width="1.6"/><line x1="321.3545457642601" y1="200.67366430758003" x2="325.0087275948305" y2="202.3006108798832" class="cmp" stroke-width="1.6"/><line x1="316.6025403784439" y1="210.0" x2="320.06664199358164" y2="212.0" class="cmp" stroke-width="1.6"/><line x1="310.90169943749476" y1="218.77852522924732" x2="314.1377674149945" y2="221.1296662384172" class="cmp" stroke-width="1.6"/><line x1="304.31448254773943" y1="226.9130606358858" x2="307.28706184964904" y2="229.58958306132126" class="cmp" stroke-width="1.6"/><line x1="296.9130606358858" y1="234.31448254773943" x2="299.58958306132126" y2="237.287061849649" class="cmp" stroke-width="1.6"/><line x1="288.7785252292473" y1="240.90169943749476" x2="291.1296662384172" y2="244.13776741499453" class="cmp" stroke-width="1.6"/><line x1="280.0" y1="246.60254037844385" x2="282.0" y2="250.0666419935816" class="cmp" stroke-width="1.6"/><line x1="270.67366430758" y1="251.35454576426008" x2="272.3006108798832" y2="255.00872759483048" class="cmp" stroke-width="1.6"/><line x1="260.90169943749476" y1="255.10565162951536" x2="262.1377674149945" y2="258.909877694696" class="cmp" stroke-width="1.6"/><line x1="250.79116908177593" y1="257.81476007338057" x2="251.62281584504697" y2="261.7273504763158" class="cmp" stroke-width="1.6"/><line x1="240.45284632676535" y1="259.45218953682735" x2="240.87096017983595" y2="263.4302771183004" class="cmp" stroke-width="1.6"/><line x1="230.0" y1="260.0" x2="230.0" y2="264.0" class="cmp" stroke-width="1.6"/><line x1="219.54715367323465" y1="259.45218953682735" x2="219.12903982016402" y2="263.4302771183004" class="cmp" stroke-width="1.6"/><line x1="209.20883091822407" y1="257.81476007338057" x2="208.37718415495303" y2="261.7273504763158" class="cmp" stroke-width="1.6"/><line x1="199.09830056250527" y1="255.10565162951536" x2="197.86223258500547" y2="258.909877694696" class="cmp" stroke-width="1.6"/><line x1="189.32633569241997" y1="251.35454576426008" x2="187.69938912011676" y2="255.00872759483048" class="cmp" stroke-width="1.6"/><line x1="180.00000000000003" y1="246.60254037844388" x2="178.00000000000003" y2="250.06664199358164" class="cmp" stroke-width="1.6"/><line x1="171.2214747707527" y1="240.90169943749476" x2="168.8703337615828" y2="244.13776741499453" class="cmp" stroke-width="1.6"/><line x1="163.0869393641142" y1="234.31448254773943" x2="160.41041693867874" y2="237.287061849649" class="cmp" stroke-width="1.6"/><line x1="155.6855174522606" y1="226.91306063588584" x2="152.71293815035102" y2="229.58958306132126" class="cmp" stroke-width="1.6"/><line x1="149.09830056250527" y1="218.77852522924732" x2="145.86223258500547" y2="221.1296662384172" class="cmp" stroke-width="1.6"/><line x1="143.39745962155612" y1="210.0" x2="139.93335800641836" y2="212.0" class="cmp" stroke-width="1.6"/><line x1="138.64545423573992" y1="200.67366430758005" x2="134.99127240516952" y2="202.30061087988324" class="cmp" stroke-width="1.6"/><line x1="134.89434837048464" y1="190.90169943749476" x2="131.09012230530402" y2="192.13776741499453" class="cmp" stroke-width="1.6"/><line x1="132.18523992661943" y1="180.79116908177593" x2="128.2726495236842" y2="181.62281584504697" class="cmp" stroke-width="1.6"/><line x1="130.54781046317265" y1="170.45284632676538" x2="126.56972288169958" y2="170.87096017983598" class="cmp" stroke-width="1.6"/><line x1="130.0" y1="160.0" x2="126.0" y2="160.0" class="cmp" stroke-width="1.6"/><line x1="130.54781046317265" y1="149.54715367323465" x2="126.56972288169958" y2="149.12903982016402" class="cmp" stroke-width="1.6"/><line x1="132.18523992661943" y1="139.20883091822404" x2="128.2726495236842" y2="138.377184154953" class="cmp" stroke-width="1.6"/><line x1="134.89434837048464" y1="129.09830056250527" x2="131.09012230530402" y2="127.86223258500547" class="cmp" stroke-width="1.6"/><line x1="138.64545423573992" y1="119.32633569241997" x2="134.99127240516952" y2="117.69938912011678" class="cmp" stroke-width="1.6"/><line x1="143.39745962155615" y1="109.99999999999999" x2="139.9333580064184" y2="107.99999999999999" class="cmp" stroke-width="1.6"/><line x1="149.09830056250524" y1="101.2214747707527" x2="145.86223258500547" y2="98.8703337615828" class="cmp" stroke-width="1.6"/><line x1="155.68551745226057" y1="93.08693936411417" x2="152.712938150351" y2="90.41041693867874" class="cmp" stroke-width="1.6"/><line x1="163.0869393641142" y1="85.68551745226057" x2="160.41041693867874" y2="82.712938150351" class="cmp" stroke-width="1.6"/><line x1="171.22147477075268" y1="79.09830056250527" x2="168.8703337615828" y2="75.86223258500547" class="cmp" stroke-width="1.6"/><line x1="179.99999999999994" y1="73.39745962155617" x2="177.99999999999994" y2="69.93335800641842" class="cmp" stroke-width="1.6"/><line x1="189.32633569242" y1="68.6454542357399" x2="187.6993891201168" y2="64.9912724051695" class="cmp" stroke-width="1.6"/><line x1="199.09830056250524" y1="64.89434837048465" x2="197.86223258500544" y2="61.090122305304035" class="cmp" stroke-width="1.6"/><line x1="209.208830918224" y1="62.185239926619445" x2="208.37718415495297" y2="58.27264952368422" class="cmp" stroke-width="1.6"/><line x1="219.54715367323467" y1="60.54781046317267" x2="219.12903982016405" y2="56.56972288169956" class="cmp" stroke-width="1.6"/><line x1="229.99999999999997" y1="60.0" x2="229.99999999999997" y2="56.0" class="cmp" stroke-width="1.6"/><line x1="240.4528463267653" y1="60.54781046317267" x2="240.87096017983592" y2="56.56972288169956" class="cmp" stroke-width="1.6"/><line x1="250.79116908177593" y1="62.185239926619445" x2="251.62281584504697" y2="58.27264952368422" class="cmp" stroke-width="1.6"/><line x1="260.9016994374947" y1="64.89434837048464" x2="262.1377674149945" y2="61.09012230530402" class="cmp" stroke-width="1.6"/><line x1="270.67366430758" y1="68.64545423573989" x2="272.30061087988315" y2="64.99127240516948" class="cmp" stroke-width="1.6"/><line x1="280.0" y1="73.39745962155614" x2="282.0" y2="69.93335800641839" class="cmp" stroke-width="1.6"/><line x1="288.7785252292473" y1="79.09830056250524" x2="291.1296662384172" y2="75.86223258500546" class="cmp" stroke-width="1.6"/><line x1="296.9130606358858" y1="85.68551745226054" x2="299.5895830613212" y2="82.71293815035096" class="cmp" stroke-width="1.6"/><line x1="304.31448254773943" y1="93.08693936411419" x2="307.28706184964904" y2="90.41041693867875" class="cmp" stroke-width="1.6"/><line x1="310.9016994374947" y1="101.22147477075266" x2="314.1377674149945" y2="98.87033376158277" class="cmp" stroke-width="1.6"/><line x1="316.60254037844385" y1="109.99999999999996" x2="320.0666419935816" y2="107.99999999999996" class="cmp" stroke-width="1.6"/><line x1="321.3545457642601" y1="119.32633569241999" x2="325.0087275948305" y2="117.69938912011679" class="cmp" stroke-width="1.6"/><line x1="325.10565162951536" y1="129.09830056250524" x2="328.909877694696" y2="127.86223258500544" class="cmp" stroke-width="1.6"/><line x1="327.81476007338057" y1="139.208830918224" x2="331.7273504763158" y2="138.37718415495297" class="cmp" stroke-width="1.6"/><line x1="329.45218953682735" y1="149.54715367323465" x2="333.4302771183004" y2="149.12903982016405" class="cmp" stroke-width="1.6"/><text x="230" y="32" font-size="11" fill="#4a5b6d" text-anchor="middle" font-weight="600">circular spline (fixed, internal teeth)</text><ellipse cx="230" cy="160" rx="86" ry="76" fill="none" stroke="#157a4b" stroke-width="10"/><line x1="310.0" y1="160.0" x2="317.0" y2="160.0" class="cmp" stroke-width="1.6"/><line x1="309.53103657234874" y1="167.5683312896759" x2="316.49000227242925" y2="168.3251644186435" class="cmp" stroke-width="1.6"/><line x1="308.12964445680694" y1="175.0479308147717" x2="314.9659883467775" y2="176.55272389624886" class="cmp" stroke-width="1.6"/><line x1="305.8122536946242" y1="182.3511071095186" x2="312.4458258929038" y2="184.58621782047047" class="cmp" stroke-width="1.6"/><line x1="302.60603357367654" y1="189.3922371092185" x2="308.95906151137325" y2="192.33146082014036" class="cmp" stroke-width="1.6"/><line x1="298.5485740934071" y1="196.08877000239153" x2="304.5465743265803" y2="199.69764700263067" class="cmp" stroke-width="1.6"/><line x1="293.6874452564515" y1="202.36219506356355" x2="299.260096716391" y2="206.59841456991992" class="cmp" stroke-width="1.6"/><line x1="288.07963935385044" y1="208.13896211973963" x2="293.1616077973124" y2="212.9528583317136" class="cmp" stroke-width="1.6"/><line x1="281.7909027825462" y1="213.35134385893457" x2="286.32260677601903" y2="218.686478244828" class="cmp" stroke-width="1.6"/><line x1="274.8949652289906" y1="217.93822987098235" x2="278.82327468652727" y2="223.73205285808058" class="cmp" stroke-width="1.6"/><line x1="267.47267525598323" y1="221.8458431112216" x2="270.75153434088173" y2="228.03042742234376" class="cmp" stroke-width="1.6"/><line x1="259.61105242719316" y1="225.0283703871754" x2="262.20201951457256" y2="231.53120742589294" class="cmp" stroke-width="1.6"/><line x1="251.4022670823377" y1="227.4484994763456" x2="253.27496545204224" y2="234.19334942398018" class="cmp" stroke-width="1.6"/><line x1="242.94255972422118" y1="229.07785657790683" x2="244.07503370009053" y2="235.98564223569753" class="cmp" stroke-width="1.6"/><line x1="234.3311126868334" y1="229.89733896957867" x2="234.7100850469313" y2="236.88707286653653" class="cmp" stroke-width="1.6"/><line x1="225.6688873131666" y1="229.89733896957867" x2="225.2899149530687" y2="236.88707286653653" class="cmp" stroke-width="1.6"/><line x1="217.05744027577882" y1="229.07785657790683" x2="215.92496629990947" y2="235.98564223569753" class="cmp" stroke-width="1.6"/><line x1="208.59773291766234" y1="227.4484994763456" x2="206.7250345479578" y2="234.19334942398018" class="cmp" stroke-width="1.6"/><line x1="200.38894757280687" y1="225.0283703871754" x2="197.79798048542744" y2="231.53120742589294" class="cmp" stroke-width="1.6"/><line x1="192.5273247440168" y1="221.8458431112216" x2="189.24846565911827" y2="228.03042742234376" class="cmp" stroke-width="1.6"/><line x1="185.1050347710094" y1="217.93822987098235" x2="181.17672531347273" y2="223.73205285808058" class="cmp" stroke-width="1.6"/><line x1="178.2090972174538" y1="213.35134385893457" x2="173.677393223981" y2="218.686478244828" class="cmp" stroke-width="1.6"/><line x1="171.92036064614953" y1="208.13896211973963" x2="166.8383922026876" y2="212.9528583317136" class="cmp" stroke-width="1.6"/><line x1="166.3125547435485" y1="202.36219506356355" x2="160.739903283609" y2="206.59841456991992" class="cmp" stroke-width="1.6"/><line x1="161.45142590659287" y1="196.08877000239153" x2="155.45342567341976" y2="199.6976470026307" class="cmp" stroke-width="1.6"/><line x1="157.39396642632343" y1="189.3922371092185" x2="151.04093848862675" y2="192.33146082014036" class="cmp" stroke-width="1.6"/><line x1="154.1877463053758" y1="182.3511071095186" x2="147.5541741070962" y2="184.58621782047047" class="cmp" stroke-width="1.6"/><line x1="151.87035554319306" y1="175.0479308147717" x2="145.03401165322248" y2="176.55272389624886" class="cmp" stroke-width="1.6"/><line x1="150.46896342765123" y1="167.5683312896759" x2="143.50999772757072" y2="168.32516441864348" class="cmp" stroke-width="1.6"/><line x1="150.0" y1="160.0" x2="143.0" y2="160.0" class="cmp" stroke-width="1.6"/><line x1="150.46896342765123" y1="152.4316687103241" x2="143.50999772757072" y2="151.6748355813565" class="cmp" stroke-width="1.6"/><line x1="151.87035554319306" y1="144.9520691852283" x2="145.03401165322248" y2="143.44727610375116" class="cmp" stroke-width="1.6"/><line x1="154.1877463053758" y1="137.6488928904814" x2="147.55417410709617" y2="135.41378217952953" class="cmp" stroke-width="1.6"/><line x1="157.3939664263234" y1="130.60776289078152" x2="151.04093848862672" y2="127.66853917985966" class="cmp" stroke-width="1.6"/><line x1="161.45142590659287" y1="123.91122999760847" x2="155.45342567341976" y2="120.30235299736933" class="cmp" stroke-width="1.6"/><line x1="166.31255474354847" y1="117.63780493643645" x2="160.73990328360895" y2="113.4015854300801" class="cmp" stroke-width="1.6"/><line x1="171.9203606461495" y1="111.86103788026038" x2="166.8383922026876" y2="107.04714166828643" class="cmp" stroke-width="1.6"/><line x1="178.2090972174538" y1="106.64865614106543" x2="173.67739322398103" y2="101.31352175517199" class="cmp" stroke-width="1.6"/><line x1="185.1050347710094" y1="102.06177012901767" x2="181.17672531347273" y2="96.26794714191944" class="cmp" stroke-width="1.6"/><line x1="192.52732474401674" y1="98.15415688877842" x2="189.2484656591182" y2="91.96957257765627" class="cmp" stroke-width="1.6"/><line x1="200.38894757280684" y1="94.9716296128246" x2="197.79798048542744" y2="88.46879257410706" class="cmp" stroke-width="1.6"/><line x1="208.59773291766228" y1="92.5515005236544" x2="206.72503454795776" y2="85.80665057601985" class="cmp" stroke-width="1.6"/><line x1="217.05744027577882" y1="90.92214342209317" x2="215.92496629990947" y2="84.01435776430249" class="cmp" stroke-width="1.6"/><line x1="225.66888731316658" y1="90.10266103042133" x2="225.28991495306863" y2="83.11292713346347" class="cmp" stroke-width="1.6"/><line x1="234.3311126868334" y1="90.10266103042133" x2="234.71008504693134" y2="83.11292713346347" class="cmp" stroke-width="1.6"/><line x1="242.9425597242212" y1="90.92214342209317" x2="244.0750337000906" y2="84.0143577643025" class="cmp" stroke-width="1.6"/><line x1="251.4022670823377" y1="92.5515005236544" x2="253.27496545204224" y2="85.80665057601983" class="cmp" stroke-width="1.6"/><line x1="259.61105242719316" y1="94.97162961282459" x2="262.2020195145725" y2="88.46879257410706" class="cmp" stroke-width="1.6"/><line x1="267.4726752559832" y1="98.15415688877837" x2="270.7515343408817" y2="91.96957257765621" class="cmp" stroke-width="1.6"/><line x1="274.8949652289906" y1="102.06177012901765" x2="278.82327468652727" y2="96.26794714191942" class="cmp" stroke-width="1.6"/><line x1="281.79090278254625" y1="106.64865614106546" x2="286.32260677601903" y2="101.31352175517202" class="cmp" stroke-width="1.6"/><line x1="288.07963935385044" y1="111.86103788026037" x2="293.1616077973124" y2="107.0471416682864" class="cmp" stroke-width="1.6"/><line x1="293.6874452564515" y1="117.63780493643641" x2="299.260096716391" y2="113.40158543008005" class="cmp" stroke-width="1.6"/><line x1="298.5485740934071" y1="123.91122999760847" x2="304.5465743265803" y2="120.30235299736933" class="cmp" stroke-width="1.6"/><line x1="302.60603357367654" y1="130.60776289078146" x2="308.95906151137325" y2="127.66853917985961" class="cmp" stroke-width="1.6"/><line x1="305.8122536946242" y1="137.64889289048136" x2="312.4458258929038" y2="135.41378217952948" class="cmp" stroke-width="1.6"/><line x1="308.12964445680694" y1="144.95206918522837" x2="314.9659883467775" y2="143.4472761037512" class="cmp" stroke-width="1.6"/><line x1="309.53103657234874" y1="152.4316687103241" x2="316.49000227242925" y2="151.6748355813565" class="cmp" stroke-width="1.6"/><text x="236" y="264" font-size="11" fill="#157a4b" text-anchor="middle" font-weight="600">flexspline (thin cup, 2 fewer teeth, = output)</text><ellipse cx="230" cy="160" rx="60" ry="48" fill="#fff4e5" stroke="#e07b00" stroke-width="3"/><circle cx="230" cy="160" r="12" class="cmp-f"/><circle cx="204" cy="160" r="10" class="mech2"/><circle cx="256" cy="160" r="10" class="mech2"/><text x="230" y="88" font-size="11" fill="#e07b00" text-anchor="middle" font-weight="600">wave generator</text><text x="230" y="164" font-size="10" fill="#e07b00" text-anchor="middle">input</text><path d="M 300 88 A 82 82 0 0 1 326 120" class="lnk" marker-end="url(#ah)"/><rect x="440" y="60" width="400" height="190" rx="8" class="t-box2"/><text x="640" y="88" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">Harmonic drive relations</text><text x="640" y="122" font-size="15" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">Ratio  i = F<sub>s</sub> / (C<sub>s</sub> &minus; F<sub>s</sub>)</text><text x="640" y="150" font-size="11" fill="#5b6b7c" text-anchor="middle">F s = teeth on flexspline,  C s = teeth on circular spline</text><text x="640" y="182" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="600">Example: C s = 202, F s = 200</text><text x="640" y="206" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700" font-family="Consolas,Menlo,monospace">i = 200 / (202 &minus; 200) = 100 : 1</text><text x="640" y="234" font-size="10.5" fill="#5b6b7c" text-anchor="middle">One turn of the wave generator moves the output by 1/100 turn</text><text x="440" y="278" font-size="11.5" fill="#12283d" text-anchor="middle">Only 2 to 4 teeth are engaged on each side, but many teeth share the load, so the torque capacity is high.</text></svg></div><figcaption><b>Fig. 2:</b> Harmonic drive: the wave generator (input) flexes the thin-walled flexspline so that its teeth engage the internal teeth of the circular spline at two opposite points. Because the flexspline has two fewer teeth, the output advances by only two teeth per input revolution.</figcaption></figure><h4>The three components</h4><ol><li><b>Wave generator</b> &mdash; the input. It is an elliptical plug (a thin ball bearing race) or a rotating disc with an elliptical cam, mounted on the motor shaft. Its outer diameter is slightly larger than the inside diameter of the flexspline.</li><li><b>Flexspline</b> &mdash; a thin-walled, cup-shaped, elastic steel sleeve with external gear teeth near its open end. It has <b>two fewer teeth</b> than the circular spline. The closed end of the cup forms the output flange.</li><li><b>Circular spline</b> &mdash; a rigid ring with internal teeth, normally fixed to the robot housing. It has the same tooth pitch as the flexspline but two more teeth.</li></ol><h4>Working</h4><p>When the wave generator rotates inside the flexspline, it forces the thin wall of the flexspline to deform into an ellipse. The teeth of the flexspline therefore engage with the teeth of the circular spline at the two ends of the <b>major axis</b> of the ellipse, and are disengaged at the ends of the minor axis. As the wave generator turns, this elliptical &ldquo;wave&rdquo; of engagement travels around the circumference.</p><p>Because the flexspline has two fewer teeth than the circular spline, after the wave generator has made one complete revolution the flexspline has been pushed round by only <b>two teeth</b> relative to the circular spline. If the circular spline has 202 teeth and the flexspline 200 teeth, the flexspline has moved by 2/200 = 1/100 of a revolution. Hence the reduction ratio is <b>100:1</b>.</p><div class="formula"><span class="tag">Formula</span><p><b>Harmonic drive ratio</b><span class='eq'>i = F<sub>s</sub> / (C<sub>s</sub> &minus; F<sub>s</sub>)</span>where F<sub>s</sub> = number of teeth on the flexspline and C<sub>s</sub> = number of teeth on the circular spline.<br>If the circular spline is fixed and the wave generator is the input, the flexspline is the output and rotates in the <b>opposite</b> direction. Ratios from 30:1 to 320:1 are standard, and special versions reach 1000:1.</p></div><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> A harmonic drive has a circular spline with 302 teeth and a flexspline with 300 teeth. Ratio i = 300/(302 &minus; 300) = <b>150:1</b>. If the motor runs at 3000 rpm, the output runs at 3000/150 = <b>20 rpm</b>, and one revolution of the motor advances the output by 360/150 = <b>2.4 degrees</b>. With a 20-bit encoder on the motor (1 048 576 counts per revolution), the output resolution is 1 048 576 &times; 150 = 157 million counts per output revolution, which is why harmonic drives give such superb positioning.</p></div><h4>Characteristics, advantages and disadvantages</h4><ul><li><b>Advantages:</b> very high reduction in a single stage (30:1 to 320:1) in a flat, compact, coaxial package; <b>zero backlash</b>, which is essential for repeatability and for stiffness; high torsional stiffness; very high positioning accuracy and resolution; excellent hysteresis characteristics; high efficiency (70 % to 85 %, which is good for such a high ratio); can be sealed and pre-greased for life; low noise; a large number of teeth are engaged simultaneously, so the tooth load is low and the torque capacity is high for the size; the input and output are co-axial, which suits a joint perfectly.</li><li><b>Disadvantages:</b> expensive, often the single costliest component of a robot joint; the flexspline is a thin elastic member and is the weakest part, so it is vulnerable to <b>shock loads</b> and to over-torque, which can permanently deform it; there is a limit to the torque; efficiency is lower than a planetary gear; the flexspline undergoes repeated elastic deformation, so it has a finite fatigue life; the housing must be precisely machined; not self-locking, so a brake is needed to hold position against gravity.</li><li><b>Use:</b> the wrist and upper arm joints of industrial robots, space robot arms (the Canadarm uses harmonic drives), surgical robots, precision positioning stages, antenna drives, semiconductor handling equipment and the joints of high-performance humanoid robots.</li></ul><h3 id="sec4"><span class="sec-no">4.</span>Cycloidal Drive (RV Reducer)</h3><p>The <b>cycloidal drive</b>, often sold as an <b>RV (Rotary Vector) reducer</b>, is the other precision reducer used in industrial robots, especially in the heavily loaded joints near the base. It has a <b>cycloidal disc</b> with lobes on its outer edge, mounted eccentrically on the input shaft through a bearing. As the input turns, the disc orbits and its lobes mesh with stationary <b>ring pins</b> around the housing. The disc has one fewer lobe than there are pins, so the disc advances by one lobe per input revolution. The motion is transferred to the output shaft through crank pins or rollers.</p><ul><li><b>Advantages:</b> extremely high torsional stiffness and very high shock load capacity (much better than a harmonic drive, because the load is carried by many rollers rather than by a thin flexspline); zero to very low backlash; high reduction ratio (30:1 to 250:1) in one or two stages; long life; can be mounted with the output hollow so that cables can pass through the centre of the joint.</li><li><b>Disadvantages:</b> heavier and bulkier than a harmonic drive; more expensive; lower efficiency; the input shaft must be balanced to avoid vibration at high speed.</li><li><b>Use:</b> the waist, shoulder and elbow joints of large industrial robots, where the torque and the shock loads are highest. Many six-axis industrial robots use RV reducers in joints 1 to 3 and harmonic drives in joints 4 to 6.</li></ul><div class="tbl-scroll"><table><caption>Table 24.1 &mdash; Comparison of robot joint reducers</caption><thead><tr><th>Feature</th><th>Planetary gear</th><th>Harmonic drive</th><th>Cycloidal / RV reducer</th></tr></thead><tbody><tr><td>Reduction per stage</td><td>3:1 to 10:1 (multi-stage to 500:1)</td><td>30:1 to 320:1 in one stage</td><td>30:1 to 250:1 in one or two stages</td></tr><tr><td>Backlash</td><td>1 to 8 arc-min</td><td>Essentially zero</td><td>Less than 1 arc-min</td></tr><tr><td>Torsional stiffness</td><td>High</td><td>Very high</td><td>Extremely high</td></tr><tr><td>Shock load capacity</td><td>Good</td><td>Poor (flexspline is fragile)</td><td>Excellent</td></tr><tr><td>Efficiency</td><td>90 to 97 % per stage</td><td>70 to 85 %</td><td>75 to 85 %</td></tr><tr><td>Size and weight</td><td>Moderate, longer for high ratio</td><td>Very flat and light</td><td>Compact but heavy</td></tr><tr><td>Cost</td><td>Low to moderate</td><td>High</td><td>Very high</td></tr><tr><td>Life</td><td>Long</td><td>Long (flexspline fatigue limited)</td><td>Very long</td></tr><tr><td>Typical robot joints</td><td>Wrists, cobots, mobile bases</td><td>Wrist and upper arm joints (4, 5, 6)</td><td>Base, shoulder, elbow joints (1, 2, 3)</td></tr></tbody></table></div><h3 id="sec5"><span class="sec-no">5.</span>Belt, Pulley, Chain and Tendon Systems</h3><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Belt, pulley and tendon drives in robots</text><text x="180" y="60" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(a) Timing belt between pulleys</text><circle cx="110" cy="140" r="34" class="mech2"/><circle cx="260" cy="140" r="22" class="mech2"/><line x1="140.0" y1="140.0" x2="144.0" y2="140.0" class="cmp" stroke-width="2"/><line x1="137.7163859753386" y1="151.4805029709527" x2="141.41190410538374" y2="153.01123670041306" class="cmp" stroke-width="2"/><line x1="131.21320343559643" y1="161.21320343559643" x2="134.0416305603426" y2="164.0416305603426" class="cmp" stroke-width="2"/><line x1="121.4805029709527" y1="167.7163859753386" x2="123.01123670041305" y2="171.41190410538374" class="cmp" stroke-width="2"/><line x1="110.0" y1="170.0" x2="110.0" y2="174.0" class="cmp" stroke-width="2"/><line x1="98.5194970290473" y1="167.7163859753386" x2="96.98876329958695" y2="171.41190410538374" class="cmp" stroke-width="2"/><line x1="88.78679656440357" y1="161.21320343559643" x2="85.95836943965739" y2="164.0416305603426" class="cmp" stroke-width="2"/><line x1="82.2836140246614" y1="151.4805029709527" x2="78.58809589461626" y2="153.01123670041306" class="cmp" stroke-width="2"/><line x1="80.0" y1="140.0" x2="76.0" y2="140.0" class="cmp" stroke-width="2"/><line x1="82.28361402466139" y1="128.5194970290473" x2="78.58809589461625" y2="126.98876329958695" class="cmp" stroke-width="2"/><line x1="88.78679656440357" y1="118.78679656440357" x2="85.95836943965737" y2="115.95836943965739" class="cmp" stroke-width="2"/><line x1="98.51949702904732" y1="112.28361402466139" x2="96.98876329958696" y2="108.58809589461625" class="cmp" stroke-width="2"/><line x1="110.0" y1="110.0" x2="110.0" y2="106.0" class="cmp" stroke-width="2"/><line x1="121.4805029709527" y1="112.2836140246614" x2="123.01123670041306" y2="108.58809589461626" class="cmp" stroke-width="2"/><line x1="131.21320343559643" y1="118.78679656440357" x2="134.0416305603426" y2="115.95836943965737" class="cmp" stroke-width="2"/><line x1="137.7163859753386" y1="128.5194970290473" x2="141.41190410538374" y2="126.98876329958695" class="cmp" stroke-width="2"/><circle cx="110" cy="140" r="6" class="cmp-f"/><circle cx="260" cy="140" r="6" class="cmp-f"/><path d="M 110 106 L 260 118 M 110 174 L 260 162" class="cmp" stroke-width="2.4"/><text x="185" y="96" font-size="10.5" fill="#157a4b" text-anchor="middle">toothed belt &mdash; no slip</text><text x="185" y="205" font-size="10.5" fill="#5b6b7c" text-anchor="middle">motor at the base drives a remote joint,</text><text x="185" y="221" font-size="10.5" fill="#5b6b7c" text-anchor="middle">keeping the arm light</text><text x="620" y="60" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(b) Tendon / cable drive</text><circle cx="520" cy="140" r="24" class="cmp-f"/><text x="520" y="145" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">M</text><circle cx="620" cy="140" r="20" class="mech2"/><line x1="544" y1="128" x2="600" y2="128" class="cmp" stroke-width="2.4"/><line x1="544" y1="152" x2="600" y2="152" class="cmp" stroke-width="2.4"/><path d="M 640 128 L 720 100 L 800 130" class="cmp" stroke-width="2.4"/><path d="M 640 152 L 720 124 L 800 154" class="cmp" stroke-width="2.4"/><rect x="790" y="122" width="26" height="42" rx="3" class="mech2"/><text x="760" y="190" font-size="10.5" fill="#5b6b7c" text-anchor="middle">cable (tendon) around idler pulleys</text><text x="620" y="216" font-size="10.5" fill="#5b6b7c" text-anchor="middle">used in robot hands, surgical instruments</text><text x="620" y="232" font-size="10.5" fill="#5b6b7c" text-anchor="middle">and exoskeletons &mdash; very low inertia</text><text x="440" y="244" font-size="10" fill="#12283d" text-anchor="middle"></text></svg></div><figcaption><b>Fig. 3:</b> Toothed timing belt drive (left) and cable/tendon drive (right). Both allow the motor to be mounted away from the joint, keeping the moving arm light.</figcaption></figure><p>Belts and cables are used in robots for a specific and very important purpose: to <b>move the motor away from the joint</b>. Every kilogram mounted on a moving link must be accelerated by all the joints below it, and its inertia is multiplied by the square of the distance from the axis. By placing the motors on the fixed base and transmitting rotation to the joints by belts or cables, the moving arm becomes very light and the robot can accelerate much faster.</p><h4>Toothed (timing / synchronous) belt and pulley</h4><p>A belt with moulded teeth meshes with a toothed pulley, giving a <b>positive drive with no slip</b>. The common profiles are trapezoidal (T2.5, T5, T10), curvilinear HTD (3M, 5M, 8M) and the improved GT profile. Belts are made of polyurethane or neoprene reinforced with steel or glass fibre cords.</p><span class="eq">Speed ratio  N<sub>2</sub>/N<sub>1</sub> = D<sub>1</sub>/D<sub>2</sub> = T<sub>1</sub>/T<sub>2</sub>     (D = pitch diameter, T = number of teeth)</span><ul><li><b>Advantages:</b> no slip, so the position relationship is exact; no lubrication needed; quiet; can transmit motion over a long distance and around corners using idler pulleys; the motor can be placed on the base, greatly reducing the inertia of the moving arm; cheap and easy to replace; absorbs a little shock.</li><li><b>Disadvantages:</b> the belt is elastic, so there is some <b>compliance</b> and <b>lost motion</b> (not backlash, but a wind-up under torque) which reduces the stiffness of the joint; the belt must be tensioned correctly &mdash; too loose and it will jump teeth, too tight and the bearings are overloaded; belts wear and stretch and must be replaced periodically; the belt can only transmit limited torque; alignment of the pulleys must be accurate; a belt failure can be sudden.</li><li><b>Use:</b> the wrists of SCARA robots (where two motors on the forearm drive the wrist by crossed belts), 3D printers, CNC routers, pick-and-place robots, camera pan-tilt units, AGVs, and the legs of some legged robots. Also used to drive the joints of lightweight collaborative and service robots.</li></ul><div class="note"><span class="tag">Note</span><p>A common SCARA arrangement drives the two wrist axes by a pair of crossed belts from motors mounted on the forearm. This makes the wrist very light, which is why SCARA robots are so fast. The crossed belts also make the wrist rotation independent of the arm rotation, which simplifies the control.</p></div><h4>Chain and sprocket</h4><p>A chain gives a positive drive with higher torque capacity than a belt but is heavier, noisier and needs lubrication. Chains are used in heavy material handling robots, in the tracks of mobile robots, in fork-lift masts and in large gantry systems, but rarely in precision robot joints.</p><h4>Cable (tendon) drive</h4><p>A steel cable or a high-strength synthetic tendon such as Dyneema runs over small pulleys, usually in a loop with one side under tension. It is used where the motion must be transmitted a long distance through a confined and articulated path, and where the moving mass must be extremely small.</p><ul><li><b>Advantages:</b> the lightest possible transmission; can route motion through many bends and along a serpentine arm; allows all the motors to be mounted in the base or even off the robot; ideal for multi-fingered hands with many degrees of freedom; zero backlash if pre-tensioned in both directions.</li><li><b>Disadvantages:</b> the cable stretches elastically, so the joint is compliant and less stiff; cables fatigue and can fray or snap, which is a safety issue; the tensioning mechanism is critical and must be adjustable; friction at the pulleys can be significant and non-linear, especially when the path bends through many angles; the tendon must be kept clean; measuring the actual joint angle is essential because the cable stretch cannot be predicted.</li><li><b>Use:</b> the <b>Shadow Hand</b> and other multi-fingered dextrous robot hands; <b>surgical robots</b> such as the da Vinci, where the motors are in a cart and the motion is transmitted by cables through long slender instruments; <b>exoskeletons</b>; the fingers of some prosthetic hands; large radio telescope and space structure actuators; the legs of some cable-driven parallel robots.</li></ul><h4>Gear, belt and tendon comparison for robot joints</h4><div class="tbl-scroll"><table><caption>Table 24.2 &mdash; Rotary-to-rotary transmission methods in robots</caption><thead><tr><th>Feature</th><th>Gears (planetary, harmonic, cycloidal)</th><th>Toothed belt</th><th>Cable / tendon</th></tr></thead><tbody><tr><td>Reduction ratio</td><td>3:1 to 320:1 in the joint</td><td>1:1 to 4:1 typically</td><td>1:1 to 3:1</td></tr><tr><td>Backlash / lost motion</td><td>Near zero for harmonic and cycloidal</td><td>Small, but elastic wind-up</td><td>Zero if bi-directionally tensioned</td></tr><tr><td>Stiffness</td><td>Very high</td><td>Moderate</td><td>Low</td></tr><tr><td>Torque capacity</td><td>Very high</td><td>Moderate</td><td>Low</td></tr><tr><td>Mass at the joint</td><td>High &mdash; the motor is at the joint</td><td>Low &mdash; the motor can be remote</td><td>Very low &mdash; the motor can be remote</td></tr><tr><td>Distance of transmission</td><td>None (coaxial)</td><td>Up to about 1 m</td><td>Several metres, through bends</td></tr><tr><td>Maintenance</td><td>Greased for life</td><td>Periodic tensioning and replacement</td><td>Regular tensioning and inspection</td></tr><tr><td>Cost</td><td>High</td><td>Low</td><td>Moderate</td></tr><tr><td>Typical use</td><td>Industrial robot joints</td><td>SCARA wrists, 3D printers, light arms</td><td>Dexterous hands, surgical robots, exoskeletons</td></tr></tbody></table></div><div class="warn"><span class="tag">Important</span><p><b>Design rule.</b> Wherever possible, put the mass near the base. For a two-link arm, moving 1 kg from the elbow to the shoulder reduces the inertia that the shoulder motor must accelerate by the square of the ratio of the distances. This single rule explains most of the mechanical design decisions seen in fast robots: motors on the base, belts to the wrist, hollow links, and lightweight composite distal segments.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>Robot joint transmissions must be compact, high-ratio, near-zero backlash, stiff, efficient and reliable.</li><li>Spur and helical gears are cheap and efficient but have backlash, which can be reduced by preloading or by precision grinding.</li><li>A planetary gearbox has a sun, planets and a ring gear; with the ring fixed the ratio is 1 + Z<sub>ring</sub>/Z<sub>sun</sub>, typically 3:1 to 10:1 per stage. It is compact, coaxial and strong.</li><li>A harmonic drive has three parts: the wave generator (input), the flexspline (output, with two fewer teeth) and the circular spline (fixed). The ratio is F<sub>s</sub>/(C<sub>s</sub> &minus; F<sub>s</sub>), giving 30:1 to 320:1 in one stage with zero backlash.</li><li>Harmonic drives are flat, light, extremely precise and stiff, but costly and vulnerable to shock loads because the flexspline is thin and elastic.</li><li>A cycloidal (RV) reducer gives very high stiffness and excellent shock capacity and is used for the heavily loaded base joints.</li><li>Industrial robots commonly use RV reducers in joints 1 to 3 and harmonic drives in joints 4 to 6.</li><li>Toothed belts give a positive drive with no slip and allow the motor to be mounted away from the joint, greatly reducing the inertia of the moving arm.</li><li>Belts are compliant and must be correctly tensioned; they are used in SCARA wrists, 3D printers and light arms.</li><li>Cable (tendon) drives are the lightest transmission and can route motion through many bends; they are used in dexterous hands, surgical robots and exoskeletons, but they stretch and need careful tensioning.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Why do robot joints need specialised transmissions rather than ordinary gearboxes?</li><li>Describe a planetary gearbox and derive its reduction ratio with the ring gear fixed.</li><li>Explain the construction and working of a harmonic drive with a neat sketch. Name its three components.</li><li>Derive the reduction ratio formula of a harmonic drive and calculate it for a flexspline of 200 teeth and a circular spline of 202 teeth. (Answer: 100:1)</li><li>State four advantages and four disadvantages of a harmonic drive.</li><li>Describe the cycloidal (RV) reducer. In which robot joints is it preferred and why?</li><li>Compare planetary, harmonic and cycloidal reducers on the basis of ratio, backlash, stiffness, shock capacity and cost.</li><li>Why are belt drives used in SCARA robot wrists? What is the main advantage of mounting the motor away from the joint?</li><li>Compare toothed belt drives with cable (tendon) drives for robot applications.</li><li>What is meant by elastic wind-up of a belt and how does it affect the stiffness of a robot joint?</li><li>A motor running at 4000 rpm drives a harmonic reducer of ratio 160:1 with 80 % efficiency to move a joint requiring 24 N m. Find the output speed and the motor torque. (Answers: 25 rpm, 0.1875 N m)</li></ol></div><div class="pager"><a class="prev" href="23-translation-rotation-moment-of-inertia.html"><span class="dir">&larr; Previous topic</span><span class="ttl">23. Elementary Mechanical Concepts &mdash; Translation, Rotation and Moment of Inertia</span></a><a class="next" href="25-rotary-to-linear-lead-screw-rack-pinion-linkages.html"><span class="dir">Next topic &rarr;</span><span class="ttl">25. Rotary to Linear Motion &mdash; Lead Screws, Rack and Pinion, Slider Cranks, Cams, Linkages and Couplers</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trajectory Planning and Generation | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="How a robot decides where to be at every instant between two taught points: path and trajectory, joint space versus Cartesian space, velocity profiles">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit IV &middot; Topic 26 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit IV &rsaquo; Topic 26</nav><div class="unit-tag">Unit IV</div><h2 class="page-title"><span class="topic-no">26</span>Trajectory Planning and Generation</h2><p class="lede">How a robot decides where to be at every instant between two taught points: path and trajectory, joint space versus Cartesian space, velocity profiles, and polynomial interpolation.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Path, Trajectory and the Planning Problem</a></li><li><a href="#sec2">Joint Space versus Cartesian Space Planning</a></li><li><a href="#sec3">Velocity Profiles (Speed Planning Along a Path)</a></li><li><a href="#sec4">Trajectory Generation in a Robot Controller</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Path, Trajectory and the Planning Problem</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>path</b> is the set of geometric points in space that the tool must pass through, without any reference to time. A <b>trajectory</b> is a path with a <b>time schedule</b> attached to it &mdash; it specifies where the tool is at every instant, and therefore also its velocity and acceleration. <b>Trajectory planning</b> is the process of generating a trajectory that moves the robot from an initial state to a final state, satisfying the geometric, kinematic and dynamic constraints of the task and of the machine.</p></div><p>The problem arises because the operator only teaches a small number of points. Between two consecutive taught points the robot may have to travel 500 mm, and if the controller simply commanded a jump from one to the other the result would be a violent, uncontrolled movement. The controller must therefore <b>interpolate</b>: it must compute a smooth, continuous set of intermediate positions at a high rate (typically 1 kHz to 4 kHz for the servo loop and 100 Hz to 1 kHz for the interpolator), while respecting the limits of velocity, acceleration, jerk, motor torque and the workspace.</p><h4>Constraints that must be satisfied</h4><ul><li><b>Boundary conditions</b> &mdash; the position, velocity and sometimes acceleration at the start and at the end of the move must match what is required (usually zero velocity at both ends).</li><li><b>Kinematic limits</b> &mdash; maximum joint velocity, maximum joint acceleration and maximum tool speed.</li><li><b>Dynamic limits</b> &mdash; maximum motor torque, which depends on inertia, gravity, friction and the payload.</li><li><b>Geometric constraints</b> &mdash; the path must avoid obstacles, must stay inside the workspace, and must avoid singularities and joint limits.</li><li><b>Process constraints</b> &mdash; in welding, painting or grinding the tool speed along the path must be constant and correct for the process.</li><li><b>Smoothness</b> &mdash; the velocity and preferably the acceleration must be continuous, otherwise vibration, noise, wear and poor surface finish result.</li><li><b>Optimality</b> &mdash; among all feasible trajectories, the fastest or the most energy-efficient is preferred.</li></ul><h3 id="sec2"><span class="sec-no">2.</span>Joint Space versus Cartesian Space Planning</h3><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Joint-space and Cartesian-space trajectories</text><text x="220" y="58" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(a) Joint space trajectory</text><rect x="50" y="70" width="350" height="150" rx="6" class="t-box"/><line x1="85" y1="200" x2="85" y2="90" class="ax" marker-end="url(#ah)"/><line x1="85" y1="200" x2="375" y2="200" class="ax" marker-end="url(#ah)"/><text x="381" y="204" font-size="11.5" fill="#5b6b7c" text-anchor="start">time</text><text x="79" y="84" font-size="11.5" fill="#5b6b7c" text-anchor="start">joint angle</text><path d="M 85 195 C 160 195, 200 120, 370 110" class="lnk" stroke-width="2"/><path d="M 85 175 C 150 172, 230 140, 370 90" class="lnk" stroke-width="2"/><path d="M 85 160 C 170 158, 240 175, 370 150" class="lnk" stroke-width="2"/><text x="330" y="84" font-size="10.5" fill="#0f5fa8" text-anchor="middle">&#952;3</text><text x="330" y="106" font-size="10.5" fill="#157a4b" text-anchor="middle">&#952;2</text><text x="330" y="146" font-size="10.5" fill="#a8232a" text-anchor="middle">&#952;1</text><text x="220" y="238" font-size="11" fill="#5b6b7c" text-anchor="middle">each joint is planned independently</text><text x="655" y="58" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(b) Cartesian-space trajectory</text><rect x="480" y="70" width="350" height="150" rx="6" class="t-box"/><rect x="520" y="160" width="270" height="14" rx="2" class="mech"/><path d="M 560 150 L 760 110" class="lnk" stroke-width="2.6"/><circle cx="560" cy="150" r="7" class="cmp-y"/><circle cx="760" cy="110" r="7" class="cmp-y"/><text x="540" y="140" font-size="11" fill="#12283d" text-anchor="end" font-weight="700">P1</text><text x="780" y="106" font-size="11" fill="#12283d" text-anchor="start" font-weight="700">P2</text><polyline points="620,138 655,131" class="lnk" marker-end="url(#ah)"/><text x="660" y="152" font-size="10.5" fill="#157a4b" text-anchor="start">tool moves along a</text><text x="660" y="166" font-size="10.5" fill="#157a4b" text-anchor="start">straight line in space;</text><text x="660" y="180" font-size="10.5" fill="#157a4b" text-anchor="start">joints must be coordinated</text><text x="655" y="238" font-size="11" fill="#5b6b7c" text-anchor="middle">requires inverse kinematics at every instant</text></svg></div><figcaption><b>Fig. 1:</b> Joint-space planning (left) plans each joint independently; Cartesian-space planning (right) plans the tool path in space and converts it to joint angles continuously.</figcaption></figure><h4>Joint space (joint interpolated) motion</h4><p>Each joint is planned independently, using a polynomial that takes it from its initial angle to its final angle. The joints may reach their targets at the same time but they do not move in a coordinated way in space, so the <b>path of the tool is generally a curved and unpredictable line</b>. This is the classic <b>point-to-point (PTP)</b> or <b>joint move</b>, called <code>MOVJ</code> in many robot languages and <code>MoveJ</code> in RAPID.</p><ul><li><b>Advantages:</b> the computation is very simple because each joint is planned independently; no inverse kinematics is needed; there is no risk of a singularity; it is the fastest way to get from one pose to another because every joint can use its full speed; it never fails, since a joint move always has a solution.</li><li><b>Disadvantages:</b> the path of the tool is unknown, so it may collide with a fixture or with itself; the tool orientation changes in an uncontrolled way; the process speed along the path cannot be controlled; it is therefore unsuitable for any process that depends on the path.</li><li><b>Use:</b> rapid traverses between operations, pick and place, spot welding, machine loading and any motion where only the end points matter.</li></ul><h4>Cartesian space (linear or circular interpolated) motion</h4><p>The desired path is defined in the workspace &mdash; a straight line, a circle or a spline &mdash; and the controller computes the tool position at each interpolation interval along that path, then converts each position into joint angles using <b>inverse kinematics</b>. In robot languages this is <code>MOVL</code> / <code>MoveL</code> for a straight line and <code>MOVC</code> / <code>MoveC</code> for a circular arc through three points.</p><ul><li><b>Advantages:</b> the tool follows exactly the required geometric path at the required speed, which is essential for welding, cutting, painting, gluing and grinding; the path is predictable, so collision checking is straightforward.</li><li><b>Disadvantages:</b> the computation is heavy because inverse kinematics must be solved at every interpolation point; the path may pass through a <b>singularity</b>, where the required joint velocities become infinite; the required joint velocities may exceed the limits near the edge of the workspace; the move may fail if no inverse kinematic solution exists for some point on the line.</li><li><b>Use:</b> arc welding, laser and waterjet cutting, spray painting, adhesive dispensing, grinding, polishing, deburring, milling and any contour following task.</li></ul><div class="tbl-scroll"><table><caption>Table 26.1 &mdash; Joint space and Cartesian space motion compared</caption><thead><tr><th>Feature</th><th>Joint space (PTP / MoveJ)</th><th>Cartesian space (CP / MoveL, MoveC)</th></tr></thead><tbody><tr><td>What is planned</td><td>Each joint angle independently</td><td>The tool position and orientation in space</td></tr><tr><td>Tool path</td><td>Unpredictable curve</td><td>Exactly the commanded line or arc</td></tr><tr><td>Computation</td><td>Simple &mdash; one polynomial per joint</td><td>Heavy &mdash; inverse kinematics at every point</td></tr><tr><td>Speed along the path</td><td>Not controlled</td><td>Constant and controlled</td></tr><tr><td>Singularity risk</td><td>None</td><td>Possible</td></tr><tr><td>Failure risk</td><td>None (always solvable)</td><td>Possible if no IK solution exists</td></tr><tr><td>Typical speed</td><td>Fastest between two poses</td><td>Slower</td></tr><tr><td>Applications</td><td>Pick and place, spot welding, rapid traverse</td><td>Arc welding, cutting, painting, grinding, dispensing</td></tr></tbody></table></div><h3 id="sec3"><span class="sec-no">3.</span>Velocity Profiles (Speed Planning Along a Path)</h3><p>Once the geometric path is decided, the second question is <b>how fast to travel along it</b>. This is described by the <b>velocity profile</b>. The aim is to complete the move in the shortest time while keeping the velocity, acceleration and jerk within limits and while making the motion as smooth as possible.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" width="880" height="320" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Velocity profiles for a point-to-point move</text><text x="170" y="58" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(a) Trapezoidal</text><rect x="40" y="70" width="270" height="200" rx="6" class="t-box"/><line x1="72" y1="240" x2="72" y2="90" class="ax" marker-end="url(#ah)"/><line x1="72" y1="240" x2="290" y2="240" class="ax" marker-end="url(#ah)"/><text x="296" y="244" font-size="11.5" fill="#5b6b7c" text-anchor="start">time</text><text x="66" y="84" font-size="11.5" fill="#5b6b7c" text-anchor="start">velocity</text><path d="M 72 240 L 120 100 L 232 100 L 280 240" class="lnk" stroke-width="2.2"/><line x1="72" y1="100" x2="288" y2="100" class="ax" stroke-dasharray="6 4"/><text x="150" y="92" font-size="9.5" fill="#5b6b7c" text-anchor="middle">constant velocity (cruise)</text><text x="96" y="170" font-size="9.5" fill="#a8232a" text-anchor="middle">accel.</text><text x="258" y="170" font-size="9.5" fill="#a8232a" text-anchor="middle">decel.</text><text x="170" y="288" font-size="10.5" fill="#5b6b7c" text-anchor="middle">acceleration is discontinuous</text><text x="170" y="302" font-size="10.5" fill="#a8232a" text-anchor="middle">&rarr; jerk spikes and vibration</text><text x="480" y="58" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(b) S-curve</text><rect x="350" y="70" width="270" height="200" rx="6" class="t-box"/><line x1="382" y1="240" x2="382" y2="90" class="ax" marker-end="url(#ah)"/><line x1="382" y1="240" x2="600" y2="240" class="ax" marker-end="url(#ah)"/><text x="606" y="244" font-size="11.5" fill="#5b6b7c" text-anchor="start">time</text><text x="376" y="84" font-size="11.5" fill="#5b6b7c" text-anchor="start">velocity</text><path d="M 382 240 C 412 240, 420 100, 460 100 L 530 100 C 570 100, 578 240, 608 240" class="lnk" stroke-width="2.2"/><line x1="382" y1="100" x2="600" y2="100" class="ax" stroke-dasharray="6 4"/><text x="480" y="288" font-size="10.5" fill="#5b6b7c" text-anchor="middle">acceleration ramps smoothly</text><text x="480" y="302" font-size="10.5" fill="#157a4b" text-anchor="middle">&rarr; low jerk, quiet, less wear</text><text x="760" y="58" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(c) Cubic position profile</text><rect x="660" y="70" width="200" height="200" rx="6" class="t-box"/><line x1="690" y1="240" x2="690" y2="90" class="ax" marker-end="url(#ah)"/><line x1="690" y1="240" x2="840" y2="240" class="ax" marker-end="url(#ah)"/><text x="846" y="244" font-size="11.5" fill="#5b6b7c" text-anchor="start">t</text><text x="684" y="84" font-size="11.5" fill="#5b6b7c" text-anchor="start">&#952;</text><path d="M 690 240 C 740 238, 790 100, 838 96" class="lnk" stroke-width="2.2"/><text x="760" y="288" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">&#952;(t) = a0 + a1 t</text><text x="760" y="304" font-size="11" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">+ a2 t&#178; + a3 t&#179;</text></svg></div><figcaption><b>Fig. 2:</b> Trapezoidal and S-curve velocity profiles, and a cubic position profile. The S-curve gives smooth acceleration and therefore much less vibration.</figcaption></figure><h4>Trapezoidal velocity profile</h4><p>The simplest and most widely used profile. The motion has three phases: <b>accelerate</b> at a constant rate to the maximum velocity, <b>cruise</b> at constant velocity, and <b>decelerate</b> at a constant rate to rest. If the move is too short to reach the maximum velocity, the cruise phase disappears and the profile becomes <b>triangular</b>.</p><span class="eq">With acceleration a, maximum velocity v<sub>max</sub> and total distance D:<br>time to reach v<sub>max</sub>:  t<sub>a</sub> = v<sub>max</sub>/a   ,   distance during acceleration = v<sub>max</sub>&#178;/(2a)<br>If D &lt; v<sub>max</sub>&#178;/a the profile is triangular and the peak velocity is v<sub>peak</sub> = &#8730;(a D)</span><p>The disadvantage is that the acceleration changes <b>instantly</b> at the start, at the two transitions and at the end. An instantaneous change of acceleration is an infinite <b>jerk</b>, which excites the natural frequencies of the structure and produces vibration, noise, wear and poor surface finish.</p><h4>S-curve (jerk-limited) velocity profile</h4><p>The acceleration itself is ramped up and down smoothly, so the velocity curve looks like an S. There are seven phases: increasing acceleration, constant acceleration, decreasing acceleration, constant velocity, decreasing deceleration, constant deceleration, increasing deceleration. The <b>jerk</b> (rate of change of acceleration) is limited to a set value. This greatly reduces vibration and machine wear and improves surface finish in machining and painting, at the cost of slightly longer move time and more computation.</p><h4>Polynomial position profiles</h4><p>Instead of specifying the velocity profile directly, the position can be specified as a polynomial in time, and the velocity and acceleration follow by differentiation.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Cubic and quintic polynomial joint trajectories</text><text x="220" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Cubic:  &#952;(t) = a&#8320; + a&#8321;t + a&#8322;t&#178; + a&#8323;t&#179;</text><rect x="50" y="72" width="350" height="170" rx="6" class="t-box"/><line x1="85" y1="220" x2="85" y2="92" class="ax" marker-end="url(#ah)"/><line x1="85" y1="220" x2="375" y2="220" class="ax" marker-end="url(#ah)"/><text x="381" y="224" font-size="11.5" fill="#5b6b7c" text-anchor="start">t</text><text x="79" y="86" font-size="11.5" fill="#5b6b7c" text-anchor="start">&#952;</text><path d="M 85 214 C 150 212, 220 92, 372 88" class="lnk" stroke-width="2.2"/><text x="225" y="262" font-size="10.5" fill="#5b6b7c" text-anchor="middle">position smooth; velocity is a parabola</text><text x="225" y="278" font-size="10.5" fill="#a8232a" text-anchor="middle">acceleration is a straight line &rarr; jerk is constant but discontinuous at the ends</text><rect x="50" y="292" width="350" height="0" rx="1" class="t-box"/><text x="660" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Quintic:  &#952;(t) = a&#8320; + a&#8321;t + &hellip; + a&#8337;t&#8309;</text><rect x="490" y="72" width="350" height="170" rx="6" class="t-box"/><line x1="525" y1="220" x2="525" y2="92" class="ax" marker-end="url(#ah)"/><line x1="525" y1="220" x2="815" y2="220" class="ax" marker-end="url(#ah)"/><text x="821" y="224" font-size="11.5" fill="#5b6b7c" text-anchor="start">t</text><text x="519" y="86" font-size="11.5" fill="#5b6b7c" text-anchor="start">&#952;</text><path d="M 525 214 C 590 214, 600 88, 812 88" class="lnk" stroke-width="2.2"/><text x="665" y="262" font-size="10.5" fill="#5b6b7c" text-anchor="middle">position, velocity AND acceleration</text><text x="665" y="278" font-size="10.5" fill="#157a4b" text-anchor="middle">all start and end at zero &rarr; smoothest motion</text><text x="440" y="292" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">6 coefficients need 6 conditions: &#952;, &#952;&#775; and &#952;&#776; at both the start and the end.</text></svg></div><figcaption><b>Fig. 3:</b> Cubic and quintic polynomial position profiles. The quintic also brings acceleration smoothly to zero at both ends.</figcaption></figure><div class="formula"><span class="tag">Formula</span><p><b>Cubic polynomial (4 coefficients, 4 conditions)</b><span class='eq'>&#952;(t) = a&#8320; + a&#8321;t + a&#8322;t&#178; + a&#8323;t&#179;</span>Conditions: &#952;(0) = &#952;&#8320;, &#952;(t<sub>f</sub>) = &#952;<sub>f</sub>, &#952;&#775;(0) = 0, &#952;&#775;(t<sub>f</sub>) = 0. Solving gives:<br><span class='eq'>&#952;(t) = &#952;&#8320; + (&#952;<sub>f</sub> &minus; &#952;&#8320;) [ 3(t/t<sub>f</sub>)&#178; &minus; 2(t/t<sub>f</sub>)&#179; ]</span>Velocity is a parabola with a maximum of 1.5(&#952;<sub>f</sub>&minus;&#952;&#8320;)/t<sub>f</sub> at the mid-point; acceleration is a straight line and is <b>discontinuous</b> at t = 0 and t = t<sub>f</sub>, so there is a jerk impulse at each end.<br><br><b>Quintic polynomial (6 coefficients, 6 conditions)</b><span class='eq'>&#952;(t) = a&#8320; + a&#8321;t + a&#8322;t&#178; + a&#8323;t&#179; + a&#8334;t&#8308; + a&#8337;t&#8309;</span>Conditions: &#952;, &#952;&#775; and &#952;&#776; are all specified at both the start and the end. Solving for zero initial and final velocity and acceleration gives:<br><span class='eq'>&#952;(t) = &#952;&#8320; + (&#952;<sub>f</sub> &minus; &#952;&#8320;) [ 10&#964;&#179; &minus; 15&#964;&#8308; + 6&#964;&#8309; ] ,  where &#964; = t/t<sub>f</sub></span>The peak velocity is 1.875(&#952;<sub>f</sub>&minus;&#952;&#8320;)/t<sub>f</sub> and the peak acceleration is 5.77(&#952;<sub>f</sub>&minus;&#952;&#8320;)/t<sub>f</sub>&#178;. Position, velocity and acceleration are all continuous &mdash; the smoothest of the simple profiles.</p></div><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> A joint must move from 10&deg; to 60&deg; in 2 seconds using a cubic profile. &#952;(t) = 10 + 50[3(t/2)&#178; &minus; 2(t/2)&#179;]. At t = 1 s, &#964; = t/t<sub>f</sub> = 0.5, so &#952; = 10 + 50[3(0.25) &minus; 2(0.125)] = 10 + 50[0.75 &minus; 0.25] = 10 + 25 = <b>35&deg;</b>. The maximum velocity occurs at t = 1 s and equals 1.5 &times; 50/2 = <b>37.5 &deg;/s</b>. The acceleration at the start is 6(&#952;<sub>f</sub>&minus;&#952;&#8320;)/t<sub>f</sub>&#178; = 6 &times; 50/4 = <b>75 &deg;/s&#178;</b> and it changes sign abruptly at t = 1 s, which is the weakness of the cubic profile.</p></div><h4>Other interpolation methods</h4><ul><li><b>Linear interpolation with parabolic blends</b> &mdash; constant velocity in the middle of each segment with a parabolic (constant acceleration) blend at each end. Very common in CNC and in robot controllers.</li><li><b>Higher-order splines</b> &mdash; cubic splines give continuous position, velocity and acceleration through all the via points.</li><li><b>Trigonometric (cycloidal) motion</b> &mdash; &#952;(t) = &#952;&#8320; + (&#952;<sub>f</sub>&minus;&#952;&#8320;)[t/t<sub>f</sub> &minus; (1/2&#960;)sin(2&#960;t/t<sub>f</sub>)]. Acceleration is a smooth sine, so there is no jerk at all; used in high-speed cam design and in precision machines.</li><li><b>Bang-bang (time-optimal) control</b> &mdash; accelerate at the maximum possible rate and then decelerate at the maximum possible rate. This gives the shortest possible move time but the harshest motion.</li><li><b>Look-ahead (block transition) smoothing</b> &mdash; in CNC, the controller reads many blocks ahead and blends the corners so that the machine does not have to stop at every line end.</li></ul><h3 id="sec4"><span class="sec-no">4.</span>Trajectory Generation in a Robot Controller</h3><ol><li><b>Teaching.</b> The operator records a series of points, each with a position, an orientation, a motion type (joint, linear or circular), a speed and a blend (cornering) tolerance.</li><li><b>Path definition.</b> The controller builds the geometric path from the sequence of points.</li><li><b>Velocity planning.</b> The controller decides the speed along each segment and blends the corners, subject to the joint velocity and acceleration limits and to the commanded speed.</li><li><b>Interpolation.</b> At each interpolation cycle (for example every 4 ms) the controller computes the next commanded tool position and orientation along the path.</li><li><b>Inverse kinematics.</b> Each commanded tool pose is converted into a set of joint angles.</li><li><b>Joint-level trajectory generation.</b> For joint moves, the joint polynomials are evaluated directly instead.</li><li><b>Servo loop.</b> At a much higher rate (for example every 0.25 ms to 1 ms) each joint servo compares its actual encoder position with the commanded position and applies a PID or computed-torque correction.</li><li><b>Monitoring.</b> Following error, torque, temperature, limit switches and singularities are monitored continuously, and the motion is stopped if any limit is exceeded.</li></ol><div class="note"><span class="tag">Note</span><p><b>Blending (cornering).</b> When a robot moves through a series of points, stopping exactly at each one wastes a great deal of time. Controllers therefore allow the path to <b>cut the corner</b> within a specified tolerance, called the <b>zone</b>, <b>blend radius</b> or <b>approximation distance</b>. A large zone gives a fast, smooth motion but deviates from the taught point; a zone of zero gives an exact stop at the point. In continuous-path processes such as welding the zone must usually be zero or very small; in handling it can be large.</p></div><h4>Common problems in trajectory generation</h4><ul><li><b>Singularity avoidance</b> &mdash; near a singularity the joint velocities required for a given tool velocity become very large. Controllers reduce the tool speed automatically or refuse the move.</li><li><b>Joint limit avoidance</b> &mdash; the inverse kinematics may return a solution in which a joint is beyond its limit; the controller must select a different solution branch.</li><li><b>Solution branch selection</b> &mdash; a six-axis robot generally has up to eight inverse kinematic solutions for a given pose. The controller must choose the one nearest to the current configuration and must not switch branches in the middle of a path, which would cause a large unexpected movement.</li><li><b>Wrist flip and elbow flip</b> &mdash; undesirable branch changes; avoided by checking the continuity of the joint angles.</li><li><b>Following error</b> &mdash; the difference between the commanded and the actual position, caused by friction, inertia and compliance. It grows with speed and is a fundamental limit on accuracy.</li><li><b>Collision detection</b> &mdash; the trajectory must be checked against the fixtures, the machine and the robot itself, usually by off-line simulation.</li></ul><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A path is geometry only; a trajectory is a path with a time schedule, giving position, velocity and acceleration at every instant.</li><li>Trajectory planning must satisfy boundary conditions, kinematic and dynamic limits, geometric and process constraints, smoothness and, if possible, optimality.</li><li>Joint space planning moves each joint independently; the tool path is unpredictable but the computation is simple, no singularity can occur, and it is the fastest way between two poses.</li><li>Cartesian space planning follows an exact straight line or arc; it needs inverse kinematics at every interpolation point and risks singularities and joint limit violations.</li><li>A trapezoidal velocity profile has constant acceleration, cruise and deceleration phases; it is simple but produces infinite jerk at the transitions.</li><li>An S-curve profile limits the jerk and gives much smoother, quieter motion with less wear.</li><li>A cubic polynomial gives continuous position and velocity but discontinuous acceleration; a quintic polynomial gives continuous position, velocity and acceleration.</li><li>Cubic blend: &#952;(t) = &#952;&#8320; + (&#952;<sub>f</sub>&minus;&#952;&#8320;)[3&#964;&#178; &minus; 2&#964;&#179;]; quintic blend: &#952;(t) = &#952;&#8320; + (&#952;<sub>f</sub>&minus;&#952;&#8320;)[10&#964;&#179; &minus; 15&#964;&#8308; + 6&#964;&#8309;].</li><li>Blending (cornering tolerance) lets the robot cut corners within a set tolerance, greatly reducing cycle time.</li><li>The controller performs path definition, velocity planning, interpolation, inverse kinematics and a much faster servo loop.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Differentiate between a path and a trajectory.</li><li>List the constraints that a trajectory planner must satisfy.</li><li>Compare joint space and Cartesian space motion planning. Give two applications of each.</li><li>Why can a Cartesian linear move fail or become dangerous near a singularity?</li><li>Explain the trapezoidal velocity profile and derive the condition for it to become triangular.</li><li>What is jerk and why is it limited in an S-curve profile?</li><li>Derive the cubic polynomial joint trajectory for a move from &#952;&#8320; to &#952;<sub>f</sub> in time t<sub>f</sub> with zero initial and final velocity.</li><li>A joint moves from 20&deg; to 100&deg; in 3 s using a cubic profile. Find the angle at t = 1.5 s, the maximum velocity and the initial acceleration. (Answers: 60&deg;, 40 &deg;/s, 53.3 &deg;/s&#178;)</li><li>Why is a quintic polynomial preferred over a cubic for high-speed motion?</li><li>What is meant by blending or cornering tolerance? When must it be zero?</li><li>Describe the sequence of operations performed by a robot controller from a taught point to a servo command.</li><li>What are following error and inverse kinematic branch selection, and why do they matter?</li></ol></div><div class="pager"><a class="prev" href="25-rotary-to-linear-lead-screw-rack-pinion-linkages.html"><span class="dir">&larr; Previous topic</span><span class="ttl">25. Rotary to Linear Motion &mdash; Lead Screws, Rack and Pinion, Slider Cranks, Cams, Linkages and Couplers</span></a><a class="next" href="27-joint-space-schemes-via-points-real-world-problems.html"><span class="dir">Next topic &rarr;</span><span class="ttl">27. Joint Space Schemes, Via Points and Problems with Real-World Components</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rotary to Linear Motion &mdash; Lead Screws, Rack and Pinion, Slider Cranks, Cams, Linkages and Couplers | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="The mechanisms that turn a motor's rotation into straight-line movement: lead and ball screws, rack and pinion, slider-crank, cams, four-bar linkages ">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit IV &middot; Topic 25 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit IV &rsaquo; Topic 25</nav><div class="unit-tag">Unit IV</div><h2 class="page-title"><span class="topic-no">25</span>Rotary to Linear Motion &mdash; Lead Screws, Rack and Pinion, Slider Cranks, Cams, Linkages and Couplers</h2><p class="lede">The mechanisms that turn a motor's rotation into straight-line movement: lead and ball screws, rack and pinion, slider-crank, cams, four-bar linkages and their coupler curves, plus the couplings that connect them.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Lead Screws and Ball Screws</a></li><li><a href="#sec2">Rack and Pinion</a></li><li><a href="#sec3">Slider-Crank Mechanism</a></li><li><a href="#sec4">Cams</a></li><li><a href="#sec5">Linkages and Coupler Curves</a></li><li><a href="#sec6">Couplings</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Lead Screws and Ball Screws</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>lead screw</b> (or power screw) converts rotary motion into linear motion by means of a helical thread. A nut travels along the screw as it rotates. The distance the nut moves in one complete revolution is called the <b>lead</b>. In a single-start thread the lead equals the pitch; in a multi-start thread the lead equals the pitch multiplied by the number of starts.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 290" width="880" height="290" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Lead screw, ball screw and recirculating ball nut</text><text x="180" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(a) Plain (Acme / trapezoidal) lead screw</text><line x1="50" y1="110" x2="320" y2="110" class="cmp" stroke-width="4"/><line x1="56" y1="100" x2="68" y2="122" class="cmp" stroke-width="2.4"/><line x1="75" y1="100" x2="87" y2="122" class="cmp" stroke-width="2.4"/><line x1="94" y1="100" x2="106" y2="122" class="cmp" stroke-width="2.4"/><line x1="113" y1="100" x2="125" y2="122" class="cmp" stroke-width="2.4"/><line x1="132" y1="100" x2="144" y2="122" class="cmp" stroke-width="2.4"/><line x1="151" y1="100" x2="163" y2="122" class="cmp" stroke-width="2.4"/><line x1="170" y1="100" x2="182" y2="122" class="cmp" stroke-width="2.4"/><line x1="189" y1="100" x2="201" y2="122" class="cmp" stroke-width="2.4"/><line x1="208" y1="100" x2="220" y2="122" class="cmp" stroke-width="2.4"/><line x1="227" y1="100" x2="239" y2="122" class="cmp" stroke-width="2.4"/><line x1="246" y1="100" x2="258" y2="122" class="cmp" stroke-width="2.4"/><line x1="265" y1="100" x2="277" y2="122" class="cmp" stroke-width="2.4"/><line x1="284" y1="100" x2="296" y2="122" class="cmp" stroke-width="2.4"/><line x1="303" y1="100" x2="315" y2="122" class="cmp" stroke-width="2.4"/><circle cx="50" cy="110" r="12" class="mech"/><rect x="150" y="88" width="60" height="44" rx="4" class="mech2"/><text x="180" y="82" font-size="10.5" fill="#5b6b7c" text-anchor="middle">nut</text><line x1="180" y1="132" x2="180" y2="160" class="cmp" stroke-width="5"/><rect x="150" y="160" width="60" height="26" rx="3" class="mech"/><text x="180" y="177" font-size="10" fill="#12283d" text-anchor="middle" font-weight="600">load / table</text><polyline points="225,110 268,110" class="lnk" marker-end="url(#ah)"/><text x="280" y="114" font-size="10.5" fill="#a8232a" text-anchor="start">rotation</text><polyline points="230,173 272,173" class="lnk" marker-end="url(#ah)"/><text x="284" y="177" font-size="10.5" fill="#157a4b" text-anchor="start">linear travel</text><text x="180" y="218" font-size="10.5" fill="#5b6b7c" text-anchor="middle">sliding friction, efficiency 30 to 60 %,</text><text x="180" y="234" font-size="10.5" fill="#5b6b7c" text-anchor="middle">self-locking, cheap</text><text x="640" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(b) Ball screw with recirculating balls</text><line x1="480" y1="110" x2="800" y2="110" class="cmp" stroke-width="4"/><path d="M 486 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 507 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 528 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 549 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 570 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 591 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 612 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 633 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 654 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 675 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 696 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 717 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 738 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 759 98 q 10 12 0 24" class="cmp" stroke-width="2"/><path d="M 780 98 q 10 12 0 24" class="cmp" stroke-width="2"/><circle cx="480" cy="110" r="12" class="mech"/><rect x="600" y="84" width="74" height="52" rx="6" class="mech2"/><circle cx="614" cy="96" r="6" class="cmp-f"/><circle cx="614" cy="124" r="6" class="cmp-f"/><circle cx="630" cy="96" r="6" class="cmp-f"/><circle cx="630" cy="124" r="6" class="cmp-f"/><circle cx="646" cy="96" r="6" class="cmp-f"/><circle cx="646" cy="124" r="6" class="cmp-f"/><circle cx="662" cy="96" r="6" class="cmp-f"/><circle cx="662" cy="124" r="6" class="cmp-f"/><text x="637" y="78" font-size="10.5" fill="#5b6b7c" text-anchor="middle">ball nut</text><line x1="637" y1="136" x2="637" y2="160" class="cmp" stroke-width="5"/><rect x="606" y="160" width="62" height="26" rx="3" class="mech"/><text x="637" y="177" font-size="10" fill="#12283d" text-anchor="middle" font-weight="600">table</text><path d="M 690 96 q 24 14 0 28" class="lnk-d" marker-end="url(#ah)"/><text x="712" y="96" font-size="10" fill="#0f5fa8" text-anchor="start">balls recirculate</text><text x="712" y="112" font-size="10" fill="#0f5fa8" text-anchor="start">through a return tube</text><text x="640" y="218" font-size="10.5" fill="#5b6b7c" text-anchor="middle">rolling friction, efficiency 90 % or more,</text><text x="640" y="234" font-size="10.5" fill="#5b6b7c" text-anchor="middle">no backlash, precise, costly, NOT self-locking</text><text x="440" y="272" font-size="12" fill="#12283d" text-anchor="middle" font-weight="600">Linear travel per revolution = lead L.   Travel = (N revolutions) &times; L.   Resolution per motor step = L / (steps per revolution).</text></svg></div><figcaption><b>Fig. 1:</b> A plain (Acme) lead screw with sliding friction (left) and a ball screw with recirculating balls and rolling friction (right).</figcaption></figure><h4>Thread forms</h4><ul><li><b>Square thread</b> &mdash; theoretically the most efficient because the load is axial and there is no wedging action, but it is difficult to manufacture and cannot be adjusted for wear.</li><li><b>Acme / trapezoidal thread</b> &mdash; a 29&deg; included angle. Stronger than a square thread, easier to cut, and the nut can be adjusted for wear by a split nut. The most common form for plain lead screws.</li><li><b>Buttress thread</b> &mdash; used where the load acts in one direction only, as in presses and jacks.</li><li><b>Ball screw thread</b> &mdash; a gothic or circular arc profile designed to accommodate the recirculating balls.</li></ul><h4>Plain lead screw</h4><p>The nut slides directly on the thread, so friction is <b>sliding</b> friction and the efficiency is only 30 % to 60 %. The advantage is that a plain lead screw with a small lead angle is <b>self-locking</b>: the friction is high enough that an axial load cannot back-drive the screw, so the position is held when the motor is switched off. This is very useful in a vertical axis, where it prevents the load from falling. Plain lead screws are cheap, quiet and simple, and are used in vices, jacks, presses, 3D printer Z axes and low-cost positioning stages.</p><h4>Ball screw</h4><p>In a <b>ball screw</b>, hardened steel balls roll in matching grooves in the screw and the nut, and are recirculated through a return tube or an internal deflector. The friction is <b>rolling</b> friction, so the efficiency is 90 % or more. Ball screws have almost no backlash (a preloaded double nut eliminates it completely), are very stiff, and can transmit high loads at high speed. They are the standard choice for CNC machine axes, industrial robot prismatic joints, precision positioning tables and aircraft actuators.</p><ul><li><b>Advantages of a ball screw:</b> efficiency above 90 % against 30 % to 60 % for a plain screw, so less heat and less motor power; very high positional accuracy and repeatability; zero backlash when preloaded; high load capacity and long life; smooth motion with no stick-slip; can be run at high speed.</li><li><b>Disadvantages:</b> much more expensive; <b>not self-locking</b>, so a vertical axis needs a brake or a counterweight to hold the load when power is removed; needs precise support bearings (usually an angular contact pair at one end); sensitive to dirt, so a bellows or way cover is needed; the nut is bulky; if the screw is long and rotates fast, it can whip at its <b>critical speed</b>.</li></ul><div class="formula"><span class="tag">Formula</span><p><b>Lead screw relations</b><span class='eq'>Linear travel per revolution = lead L</span><span class='eq'>Linear speed  v = L &times; N / 60   (N in rpm, L in m)</span><span class='eq'>Resolution per motor step = L / (steps per revolution &times; microstepping factor)</span><span class='eq'>Torque to raise the load  T = (F d<sub>m</sub> / 2) &times; (l + &#960; &#956; d<sub>m</sub> sec&#945;) / (&#960; d<sub>m</sub> &minus; &#956; l sec&#945;)</span><span class='eq'>Efficiency  &#951; = tan &#955; / tan(&#955; + &#966;)  where &#955; = lead angle and &#966; = friction angle</span><span class='eq'>Self-locking condition:  &#956; &gt; tan &#955;  (that is, the friction angle exceeds the lead angle)</span>where d<sub>m</sub> is the mean diameter of the thread, l the lead, &#956; the coefficient of friction and &#945; half the thread angle.</p></div><div class="example"><span class="tag">Example</span><p><b>Numerical 1.</b> A ball screw of 10 mm lead is driven by a stepper motor of 1.8&deg; step angle with 8 times microstepping. Steps per revolution = 200 &times; 8 = 1600. Resolution = 10/1600 = <b>0.00625 mm</b> = 6.25 &#181;m per step.<br><b>Numerical 2.</b> The same screw must move a table at 0.5 m/s. Required speed = 0.5/0.010 = 50 revolutions per second = <b>3000 rpm</b>.<br><b>Numerical 3.</b> A plain lead screw of mean diameter 24 mm and lead 6 mm carries an axial load of 5 kN. The coefficient of friction is 0.12 and the thread is square. Lead angle &#955; = tan<sup>&minus;1</sup>(6/(&#960;&times;24)) = tan<sup>&minus;1</sup>(0.0796) = 4.55&deg;. Friction angle &#966; = tan<sup>&minus;1</sup>(0.12) = 6.84&deg;. Torque T = (F d<sub>m</sub>/2) tan(&#955;+&#966;) = (5000 &times; 0.024/2) &times; tan(11.39&deg;) = 60 &times; 0.2014 = <b>12.1 N m</b>. Efficiency = tan 4.55&deg;/tan 11.39&deg; = 0.0796/0.2014 = <b>39.5 %</b>. Since &#966; &gt; &#955;, the screw is <b>self-locking</b>.</p></div><h4>Support and mounting of a screw</h4><p>A screw must be supported by bearings. The three standard arrangements are: <b>fixed-free</b> (one end held by a bearing pair, the other end unsupported &mdash; cheap, but limited speed and accuracy, used for short screws), <b>fixed-supported</b> (one end held by an angular contact bearing pair and the other by a simple radial bearing &mdash; the usual arrangement), and <b>fixed-fixed</b> (both ends held by preloaded angular contact bearings &mdash; the stiffest and most accurate, allowing the highest speed, and permitting the screw to be pre-tensioned against thermal expansion). The nut is connected to the moving table through a <b>nut housing</b>, and the connection must be stiff or the table will lag.</p><h3 id="sec2"><span class="sec-no">2.</span>Rack and Pinion</h3><p>A <b>rack</b> is a straight bar with gear teeth, and a <b>pinion</b> is the small gear that meshes with it. Rotation of the pinion produces linear motion of the rack, or vice versa. This is the simplest and most direct way to convert rotary to linear motion over a long distance.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 200" width="880" height="200" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Rack and pinion &mdash; rotary to linear motion</text><circle cx="250" cy="85" r="46" class="mech2"/><line x1="288.0" y1="85.0" x2="297.0" y2="85.0" class="cmp" stroke-width="3"/><line x1="285.1074222354289" y1="99.54197042987342" x2="293.4223380280305" y2="102.98612132115922" class="cmp" stroke-width="3"/><line x1="276.8700576850888" y1="111.8700576850888" x2="283.2340187157677" y2="118.23401871576773" class="cmp" stroke-width="3"/><line x1="264.5419704298734" y1="120.1074222354289" x2="267.9861213211592" y2="128.42233802803048" class="cmp" stroke-width="3"/><line x1="250.0" y1="123.0" x2="250.0" y2="132.0" class="cmp" stroke-width="3"/><line x1="235.4580295701266" y1="120.1074222354289" x2="232.0138786788408" y2="128.42233802803048" class="cmp" stroke-width="3"/><line x1="223.1299423149112" y1="111.87005768508881" x2="216.76598128423228" y2="118.23401871576775" class="cmp" stroke-width="3"/><line x1="214.89257776457112" y1="99.54197042987342" x2="206.57766197196952" y2="102.98612132115923" class="cmp" stroke-width="3"/><line x1="212.0" y1="85.0" x2="203.0" y2="85.0" class="cmp" stroke-width="3"/><line x1="214.89257776457112" y1="70.4580295701266" x2="206.57766197196952" y2="67.01387867884078" class="cmp" stroke-width="3"/><line x1="223.12994231491118" y1="58.1299423149112" x2="216.76598128423225" y2="51.76598128423227" class="cmp" stroke-width="3"/><line x1="235.4580295701266" y1="49.8925777645711" x2="232.0138786788408" y2="41.57766197196952" class="cmp" stroke-width="3"/><line x1="250.0" y1="47.0" x2="250.0" y2="38.0" class="cmp" stroke-width="3"/><line x1="264.5419704298734" y1="49.89257776457111" x2="267.9861213211592" y2="41.577661971969526" class="cmp" stroke-width="3"/><line x1="276.8700576850888" y1="58.12994231491119" x2="283.2340187157677" y2="51.76598128423226" class="cmp" stroke-width="3"/><line x1="285.1074222354289" y1="70.4580295701266" x2="293.4223380280305" y2="67.0138786788408" class="cmp" stroke-width="3"/><circle cx="250" cy="85" r="7" class="cmp-f"/><path d="M 288 55 A 52 52 0 0 1 300 88" class="lnk" marker-end="url(#ah)"/><text x="322" y="60" font-size="11" fill="#a8232a" text-anchor="start">&#969; rotation</text><rect x="120" y="131" width="460" height="26" rx="8" class="mech"/><polygon points="124,131 134,118 144,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="144,131 154,118 164,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="164,131 174,118 184,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="184,131 194,118 204,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="204,131 214,118 224,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="224,131 234,118 244,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="244,131 254,118 264,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="264,131 274,118 284,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="284,131 294,118 304,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="304,131 314,118 324,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="324,131 334,118 344,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="344,131 354,118 364,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="364,131 374,118 384,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="384,131 394,118 404,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="404,131 414,118 424,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="424,131 434,118 444,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="444,131 454,118 464,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="464,131 474,118 484,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="484,131 494,118 504,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="504,131 514,118 524,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="524,131 534,118 544,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="544,131 554,118 564,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polygon points="564,131 574,118 584,131" fill="#fff" stroke="#4a5b6d" stroke-width="1.4"/><polyline points="600,144 650,144" class="lnk" marker-end="url(#ah)"/><text x="660" y="148" font-size="12" fill="#12283d" text-anchor="start" font-weight="600">linear motion v = &#969; r</text><text x="350" y="190" font-size="11.5" fill="#5b6b7c" text-anchor="middle">used in vehicle steering, lathe cross-slide, robot prismatic joints and 3D printers</text></svg></div><figcaption><b>Fig. 2:</b> Rack and pinion: rotation of the pinion moves the rack in a straight line. Travel per revolution equals the pitch-circle circumference.</figcaption></figure><span class="eq">Linear travel per revolution = &#960; &times; D<sub>pinion</sub> = p<sub>c</sub> &times; T<sub>pinion</sub>        Linear speed v = &#969; r</span><ul><li><b>Advantages:</b> unlimited stroke length, limited only by the length of the rack; simple and robust; positive drive with no slip; high speed capability; can carry heavy loads; cheap to manufacture; the rack can be made in sections and joined end to end.</li><li><b>Disadvantages:</b> backlash unless a spring-loaded pinion or a split rack is used; accuracy is limited by the manufacturing tolerance of the teeth and by the joint between rack sections; the gear mesh needs lubrication and protection from dust; the pinion must be accurately aligned with the rack; the linear resolution is coarser than a fine lead screw.</li><li><b>Applications:</b> <b>automobile steering</b> (the most famous application &mdash; the steering wheel turns the pinion and the rack moves the track rods), lathe traverse and CNC gantry axes (a long X axis is much better done with a rack than with a 5 m screw, which would whip), sliding gates and doors, railway point machines, rack-and-pinion jacks, the boom of a crane, the height adjustment of a drill press or a milling machine, robot prismatic joints and linear actuators, and the focusing mechanism of a microscope.</li></ul><div class="note"><span class="tag">Note</span><p>A rack and pinion is essentially a <b>gear of infinite diameter</b>. The teeth of the rack are straight-sided (an involute of infinite radius), and the same module must be used for both members.</p></div><h3 id="sec3"><span class="sec-no">3.</span>Slider-Crank Mechanism</h3><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Slider-crank mechanism &mdash; rotary to reciprocating motion</text><circle cx="240" cy="140" r="62" fill="none" stroke="#8aa2b8" stroke-width="1.3" stroke-dasharray="5 4"/><circle cx="240" cy="140" r="10" class="mech"/><line x1="240" y1="140" x2="287.49475547337664" y2="100.14716819943456" class="cmp" stroke-width="7"/><circle cx="287.49475547337664" cy="100.14716819943456" r="8" class="cmp-f"/><line x1="287.49475547337664" y1="100.14716819943456" x2="520" y2="140" class="cmp" stroke-width="6"/><circle cx="520" cy="140" r="9" class="cmp-f"/><rect x="492" y="116" width="74" height="48" rx="4" class="mech2"/><rect x="470" y="168" width="130" height="12" rx="2" class="mech"/><polyline points="580,140 626,140" class="lnk" marker-end="url(#ah)"/><text x="636" y="144" font-size="11" fill="#157a4b" text-anchor="start">reciprocating motion</text><text x="288" y="108" font-size="11" fill="#0f5fa8" text-anchor="middle">r (crank)</text><text x="390" y="118" font-size="11" fill="#0f5fa8" text-anchor="middle">l (connecting rod)</text><path d="M 300 158 A 66 66 0 0 0 288 186" class="lnk" marker-end="url(#ah)"/><text x="316" y="184" font-size="12" fill="#a8232a" text-anchor="middle" font-weight="700">&#952;</text><rect x="660" y="60" width="190" height="140" rx="8" class="t-box2"/><text x="755" y="86" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Slider position</text><text x="755" y="114" font-size="12.5" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">x = r cos &#952; +</text><text x="755" y="134" font-size="12.5" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">&#8730;( l&#178; &minus; r&#178; sin&#178;&#952; )</text><text x="755" y="162" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Stroke = 2 r</text><text x="755" y="184" font-size="11" fill="#5b6b7c" text-anchor="middle">Let n = l / r</text><text x="440" y="236" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">The motion is not simple harmonic; it is faster on one side of the stroke than the other, which gives the quick-return effect when an offset is added.</text></svg></div><figcaption><b>Fig. 3:</b> The slider-crank mechanism: a rotating crank, a connecting rod and a sliding block. Rotation of the crank produces reciprocating motion of the slider.</figcaption></figure><p>The <b>slider-crank</b> is the mechanism at the heart of the reciprocating engine and compressor. It has three moving links: the <b>crank</b> (which rotates fully about a fixed axis), the <b>connecting rod</b> (which has complex plane motion) and the <b>slider</b> (which translates along a fixed guide). There are three turning pairs and one sliding pair, and the mobility is 1.</p><span class="eq">Slider displacement  x = r cos &#952; + &#8730;(l&#178; &minus; r&#178; sin&#178;&#952;)        Stroke = 2r        where n = l/r</span><p>For a long connecting rod (n large), the motion of the slider approaches simple harmonic motion. For a short rod, the motion becomes noticeably non-symmetrical: the slider moves faster during one half of the cycle than the other. This asymmetry is exploited in the <b>quick-return mechanism</b>.</p><ul><li><b>In-line slider-crank</b> &mdash; the slider path passes through the crank axis; forward and return strokes take equal time.</li><li><b>Offset slider-crank</b> &mdash; the slider path is offset from the crank axis, so one stroke is quicker than the other. This is the basis of the quick-return action.</li><li><b>Inversions:</b> fixing the crank gives the <b>Whitworth quick-return</b> mechanism (used in shaping machines); fixing the connecting rod gives the <b>crank and slotted lever</b> mechanism; fixing the slider gives the <b>oscillating cylinder engine</b> and hand pumps.</li></ul><ul><li><b>Applications:</b> internal combustion engines (piston, connecting rod and crankshaft); reciprocating compressors and pumps; shaping, slotting and planing machines; presses and punch presses; the drive of some robot wrists and grippers; sewing machines; steam locomotives; windshield wiper mechanisms; and the Scotch yoke, which is a variant that produces exact simple harmonic motion.</li></ul><h3 id="sec4"><span class="sec-no">4.</span>Cams</h3><p>Cams are described in detail in Topic 8. In the context of rotary-to-linear conversion in robots and automated machines, a cam is used when the linear motion must follow an <b>exact, repeatable profile</b> that is a function of the shaft angle, and when the speed is high. The follower's displacement is programmed into the shape of the cam, so no control system is needed at all &mdash; the program is in the metal.</p><ul><li><b>Advantages in automation:</b> extremely fast and repeatable; no controller, no sensor and no feedback needed; the motion profile is exactly as designed; several motions can be synchronised from one shaft; very reliable.</li><li><b>Disadvantages:</b> the profile is fixed, so changing the motion means making a new cam; cams wear and are expensive to manufacture accurately; high contact stresses; need lubrication; not programmable.</li><li><b>Applications:</b> valve gear of internal combustion engines; automatic lathes and screw machines; textile machinery; packaging and bottling machines; printing presses; indexing mechanisms; the feed of a punch press; and in older robots, where a cam on a motor shaft operated limit switches.</li></ul><div class="note"><span class="tag">Note</span><p>In a modern robot, a cam is usually replaced in software by a <b>motion profile</b> or <b>electronic cam</b>: the controller generates a position-versus-time table that plays the same role as the cam profile, but it can be changed instantly by editing a number. This is one of the clearest illustrations of the mechatronic philosophy &mdash; hardware replaced by software.</p></div><h3 id="sec5"><span class="sec-no">5.</span>Linkages and Coupler Curves</h3><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 280" width="880" height="280" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Four-bar linkage &mdash; coupler curve and inversions</text><rect x="120" y="220" width="340" height="10" rx="2" class="hatch"/><line x1="170" y1="220" x2="200" y2="120" class="cmp" stroke-width="6"/><line x1="200" y1="120" x2="370" y2="130" class="cmp" stroke-width="6"/><line x1="370" y1="130" x2="410" y2="220" class="cmp" stroke-width="6"/><line x1="170" y1="220" x2="410" y2="220" class="cmp" stroke-width="3" stroke-dasharray="6 4"/><circle cx="170" cy="220" r="8" class="cmp-f"/><circle cx="200" cy="120" r="8" class="cmp-f"/><circle cx="370" cy="130" r="8" class="cmp-f"/><circle cx="410" cy="220" r="8" class="cmp-f"/><text x="156" y="242" font-size="10.5" fill="#5b6b7c" text-anchor="end">A (fixed)</text><text x="424" y="242" font-size="10.5" fill="#5b6b7c" text-anchor="start">D (fixed)</text><text x="188" y="110" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">B</text><text x="382" y="120" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">C</text><line x1="200" y1="120" x2="285" y2="80" class="cmp" stroke-width="3"/><line x1="370" y1="130" x2="285" y2="80" class="cmp" stroke-width="3"/><circle cx="285" cy="80" r="8" class="cmp-y"/><text x="299" y="74" font-size="11" fill="#a8232a" text-anchor="start" font-weight="600">coupler point P</text><path d="M 150 170 C 190 60, 330 40, 400 90 C 450 130, 430 200, 380 195 C 320 190, 250 210, 200 200 C 165 194, 140 186, 150 170" class="lnk-d" stroke-width="1.8"/><text x="300" y="34" font-size="11" fill="#0f5fa8" text-anchor="middle">coupler curve traced by P</text><text x="230" y="172" font-size="10.5" fill="#5b6b7c" text-anchor="middle">coupler (link 3)</text><text x="160" y="168" font-size="10.5" fill="#5b6b7c" text-anchor="end">crank</text><text x="415" y="172" font-size="10.5" fill="#5b6b7c" text-anchor="start">rocker</text><rect x="560" y="55" width="290" height="200" rx="8" class="t-box2"/><text x="705" y="82" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Inversions of the four-bar chain</text><text x="580" y="112" font-size="11" fill="#12283d" text-anchor="start" font-weight="600">&#8226; Shortest link fixed</text><text x="596" y="130" font-size="11" fill="#4a5b6d" text-anchor="start">Double crank (drag link)</text><text x="580" y="146" font-size="11" fill="#12283d" text-anchor="start" font-weight="600">&#8226; Link adjacent to shortest fixed</text><text x="596" y="164" font-size="11" fill="#4a5b6d" text-anchor="start">Crank-rocker &mdash; most common</text><text x="580" y="180" font-size="11" fill="#12283d" text-anchor="start" font-weight="600">&#8226; Link opposite shortest fixed</text><text x="596" y="198" font-size="11" fill="#4a5b6d" text-anchor="start">Double rocker</text><text x="580" y="214" font-size="11" fill="#12283d" text-anchor="start" font-weight="600">&#8226; s + l &gt; p + q</text><text x="596" y="232" font-size="11" fill="#4a5b6d" text-anchor="start">Double rocker, no full rotation</text><text x="705" y="244" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">Grashof: s + l &#8804; p + q</text></svg></div><figcaption><b>Fig. 4:</b> A four-bar linkage with a coupler point P tracing a coupler curve, and the inversions of the chain determined by Grashof's law.</figcaption></figure><p>A <b>linkage</b> is an assembly of rigid links connected by joints that constrains the motion of the links in a useful way. The most important is the <b>four-bar linkage</b>, which has four links and four revolute joints, and mobility of one.</p><h4>The coupler and the coupler curve</h4><p>In a four-bar linkage the link that connects the crank to the rocker is called the <b>coupler</b>. The coupler has general plane motion &mdash; it both translates and rotates. Any point on the coupler (or on an extension of it) traces a closed curve called the <b>coupler curve</b>. These curves can be surprisingly complex and useful: they may have straight-line portions, cusps, loops and near-circular arcs.</p><ul><li><b>Why coupler curves matter:</b> by choosing the link lengths and the position of the coupler point, a designer can generate a wide variety of motion paths with a single rotating input and no control system at all.</li><li><b>Straight-line mechanisms:</b> the <b>Watt</b> linkage, the <b>Chebyshev</b> lambda linkage and the <b>Peaucellier-Lipkin</b> linkage all produce exact or approximate straight-line motion from pure rotation, before the invention of the sliding pair. The Peaucellier cell gives an exact straight line using only revolute joints.</li><li><b>Roberts' theorem:</b> any coupler curve can be generated by three different four-bar linkages, which gives the designer freedom to choose the most convenient arrangement.</li></ul><h4>Common linkages used in machines and robots</h4><ul><li><b>Crank-rocker</b> &mdash; the crank rotates fully and the rocker oscillates. Used in wiper mechanisms, pump drives and the treadle of a sewing machine.</li><li><b>Double-crank (drag link)</b> &mdash; both side links rotate fully. Used to couple two parallel shafts at a varying speed ratio.</li><li><b>Double-rocker</b> &mdash; both side links oscillate.</li><li><b>Parallel linkage / pantograph</b> &mdash; opposite links are equal and parallel, so the coupler translates without rotating. Used to keep a platform level, in scissor lifts, in the Delta robot, in the arms of some palletising robots, and in pantographs for copying and for electric locomotive current collectors.</li><li><b>Whitworth and crank-and-slotted-lever quick-return</b> &mdash; used in shapers and slotters.</li><li><b>Toggle mechanism</b> &mdash; near the fully extended position, a small input force produces a very large output force. Used in clamps, presses and locking devices.</li><li><b>Geneva mechanism</b> &mdash; converts continuous rotation into intermittent indexing motion, used in film projectors, tool changers and indexing tables.</li><li><b>Five-bar and six-bar linkages</b> &mdash; used where a four-bar cannot produce the required motion; two inputs are needed for a five-bar.</li><li><b>Leg mechanisms</b> &mdash; the Theo Jansen linkage and the Klann linkage produce a walking motion from a single rotating crank, and are used in walking robots.</li></ul><h4>Linkages in robotics</h4><p>Linkages are used in robots for three purposes: as the <b>structure</b> of parallel and Delta robots; as a <b>transmission</b> that keeps the motor on a fixed link (as in the closed-loop linkage of some SCARA and palletising robots); and as a <b>motion generator</b> for walking legs. A <b>parallel manipulator</b> such as the Stewart platform uses six linear actuators connecting a fixed base to a moving platform, giving six degrees of freedom with very high stiffness and accuracy &mdash; it is used in flight simulators, in machine tools and in precision positioning.</p><h3 id="sec6"><span class="sec-no">6.</span>Couplings</h3><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Shaft couplings used to connect a motor to a screw or joint</text><rect x="32" y="55" width="156" height="130" rx="8" class="t-box"/><text x="110" y="170" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">Rigid (flange / sleeve)</text><rect x="60" y="98" width="40" height="24" rx="3" class="mech2"/><rect x="120" y="98" width="40" height="24" rx="3" class="mech2"/><line x1="100" y1="110" x2="120" y2="110" class="cmp" stroke-width="8"/><circle cx="80" cy="106" r="2.5" class="dot"/><circle cx="80" cy="114" r="2.5" class="dot"/><circle cx="140" cy="106" r="2.5" class="dot"/><circle cx="140" cy="114" r="2.5" class="dot"/><rect x="212" y="55" width="156" height="130" rx="8" class="t-box"/><text x="290" y="170" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">Oldham</text><rect x="236" y="94" width="34" height="32" rx="3" class="mech2"/><rect x="272" y="88" width="36" height="44" rx="3" class="mech3"/><rect x="310" y="94" width="34" height="32" rx="3" class="mech2"/><line x1="270" y1="110" x2="310" y2="110" class="cmp" stroke-width="4"/><rect x="412" y="55" width="156" height="130" rx="8" class="t-box"/><text x="490" y="170" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">Universal joint (Hooke)</text><line x1="438" y1="94" x2="484" y2="110" class="cmp" stroke-width="5"/><line x1="542" y1="126" x2="496" y2="110" class="cmp" stroke-width="5"/><circle cx="490" cy="110" r="12" class="cmp-f"/><line x1="480" y1="102" x2="500" y2="118" class="cmp" stroke-width="3"/><text x="490" y="154" font-size="9.5" fill="#5b6b7c" text-anchor="middle">angle up to 30&#176;</text><rect x="602" y="55" width="156" height="130" rx="8" class="t-box"/><text x="680" y="170" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">Flexible / jaw</text><rect x="630" y="92" width="36" height="36" rx="4" class="mech2"/><rect x="694" y="92" width="36" height="36" rx="4" class="mech2"/><circle cx="679" cy="98" r="6" class="cmp-y"/><circle cx="679" cy="110" r="6" class="cmp-y"/><circle cx="679" cy="122" r="6" class="cmp-y"/><path d="M 672 96 q 8 14 0 28" class="mech3"/><rect x="732" y="55" width="156" height="130" rx="8" class="t-box"/><text x="810" y="170" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">Bellows / beam</text><rect x="760" y="100" width="28" height="20" rx="2" class="mech2"/><rect x="832" y="100" width="28" height="20" rx="2" class="mech2"/><path d="M 788 100 q 6 -8 12 0 q 6 8 12 0 q 6 -8 12 0 q 6 8 8 0" fill="none" stroke="#157a4b" stroke-width="2.4"/><path d="M 788 120 q 6 -8 12 0 q 6 8 12 0 q 6 -8 12 0 q 6 8 8 0" fill="none" stroke="#157a4b" stroke-width="2.4"/><text x="810" y="154" font-size="9.5" fill="#5b6b7c" text-anchor="middle">zero backlash</text><text x="440" y="216" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">A rigid coupling needs perfect alignment; flexible couplings tolerate parallel, angular and axial misalignment.</text><text x="440" y="238" font-size="11" fill="#5b6b7c" text-anchor="middle">In precision robot and CNC axes a bellows or beam coupling is used because it has zero backlash and high torsional stiffness.</text></svg></div><figcaption><b>Fig. 5:</b> Shaft couplings: rigid, Oldham, universal joint, flexible jaw and precision bellows/beam types.</figcaption></figure><div class="defbox"><span class="tag">Definition</span><p>A <b>coupling</b> is a device used to connect the ends of two shafts permanently or temporarily, in order to transmit torque. Couplings are needed wherever a motor drives a lead screw, a pinion or a gearbox.</p></div><h4>Types of coupling</h4><ul><li><b>Rigid couplings</b> &mdash; sleeve (muff), flanged and clamp types. Used only where the shafts are perfectly aligned, because any misalignment produces large bending loads on the bearings. Cheapest and stiffest.</li><li><b>Flexible couplings</b> &mdash; tolerate some misalignment and absorb shock and vibration:</li><li>&nbsp;&nbsp;&nbsp;&nbsp;&bull; <b>Oldham coupling</b> &mdash; three discs, the middle one having two perpendicular tongues sliding in slots. Accommodates large <b>parallel</b> misalignment with zero backlash. Very common in 3D printers and light CNC axes.</li><li>&nbsp;&nbsp;&nbsp;&nbsp;&bull; <b>Universal joint (Hooke's joint)</b> &mdash; a cross piece between two yokes. Accommodates large <b>angular</b> misalignment up to about 30&deg;, but the output speed fluctuates unless two joints are used in a correct arrangement (a double Cardan shaft).</li><li>&nbsp;&nbsp;&nbsp;&nbsp;&bull; <b>Gear coupling</b> &mdash; crowned teeth that slide, for heavy industrial drives.</li><li>&nbsp;&nbsp;&nbsp;&nbsp;&bull; <b>Grid, chain and disc pack couplings</b> &mdash; for heavy torque.</li><li>&nbsp;&nbsp;&nbsp;&nbsp;&bull; <b>Elastomeric jaw (spider) coupling</b> &mdash; two hubs with curved jaws and an elastomer spider between them. Cheap, damps vibration, and is fail-safe because the spider can be replaced. Has some backlash and wind-up.</li><li>&nbsp;&nbsp;&nbsp;&nbsp;&bull; <b>Bellows coupling</b> &mdash; a thin convoluted metal bellows welded between two hubs. <b>Zero backlash</b>, very high torsional stiffness, and excellent tolerance of misalignment. The standard choice for precision servo axes.</li><li>&nbsp;&nbsp;&nbsp;&nbsp;&bull; <b>Beam / helical coupling</b> &mdash; a single piece of aluminium with a helical slot cut in it. Zero backlash, inexpensive and maintenance free, widely used in small servo systems.</li><li><b>Fluid coupling and torque converter</b> &mdash; transmit torque hydraulically, allowing slip and smooth starting; used in vehicle transmissions and large conveyor drives.</li><li><b>Safety (slip) coupling</b> &mdash; disconnects or slips when the torque exceeds a set value, protecting the machine from a jam.</li></ul><h4>Selection of a coupling</h4><ol><li><b>Torque</b> to be transmitted, including the peak and shock torque, not just the continuous torque.</li><li><b>Speed</b>, and whether the assembly needs balancing above about 1800 rpm.</li><li><b>Misalignment</b> &mdash; parallel (offset), angular and axial (end float). Measure the actual misalignment; a good installation keeps it within the coupling's rating.</li><li><b>Backlash requirement</b> &mdash; precision positioning needs a zero-backlash coupling.</li><li><b>Torsional stiffness</b> &mdash; important for servo response; a soft coupling makes the servo loop oscillate.</li><li><b>Space, inertia and cost</b> &mdash; the coupling's own inertia adds to the motor's load.</li><li><b>Environment</b> &mdash; temperature, chemicals, lubrication and the need for electrical insulation between the shafts.</li></ol><div class="warn"><span class="tag">Important</span><p>Misalignment is the most common cause of premature failure in servo systems. Excess misalignment causes vibration, high bearing loads, coupling fatigue and, eventually, a broken shaft. Couplings tolerate misalignment but do not eliminate its effects. Always align motor and screw within the manufacturer's limits, usually a few hundredths of a millimetre and a few tenths of a degree.</p></div><div class="tbl-scroll"><table><caption>Table 25.1 &mdash; Rotary-to-linear conversion methods compared</caption><thead><tr><th>Method</th><th>Stroke</th><th>Accuracy</th><th>Speed</th><th>Self-locking</th><th>Cost</th><th>Typical use</th></tr></thead><tbody><tr><td>Ball screw</td><td>Short to medium (limited by whip)</td><td>Very high (&plusmn;0.01 mm)</td><td>High</td><td>No</td><td>High</td><td>CNC axes, robot prismatic joints, precision stages</td></tr><tr><td>Plain lead screw</td><td>Short to medium</td><td>Moderate</td><td>Low to moderate</td><td>Yes</td><td>Low</td><td>Jacks, vices, 3D printer Z axis, simple stages</td></tr><tr><td>Rack and pinion</td><td>Unlimited</td><td>Moderate (&plusmn;0.05 mm)</td><td>Very high</td><td>No</td><td>Moderate</td><td>Long gantry axes, steering, gates, traverses</td></tr><tr><td>Belt and pulley (linear)</td><td>Long</td><td>Low to moderate</td><td>Very high</td><td>No</td><td>Low</td><td>3D printer X and Y axes, pick and place, printers</td></tr><tr><td>Chain and sprocket</td><td>Very long</td><td>Low</td><td>Moderate</td><td>No</td><td>Low</td><td>Conveyors, forklift masts, large doors</td></tr><tr><td>Slider crank</td><td>Short (2 &times; crank radius)</td><td>Moderate</td><td>High</td><td>No</td><td>Low</td><td>Engines, presses, pumps, shapers</td></tr><tr><td>Cam and follower</td><td>Short</td><td>Very high</td><td>Very high</td><td>Depends</td><td>High</td><td>Engines, automatic machines, indexing</td></tr><tr><td>Pneumatic cylinder</td><td>Short to medium</td><td>Low (two positions only)</td><td>Very high</td><td>No</td><td>Low</td><td>Clamping, ejecting, simple actuators</td></tr><tr><td>Hydraulic cylinder</td><td>Long</td><td>Moderate to high with servo valve</td><td>Moderate</td><td>Yes (with valve closed)</td><td>High</td><td>Presses, heavy robots, construction</td></tr></tbody></table></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A lead screw converts rotation into linear motion; travel per revolution equals the lead. Acme and square threads are common.</li><li>A plain lead screw has 30 % to 60 % efficiency and is self-locking when the friction angle exceeds the lead angle.</li><li>A ball screw uses recirculating balls to give over 90 % efficiency, high accuracy, high stiffness and zero backlash, but it is costly and is not self-locking.</li><li>Efficiency of a power screw = tan&#955;/tan(&#955;+&#966;).</li><li>A rack and pinion gives unlimited stroke, is robust and cheap, but has backlash and lower accuracy; it is used in steering and in long machine axes.</li><li>The slider-crank converts rotation into reciprocating motion; x = r cos&#952; + &#8730;(l&#178; &minus; r&#178;sin&#178;&#952;) and the stroke is 2r. Offsetting it gives a quick-return action.</li><li>A cam gives an exact, fast, repeatable profile with no control system; in a robot it is replaced by a software motion profile (an electronic cam).</li><li>In a four-bar linkage the coupler has general plane motion and any point on it traces a coupler curve; these can contain useful straight-line portions.</li><li>Common linkages include the crank-rocker, the parallel linkage and pantograph, the toggle, the Geneva and the walking-leg linkages.</li><li>A coupling connects a motor to a screw or pinion. Bellows and beam couplings have zero backlash and are used in precision servo axes; Oldham couplings tolerate parallel misalignment; universal joints tolerate angular misalignment.</li><li>Misalignment is the commonest cause of servo system failure.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Differentiate between a plain lead screw and a ball screw. Give two advantages and two disadvantages of each.</li><li>Define lead, pitch and number of starts. How are they related?</li><li>Derive the expression for the efficiency of a power screw and state the condition for self-locking.</li><li>A ball screw of 5 mm lead is driven by a 1.8&deg; stepper motor with 16 times microstepping. Find the linear resolution. (Answer: 1.56 &#181;m)</li><li>Calculate the torque required to raise a 4 kN load on a square-threaded screw of mean diameter 30 mm and lead 8 mm, with a coefficient of friction of 0.1. Is it self-locking?</li><li>Why is a rack and pinion preferred over a ball screw for a very long machine axis?</li><li>Explain the slider-crank mechanism with a sketch. Derive the expression for the displacement of the slider.</li><li>What is an offset slider-crank and what advantage does the offset give?</li><li>What is a coupler curve? Name two straight-line generating linkages.</li><li>List any six linkages used in machines and robots with one application of each.</li><li>Classify shaft couplings. Compare an Oldham coupling, a universal joint and a bellows coupling.</li><li>State the factors to be considered when selecting a coupling for a servo axis.</li><li>Compare ball screw, rack and pinion, belt and pneumatic cylinder as means of producing linear motion.</li></ol></div><div class="pager"><a class="prev" href="24-rotary-to-rotary-gears-harmonic-drive-belt-pulley.html"><span class="dir">&larr; Previous topic</span><span class="ttl">24. Motion Conversion &mdash; Rotary to Rotary: Gears, Harmonic Drives, Belt and Pulley Systems</span></a><a class="next" href="26-trajectory-planning-and-generation.html"><span class="dir">Next topic &rarr;</span><span class="ttl">26. Trajectory Planning and Generation</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

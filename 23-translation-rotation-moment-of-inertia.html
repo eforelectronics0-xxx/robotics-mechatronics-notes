@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elementary Mechanical Concepts &mdash; Translation, Rotation and Moment of Inertia | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="The mechanics an engineer must know before designing a robot arm: linear and rotational motion, the equations that govern them, and above all moment o">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit IV &middot; Topic 23 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit IV &rsaquo; Topic 23</nav><div class="unit-tag">Unit IV</div><h2 class="page-title"><span class="topic-no">23</span>Elementary Mechanical Concepts &mdash; Translation, Rotation and Moment of Inertia</h2><p class="lede">The mechanics an engineer must know before designing a robot arm: linear and rotational motion, the equations that govern them, and above all moment of inertia, which decides how much torque a joint motor must produce.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Translation (Linear Motion)</a></li><li><a href="#sec2">Rotational Motion</a></li><li><a href="#sec3">Moment of Inertia</a></li><li><a href="#sec4">Other Elementary Concepts Used in Robot Mechanics</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Translation (Linear Motion)</h3><div class="defbox"><span class="tag">Definition</span><p><b>Translation</b> or <b>linear motion</b> is the motion of a body in which every particle of the body moves through the same distance, in the same direction, in the same interval of time. All points of the body have the same velocity and the same acceleration.</p></div><p>Translation may be <b>rectilinear</b> (along a straight line, such as the piston of a cylinder or the table of a 3D printer) or <b>curvilinear</b> (along a curved path, with all points keeping the same orientation, such as the platform of a parallel linkage). In robot design, linear motion appears in prismatic joints, in lead screw drives and in gantry axes.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 280" width="880" height="280" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Translation (linear motion) and rotation</text><text x="200" y="60" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(a) Pure translation</text><rect x="70" y="180" width="260" height="12" rx="2" class="mech"/><rect x="110" y="130" width="60" height="50" rx="6" class="t-box2"/><line x1="118" y1="138" x2="162" y2="138" class="lnk" stroke-width="1"/><line x1="118" y1="172" x2="162" y2="172" class="lnk" stroke-width="1"/><line x1="118" y1="138" x2="118" y2="172" class="lnk" stroke-width="1"/><line x1="162" y1="138" x2="162" y2="172" class="lnk" stroke-width="1"/><rect x="190" y="130" width="60" height="50" rx="6" class="t-box2"/><line x1="198" y1="138" x2="242" y2="138" class="lnk" stroke-width="1"/><line x1="198" y1="172" x2="242" y2="172" class="lnk" stroke-width="1"/><line x1="198" y1="138" x2="198" y2="172" class="lnk" stroke-width="1"/><line x1="242" y1="138" x2="242" y2="172" class="lnk" stroke-width="1"/><polyline points="270,155 320,155" class="lnk" marker-end="url(#ah)"/><text x="295" y="145" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">s</text><text x="200" y="225" font-size="11" fill="#5b6b7c" text-anchor="middle">every point moves the same distance</text><text x="200" y="242" font-size="11" fill="#5b6b7c" text-anchor="middle">in the same direction</text><text x="650" y="60" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(b) Pure rotation</text><circle cx="650" cy="155" r="8" class="cmp-f"/><circle cx="650" cy="155" r="4" class="dot"/><line x1="650" y1="155" x2="740" y2="110" class="cmp" stroke-width="4"/><circle cx="740" cy="110" r="7" class="mech2"/><path d="M 700 96 A 105 105 0 0 1 756 132" class="lnk" marker-end="url(#ah)"/><text x="712" y="84" font-size="13" fill="#a8232a" text-anchor="middle" font-weight="700">&#952;</text><text x="600" y="178" font-size="12" fill="#0f5fa8" text-anchor="middle" font-weight="700">r</text><line x1="650" y1="155" x2="560" y2="200" class="lnk-d" stroke-width="1.2"/><text x="560" y="214" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">arc length s = r &#952;</text><text x="650" y="245" font-size="11.5" fill="#5b6b7c" text-anchor="middle">v = r &#969; ,  a<sub>t</sub> = r &#945; ,  a<sub>c</sub> = r &#969;&#178; = v&#178;/r</text></svg></div><figcaption><b>Fig. 1:</b> Pure translation (left) and pure rotation (right), with the relations that connect linear and angular quantities.</figcaption></figure><h4>Equations of linear motion</h4><ul><li><b>Velocity</b> v = ds/dt, measured in m/s.</li><li><b>Acceleration</b> a = dv/dt, measured in m/s&#178;.</li><li><b>Momentum</b> p = m v, measured in kg m/s.</li><li><b>Force</b> F = m a (Newton's second law), measured in newtons.</li><li><b>Kinetic energy</b> KE = &#189; m v&#178;, measured in joules.</li><li><b>Work</b> W = F s, and <b>power</b> P = F v, measured in watts.</li></ul><div class="formula"><span class="tag">Formula</span><p><b>Equations of uniformly accelerated linear motion</b><span class='eq'>v = u + a t</span><span class='eq'>s = u t + &#189; a t&#178;</span><span class='eq'>v&#178; = u&#178; + 2 a s</span>where u = initial velocity, v = final velocity, a = acceleration, s = distance and t = time.</p></div><div class="example"><span class="tag">Example</span><p>A robot gantry axis must move 0.6 m in 1.2 s, starting and ending at rest, using a trapezoidal velocity profile with equal acceleration and deceleration periods of 0.3 s each. Cruise time = 1.2 &minus; 0.6 = 0.6 s. If the cruise velocity is v, the distance = &#189;v(0.3) + v(0.6) + &#189;v(0.3) = 0.15v + 0.6v + 0.15v = 0.9v. So v = 0.6/0.9 = <b>0.667 m/s</b>, and acceleration a = v/t = 0.667/0.3 = <b>2.22 m/s&#178;</b>. For a 20 kg moving mass, force F = ma = <b>44.4 N</b> plus friction.</p></div><h3 id="sec2"><span class="sec-no">2.</span>Rotational Motion</h3><div class="defbox"><span class="tag">Definition</span><p><b>Rotational motion</b> is the motion of a rigid body in which all its particles describe circles about a common fixed line called the <b>axis of rotation</b>. Different particles have different linear velocities, but all have the same <b>angular</b> velocity.</p></div><p>Rotation is the dominant form of motion in robots, because almost all robot joints are revolute and almost all motors produce rotation. Even a prismatic joint is usually driven by a rotary motor through a lead screw.</p><h4>Angular quantities</h4><ul><li><b>Angular displacement</b> &#952; &mdash; measured in radians. One revolution = 2&#960; rad = 360&deg;.</li><li><b>Angular velocity</b> &#969; = d&#952;/dt, in rad/s. If N is the speed in rpm, &#969; = 2&#960;N/60.</li><li><b>Angular acceleration</b> &#945; = d&#969;/dt, in rad/s&#178;.</li><li><b>Torque</b> T = F &times; r &times; sin&#966;, in N m, where r is the distance from the axis and &#966; the angle between the force and the radius. Torque is the rotational equivalent of force.</li><li><b>Angular momentum</b> = I&#969;.</li><li><b>Rotational kinetic energy</b> = &#189;I&#969;&#178;.</li><li><b>Power</b> P = T&#969; = 2&#960;NT/60, where N is in rpm and T in N m.</li></ul><div class="formula"><span class="tag">Formula</span><p><b>Equations of uniformly accelerated rotational motion</b><span class='eq'>&#969; = &#969;&#8320; + &#945; t</span><span class='eq'>&#952; = &#969;&#8320; t + &#189; &#945; t&#178;</span><span class='eq'>&#969;&#178; = &#969;&#8320;&#178; + 2 &#945; &#952;</span><span class='eq'>Newton's second law for rotation:   T = I &#945;</span>These are exactly parallel to the linear equations with s &rarr; &#952;, v &rarr; &#969;, a &rarr; &#945;, m &rarr; I and F &rarr; T.</p></div><h4>Connecting linear and angular quantities</h4><p>For a point at radius r from the axis of rotation:</p><span class="eq">s = r &#952; ,     v = r &#969; ,     a<sub>t</sub> = r &#945; ,     a<sub>c</sub> = v&#178;/r = r &#969;&#178;</span><p>where a<sub>t</sub> is the <b>tangential</b> (linear) acceleration and a<sub>c</sub> is the <b>centripetal</b> (radial) acceleration directed towards the axis. The centripetal force needed is F<sub>c</sub> = m v&#178;/r = m r &#969;&#178;. This matters in robot design because a spinning link loads its bearings radially, and the load rises with the square of the speed.</p><div class="example"><span class="tag">Example</span><p>A robot link rotates at 300 rpm and its centre of mass is 0.3 m from the joint axis. &#969; = 2&#960;(300)/60 = <b>31.4 rad/s</b>. Centripetal acceleration = r&#969;&#178; = 0.3 &times; 31.4&#178; = <b>296 m/s&#178;</b>, which is about 30 times gravity. If the link has a mass of 4 kg, the radial force on the bearing is 4 &times; 296 = <b>1184 N</b>.</p></div><h3 id="sec3"><span class="sec-no">3.</span>Moment of Inertia</h3><div class="defbox"><span class="tag">Definition</span><p>The <b>moment of inertia</b> I of a body about an axis is the measure of its resistance to angular acceleration. It is the rotational equivalent of mass. For a system of particles, I = &#931; m r&#178;, and for a continuous body, I = &#8747; r&#178; dm, where r is the perpendicular distance of the mass element from the axis of rotation. Its unit is <b>kg m&#178;</b>.</p></div><p>The key point is the <b>square</b> of the distance. Mass placed far from the axis contributes far more to the inertia than the same mass placed close to it. A thin ring and a solid disc of the same mass and radius have moments of inertia of m r&#178; and &#189; m r&#178; respectively &mdash; the ring is twice as hard to spin.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 280" width="880" height="280" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Moment of inertia &mdash; mass distribution matters</text><text x="200" y="60" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Solid disc</text><circle cx="200" cy="155" r="78" class="mech2"/><circle cx="200" cy="155" r="8" class="cmp-f"/><text x="200" y="258" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">I = &#189; m r&#178;</text><text x="200" y="276" font-size="10.5" fill="#5b6b7c" text-anchor="middle">mass spread over the whole disc</text><text x="440" y="60" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Ring (same mass and radius)</text><circle cx="440" cy="155" r="70" fill="none" stroke="#8a5a1c" stroke-width="17"/><circle cx="440" cy="155" r="8" class="cmp-f"/><text x="440" y="258" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">I = m r&#178;</text><text x="440" y="276" font-size="10.5" fill="#5b6b7c" text-anchor="middle">all the mass at the rim &rarr; twice the inertia</text><rect x="600" y="60" width="250" height="200" rx="8" class="t-box2"/><text x="725" y="86" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Common I values</text><text x="618" y="112" font-size="10.5" fill="#12283d" text-anchor="start">Point mass at r</text><text x="836" y="112" font-size="11" fill="#12283d" text-anchor="end" font-weight="600" font-family="Consolas,Menlo,monospace">m r&#178;</text><text x="618" y="133" font-size="10.5" fill="#12283d" text-anchor="start">Thin ring</text><text x="836" y="133" font-size="11" fill="#12283d" text-anchor="end" font-weight="600" font-family="Consolas,Menlo,monospace">m r&#178;</text><text x="618" y="154" font-size="10.5" fill="#12283d" text-anchor="start">Solid disc / cylinder</text><text x="836" y="154" font-size="11" fill="#12283d" text-anchor="end" font-weight="600" font-family="Consolas,Menlo,monospace">&#189; m r&#178;</text><text x="618" y="175" font-size="10.5" fill="#12283d" text-anchor="start">Solid sphere</text><text x="836" y="175" font-size="11" fill="#12283d" text-anchor="end" font-weight="600" font-family="Consolas,Menlo,monospace">(2/5) m r&#178;</text><text x="618" y="196" font-size="10.5" fill="#12283d" text-anchor="start">Thin rod, centre</text><text x="836" y="196" font-size="11" fill="#12283d" text-anchor="end" font-weight="600" font-family="Consolas,Menlo,monospace">m L&#178;/12</text><text x="618" y="217" font-size="10.5" fill="#12283d" text-anchor="start">Thin rod, end</text><text x="836" y="217" font-size="11" fill="#12283d" text-anchor="end" font-weight="600" font-family="Consolas,Menlo,monospace">m L&#178;/3</text><text x="618" y="238" font-size="10.5" fill="#12283d" text-anchor="start">Slender link (robot)</text><text x="836" y="238" font-size="11" fill="#12283d" text-anchor="end" font-weight="600" font-family="Consolas,Menlo,monospace">m L&#178;/3</text></svg></div><figcaption><b>Fig. 2:</b> A solid disc and a ring of the same mass and radius; the ring has twice the moment of inertia. Common formulae are listed on the right.</figcaption></figure><div class="formula"><span class="tag">Formula</span><p><b>Moments of inertia of common shapes (about the stated axis)</b><span class='eq'>Point mass at distance r:      I = m r&#178;</span><span class='eq'>Thin ring / thin-walled cylinder:  I = m r&#178;</span><span class='eq'>Solid disc / solid cylinder:   I = &#189; m r&#178;</span><span class='eq'>Solid sphere:                  I = (2/5) m r&#178;</span><span class='eq'>Hollow sphere:                 I = (2/3) m r&#178;</span><span class='eq'>Thin rod, axis through centre: I = m L&#178;/12</span><span class='eq'>Thin rod, axis through one end: I = m L&#178;/3</span><span class='eq'>Rectangular plate about a central axis: I = m (a&#178; + b&#178;)/12</span></p></div><h4>Parallel axis theorem</h4><p>The moment of inertia about any axis parallel to an axis through the centre of mass is</p><span class="eq">I = I<sub>G</sub> + m d&#178;</span><p>where I<sub>G</sub> is the moment of inertia about the centroidal axis and d is the perpendicular distance between the two axes. This theorem is essential in robot design, because a robot link almost always rotates about a joint at one end rather than about its centre of mass. For a uniform rod of length L and mass m rotating about one end, I = mL&#178;/12 + m(L/2)&#178; = mL&#178;/12 + mL&#178;/4 = <b>mL&#178;/3</b>.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 210" width="880" height="210" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Parallel axis theorem and inertia reflected through a gearbox</text><circle cx="180" cy="120" r="46" class="mech2"/><circle cx="180" cy="120" r="6" class="cmp-f"/><circle cx="240" cy="120" r="6" class="cmp-f"/><line x1="180" y1="120" x2="240" y2="120" class="lnk-d" stroke-width="1.3"/><text x="210" y="112" font-size="12" fill="#a8232a" text-anchor="middle" font-weight="700">d</text><text x="180" y="190" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">I = I<sub>G</sub> + m d&#178;</text><circle cx="470" cy="120" r="30" class="mech2"/><circle cx="540" cy="120" r="58" class="mech2"/><circle cx="470" cy="120" r="5" class="cmp-f"/><circle cx="540" cy="120" r="5" class="cmp-f"/><text x="470" y="78" font-size="10.5" fill="#5b6b7c" text-anchor="middle">motor</text><text x="540" y="58" font-size="10.5" fill="#5b6b7c" text-anchor="middle">load</text><text x="505" y="195" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">ratio n = N1/N2</text><rect x="640" y="80" width="210" height="80" rx="8" class="t-box2"/><text x="745" y="108" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">I<sub>load seen by motor</sub> = I<sub>L</sub> / n&#178;</text><text x="745" y="134" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="600">T<sub>motor</sub> = T<sub>L</sub> / n</text><text x="745" y="152" font-size="10.5" fill="#5b6b7c" text-anchor="middle">a gearbox reduces inertia hugely</text></svg></div><figcaption><b>Fig. 3:</b> The parallel axis theorem (left) and the reduction of reflected inertia by a gearbox (right).</figcaption></figure><h4>Radius of gyration</h4><p>The <b>radius of gyration</b> k is the distance from the axis at which the whole mass could be concentrated to give the same moment of inertia: I = m k&#178;, so k = &#8730;(I/m). It is a convenient way to compare the distribution of mass in different links.</p><h4>Why moment of inertia dominates robot design</h4><p>From T = I&#945;, the torque a joint motor must produce is directly proportional to the inertia of everything the joint has to move. For a robot arm this includes the link itself, all the links and motors beyond it, the end effector and the workpiece. Because inertia grows with the square of the length, <b>a robot arm that is twice as long needs about four times the torque for the same angular acceleration</b>. This is why robot designers do everything possible to reduce inertia:</p><ul><li>Motors are mounted as close to the base as possible, and motion is transmitted to the distant joints by belts, chains or tendons. This is the arrangement used in SCARA and Delta robots, where the Delta's motors are all on the fixed base so that the moving parts are extremely light.</li><li>Links are made hollow, ribbed or of composite material.</li><li>Links are tapered, being thicker near the joint and thinner at the far end.</li><li>Light aluminium alloys and carbon fibre are used instead of steel.</li><li>The payload is specified carefully and never exceeded.</li><li>Cables and hoses are routed along the arm and supported so that they do not swing.</li></ul><h4>Inertia reflected through a gearbox</h4><p>When a load with inertia I<sub>L</sub> is connected to a motor through a gearbox of ratio n (motor speed divided by load speed), the inertia seen by the motor is</p><span class="eq">I<sub>reflected</sub> = I<sub>L</sub> / n&#178;        and        T<sub>motor</sub> = T<sub>L</sub> / n   (neglecting losses)</span><p>This is one of the most useful results in robot design. A gearbox of ratio 100:1 reduces the reflected inertia by a factor of 10 000, so the motor only has to accelerate its own rotor inertia plus one ten-thousandth of the load inertia. This is exactly why robot joints use harmonic drives and planetary gearboxes with high ratios: they allow a small, fast, low-inertia motor to control a large, heavy link precisely.</p><div class="note"><span class="tag">Note</span><p><b>Inertia matching.</b> Servo motor manufacturers specify a recommended ratio of load inertia to motor rotor inertia, typically 5:1 to 10:1 for high-dynamic applications and up to 30:1 for less demanding ones. If the ratio is too high, the servo loop becomes difficult to tune, the response is sluggish and the arm may oscillate. The gearbox is chosen to bring the ratio into the recommended range.</p></div><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> A robot joint must accelerate a link of moment of inertia 0.8 kg m&#178; at 20 rad/s&#178;. Torque required at the joint = I&#945; = 0.8 &times; 20 = <b>16 N m</b>. If a harmonic drive of ratio 100:1 and efficiency 85 % is used, the motor torque = 16/(100 &times; 0.85) = <b>0.188 N m</b>, and the inertia reflected to the motor = 0.8/100&#178; = 8 &times; 10<sup>&minus;5</sup> kg m&#178;. A small servo motor with a rotor inertia of 1 &times; 10<sup>&minus;4</sup> kg m&#178; therefore has an inertia ratio of about 1.8:1, which is excellent.</p></div><h4>Dynamic torque requirement of a joint</h4><p>The total torque a robot joint motor must supply is the sum of several terms:</p><span class="eq">T<sub>total</sub> = T<sub>inertia</sub> + T<sub>friction</sub> + T<sub>gravity</sub> + T<sub>payload</sub> + T<sub>external</sub></span><ul><li><b>T<sub>inertia</sub> = I&#945;</b> &mdash; to accelerate the link, the motor rotors beyond it, the end effector and the workpiece.</li><li><b>T<sub>friction</sub></b> &mdash; to overcome bearing, seal and gear friction; usually 5 % to 15 % of the total.</li><li><b>T<sub>gravity</sub> = m g r cos&#952;</b> &mdash; to hold the weight of the link against gravity; this is maximum when the arm is horizontal and zero when it is vertical. Shoulder joints suffer most.</li><li><b>T<sub>payload</sub></b> &mdash; the effect of the weight and inertia of the carried object.</li><li><b>T<sub>external</sub></b> &mdash; process forces such as grinding, pressing or welding contact force.</li><li>In addition, centrifugal and Coriolis terms appear when several joints move together, because the motion of one joint changes the inertia seen by another.</li></ul><div class="warn"><span class="tag">Important</span><p>Gravity torque is often the largest term for the lower joints of a robot arm, especially at full reach with a full payload. It must be supplied continuously even when the robot is holding still, which wastes energy and heats the motor. Many robots therefore include <b>gravity compensation</b> in the controller (the motor current is offset to cancel gravity), or use a mechanical counterbalance, a gas spring or a brake that holds the arm when the motor is idle.</p></div><h3 id="sec4"><span class="sec-no">4.</span>Other Elementary Concepts Used in Robot Mechanics</h3><ul><li><b>Centre of mass</b> &mdash; the point at which the whole mass of a body can be considered to act. For a robot link it should be as close to the joint axis as possible to reduce gravity and centrifugal loading.</li><li><b>Centre of gravity</b> &mdash; the point through which the resultant weight acts. It coincides with the centre of mass in a uniform gravitational field.</li><li><b>Static and dynamic balance</b> &mdash; a rotating link must be balanced, otherwise it produces a rotating force that vibrates the structure and destroys the bearings.</li><li><b>Stress, strain and Young's modulus</b> &mdash; &#963; = F/A, &#949; = &#916;L/L and E = &#963;/&#949;. Links must be stiff enough not to bend under load.</li><li><b>Deflection</b> &mdash; the elastic deformation of a link under load. Deflection at the tool point directly produces positioning error and cannot be corrected by the joint encoders, because they are on the motor side of the gearbox.</li><li><b>Torsional stiffness</b> &mdash; the resistance of a shaft or a gearbox to twisting. It determines how much the tool position lags behind the commanded position when a force is applied.</li><li><b>Natural frequency</b> &mdash; f = (1/2&#960;)&#8730;(k/I). If the motion of the robot excites this frequency, resonance occurs. Robot structures are designed to have natural frequencies well above the motion frequencies.</li><li><b>Friction</b> &mdash; <b>static friction (stiction)</b> must be overcome before motion starts; <b>Coulomb (dry) friction</b> is constant and opposes motion; <b>viscous friction</b> is proportional to velocity. Friction causes following error, limit cycling and <b>stick-slip</b> motion.</li><li><b>Lubrication</b> &mdash; reduces friction and wear; robot gearboxes are filled with special grease for life.</li></ul><div class="tbl-scroll"><table><caption>Table 23.1 &mdash; Linear and rotational analogues used in robot design</caption><thead><tr><th>Concept</th><th>Linear (translation)</th><th>Rotational</th><th>Robot design implication</th></tr></thead><tbody><tr><td>Inertia</td><td>mass m (kg)</td><td>moment of inertia I (kg m&#178;)</td><td>Determines the motor torque needed</td></tr><tr><td>Driving quantity</td><td>force F (N)</td><td>torque T (N m)</td><td>Motor and gearbox rating</td></tr><tr><td>Motion</td><td>displacement s (m)</td><td>angular displacement &#952; (rad)</td><td>Encoder feedback</td></tr><tr><td>Rate</td><td>velocity v (m/s)</td><td>angular velocity &#969; (rad/s)</td><td>Speed specification</td></tr><tr><td>Rate of rate</td><td>acceleration a (m/s&#178;)</td><td>angular acceleration &#945; (rad/s&#178;)</td><td>Dynamic response and cycle time</td></tr><tr><td>Newton's second law</td><td>F = m a</td><td>T = I &#945;</td><td>Sizing calculation</td></tr><tr><td>Energy</td><td>&#189; m v&#178;</td><td>&#189; I &#969;&#178;</td><td>Braking energy and regeneration</td></tr><tr><td>Power</td><td>F v</td><td>T &#969;</td><td>Drive and power supply rating</td></tr><tr><td>Momentum</td><td>m v</td><td>I &#969;</td><td>Impact and safety on collision</td></tr><tr><td>Stiffness</td><td>k = F/x (N/m)</td><td>k<sub>t</sub> = T/&#952; (N m/rad)</td><td>Positional accuracy under load</td></tr></tbody></table></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>Translation is motion in which every particle moves the same distance in the same direction; rotation is motion in which every particle describes a circle about a common axis.</li><li>Linear and rotational quantities are connected by s = r&#952;, v = r&#969;, a<sub>t</sub> = r&#945; and a<sub>c</sub> = r&#969;&#178;.</li><li>The rotational equations mirror the linear ones with &#952;, &#969;, &#945;, I and T replacing s, v, a, m and F, and Newton's second law becomes T = I&#945;.</li><li>Moment of inertia I = &#931; m r&#178; measures resistance to angular acceleration; the square of the distance makes mass distribution critical.</li><li>A ring has twice the moment of inertia of a solid disc of the same mass and radius.</li><li>The parallel axis theorem I = I<sub>G</sub> + md&#178; is used because robot links rotate about a joint, not about their centre of mass.</li><li>A gearbox of ratio n reduces the reflected inertia to I<sub>L</sub>/n&#178;, which is why high-ratio reducers let small motors control heavy links.</li><li>Joint torque = inertia torque + friction + gravity + payload + external process forces; gravity torque is often the largest for shoulder joints.</li><li>Designers reduce inertia by mounting motors near the base, by using belts and tendons, by hollow tapered links and by light alloys.</li><li>Friction, deflection, torsional stiffness and natural frequency all affect the accuracy and smoothness of a robot.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Define translation and rotation. Distinguish between rectilinear and curvilinear translation.</li><li>Write the equations of uniformly accelerated motion for both linear and rotational motion and show the analogy between them.</li><li>Derive the relations s = r&#952;, v = r&#969; and a<sub>c</sub> = r&#969;&#178;. Why is centripetal force important in robot design?</li><li>Define moment of inertia and radius of gyration. State the units of each.</li><li>Write the moments of inertia of a point mass, a thin ring, a solid disc, a solid sphere and a thin rod about its end.</li><li>State and prove the parallel axis theorem. Why is it needed in robot dynamics?</li><li>A robot link is a uniform rod of mass 6 kg and length 0.8 m rotating about one end. Find its moment of inertia. (Answer: 1.28 kg m&#178;)</li><li>Explain how a gearbox reduces the inertia reflected to the motor. Why is this important?</li><li>List the components of the total torque required at a robot joint. Which is usually the largest for a shoulder joint?</li><li>A joint must accelerate a total inertia of 0.5 kg m&#178; at 30 rad/s&#178;. Find the torque required and the motor torque with a 80:1 gearbox of 90 % efficiency. (Answers: 15 N m, 0.208 N m)</li><li>Why do robot designers try to keep the mass of the distal links as low as possible?</li><li>Explain stiction, Coulomb friction, viscous friction and stick-slip motion.</li></ol></div><div class="pager"><a class="prev" href="22-specifications-of-industrial-robots.html"><span class="dir">&larr; Previous topic</span><span class="ttl">22. Specifications of Different Industrial Robots</span></a><a class="next" href="24-rotary-to-rotary-gears-harmonic-drive-belt-pulley.html"><span class="dir">Next topic &rarr;</span><span class="ttl">24. Motion Conversion &mdash; Rotary to Rotary: Gears, Harmonic Drives, Belt and Pulley Systems</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

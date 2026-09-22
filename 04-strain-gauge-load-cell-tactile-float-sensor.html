@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strain Gauge Load Cell, Tactile Sensor and Float Sensor | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="How a strain gauge converts force into a change of resistance, how four gauges are arranged in a Wheatstone bridge inside a load cell, how tactile arr">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit I &middot; Topic 4 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit I &rsaquo; Topic 4</nav><div class="unit-tag">Unit I</div><h2 class="page-title"><span class="topic-no">04</span>Strain Gauge Load Cell, Tactile Sensor and Float Sensor</h2><p class="lede">How a strain gauge converts force into a change of resistance, how four gauges are arranged in a Wheatstone bridge inside a load cell, how tactile arrays give a robot the sense of touch, and how float sensors measure liquid level.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Strain Gauge</a></li><li><a href="#sec2">Wheatstone Bridge and the Load Cell</a></li><li><a href="#sec3">Tactile Sensor</a></li><li><a href="#sec4">Float Sensor (Level Sensor)</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Strain Gauge</h3><h4>Principle</h4><p>The strain gauge works on the principle that the <b>electrical resistance of a conductor changes when it is mechanically deformed</b>. This is known as the <b>piezoresistive effect</b>. When a wire is stretched, it becomes longer and thinner; both changes increase its resistance. Since resistance is given by R = &#961;L/A, where &#961; is resistivity, L is length and A is cross-sectional area, an increase in L and a decrease in A both raise R.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="220" y="26" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(a) Foil strain gauge</text><rect x="80" y="60" width="290" height="120" rx="8" class="cmp-y"/><path d="M 110 78 L 110 162" class="wire" stroke-width="2.2"/><path d="M 110 78 a 18 18 0 0 1 36 0" class="wire" stroke-width="2.2"/><path d="M 110 162 a 18 18 0 0 0 36 0" class="wire" stroke-width="2.2"/><path d="M 146 78 L 146 162" class="wire" stroke-width="2.2"/><path d="M 146 78 a 18 18 0 0 1 36 0" class="wire" stroke-width="2.2"/><path d="M 146 162 a 18 18 0 0 0 36 0" class="wire" stroke-width="2.2"/><path d="M 182 78 L 182 162" class="wire" stroke-width="2.2"/><path d="M 182 78 a 18 18 0 0 1 36 0" class="wire" stroke-width="2.2"/><path d="M 182 162 a 18 18 0 0 0 36 0" class="wire" stroke-width="2.2"/><path d="M 218 78 L 218 162" class="wire" stroke-width="2.2"/><path d="M 218 78 a 18 18 0 0 1 36 0" class="wire" stroke-width="2.2"/><path d="M 218 162 a 18 18 0 0 0 36 0" class="wire" stroke-width="2.2"/><path d="M 254 78 L 254 162" class="wire" stroke-width="2.2"/><path d="M 254 78 a 18 18 0 0 1 36 0" class="wire" stroke-width="2.2"/><path d="M 254 162 a 18 18 0 0 0 36 0" class="wire" stroke-width="2.2"/><path d="M 290 78 L 290 162" class="wire" stroke-width="2.2"/><path d="M 290 78 a 18 18 0 0 1 36 0" class="wire" stroke-width="2.2"/><path d="M 290 162 a 18 18 0 0 0 36 0" class="wire" stroke-width="2.2"/><path d="M 326 78 L 326 162" class="wire" stroke-width="2.2"/><line x1="80" y1="100" x2="60" y2="100" class="wire"/><line x1="80" y1="140" x2="60" y2="140" class="wire"/><line x1="370" y1="100" x2="392" y2="100" class="wire"/><line x1="370" y1="140" x2="392" y2="140" class="wire"/><text x="45" y="122" font-size="10.5" fill="#5b6b7c" text-anchor="middle">leads</text><text x="225" y="205" font-size="11" fill="#5b6b7c" text-anchor="middle">insulating backing / carrier</text><polyline points="95,232 60,232" class="lnk" marker-end="url(#ah)"/><polyline points="355,232 390,232" class="lnk" marker-end="url(#ah)"/><text x="225" y="236" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">applied force &rarr; gauge stretches &rarr; R increases</text><text x="680" y="26" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(b) Bonded to a cantilever beam</text><path d="M 520 100 L 840 100 L 840 140 L 520 140 Z" class="mech"/><rect x="520" y="80" width="26" height="80" rx="8" class="hatch"/><rect x="620" y="100" width="70" height="12" rx="8" class="cmp-y"/><rect x="620" y="128" width="70" height="12" rx="8" class="cmp-y"/><text x="655" y="92" font-size="10.5" fill="#a8232a" text-anchor="middle">gauge in tension (top)</text><text x="655" y="158" font-size="10.5" fill="#0f5fa8" text-anchor="middle">gauge in compression (bottom)</text><polyline points="820,140 820,185" class="lnk" marker-end="url(#ah)"/><text x="820" y="200" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">load W</text><path d="M 840 100 C 870 105, 880 130, 878 165" class="lnk-d"/><text x="880" y="185" font-size="10.5" fill="#5b6b7c" text-anchor="end">deflected shape</text></svg></div><figcaption><b>Fig. 1:</b> A foil strain gauge (left) bonded to a cantilever beam (right). Gauges on the top face are in tension and those on the bottom face are in compression.</figcaption></figure><div class="formula"><span class="tag">Formula</span><p><b>Gauge factor</b><span class='eq'>G<sub>f</sub> = (&#916;R / R) / (&#916;L / L) = (&#916;R / R) / &#949;</span>where &#949; = &#916;L/L is the strain (dimensionless, often written in microstrain, 1 &#181;&#949; = 10<sup>&minus;6</sup>). A typical metallic foil gauge has G<sub>f</sub> &#8776; 2. A higher gauge factor means greater sensitivity. Semiconductor gauges have G<sub>f</sub> of 50 to 200 but are more temperature sensitive and more brittle.</p></div><h4>Construction and types</h4><ul><li><b>Bonded metallic wire gauge</b> &mdash; a very fine wire (about 25 &#181;m diameter) of constantan or nickel-chromium arranged in a grid and cemented between two thin sheets of backing material.</li><li><b>Bonded metallic foil gauge</b> &mdash; the most common type. A thin metal foil (5 to 10 &#181;m) is photo-etched into a grid pattern. It has a large surface area so it dissipates heat well, and it is thin so it follows the surface strain faithfully.</li><li><b>Unbonded gauge</b> &mdash; wires are stretched across a movable frame; used in older instruments and some pressure sensors.</li><li><b>Semiconductor gauge</b> &mdash; made of silicon; very high gauge factor but strongly affected by temperature.</li><li><b>Rosette gauge</b> &mdash; three gauges at known angles to measure strain in two dimensions.</li></ul><h4>Bonding</h4><p>The gauge must be <b>bonded</b> to the surface whose strain is to be measured, using a special adhesive such as a cyanoacrylate or an epoxy. The surface is first cleaned and abraded. The strain is then transferred from the member to the backing and from the backing to the grid. If the bonding is poor, the gauge will slip and the reading will be wrong.</p><div class="note"><span class="tag">Note</span><p>Strain is very small. A typical load cell may produce only 1000 &#181;&#949; (0.1 %) strain at full load. With G<sub>f</sub> = 2, &#916;R/R = 2 &times; 10<sup>&minus;3</sup>, so a 120 &#937; gauge changes by only <b>0.24 &#937;</b>. Such a tiny change cannot be measured with an ohmmeter, which is why a <b>Wheatstone bridge</b> is used.</p></div><h3 id="sec2"><span class="sec-no">2.</span>Wheatstone Bridge and the Load Cell</h3><p>A Wheatstone bridge has four resistive arms. If all four resistances are equal, the bridge is balanced and the output voltage between the two mid-points is zero. When one or more arms change, an output voltage appears which is proportional to the change. In a load cell all four arms are strain gauges, which doubles the sensitivity and cancels the effect of temperature.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 390" width="880" height="390" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="25" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">Four-active-gauge Wheatstone bridge with non-overlapping connections</text><path d="M 300.000,65.000 L 239.365,109.987 L 239.410,119.916 L 224.479,111.070 L 228.616,127.924 L 213.686,119.078 L 217.822,135.932 L 205.635,135.013 L 145.000,180.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="222.5" y="111.5" font-size="10.2" fill="#a8232a" text-anchor="middle">R1  (tension)</text><path d="M 300.000,65.000 L 360.635,109.987 L 370.124,107.066 L 365.987,123.920 L 380.918,115.074 L 376.781,131.928 L 391.711,123.082 L 394.365,135.013 L 455.000,180.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="377.5" y="111.5" font-size="10.2" fill="#a8232a" text-anchor="middle">R2  (tension)</text><path d="M 145.000,180.000 L 205.895,227.144 L 215.442,224.418 L 210.961,241.184 L 226.069,232.646 L 221.588,249.411 L 236.696,240.873 L 239.105,252.856 L 300.000,300.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="222.5" y="229.0" font-size="10.2" fill="#0f5fa8" text-anchor="middle">R3  (compression)</text><path d="M 455.000,180.000 L 394.105,227.144 L 394.353,237.070 L 379.245,228.532 L 383.726,245.297 L 368.617,236.760 L 373.098,253.525 L 360.895,252.856 L 300.000,300.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="377.5" y="229.0" font-size="10.2" fill="#0f5fa8" text-anchor="middle">R4  (compression)</text><circle cx="300" cy="65" r="3.3" class="dot" fill="#12283d"/><circle cx="145" cy="180" r="3.3" class="dot" fill="#12283d"/><circle cx="455" cy="180" r="3.3" class="dot" fill="#12283d"/><circle cx="300" cy="300" r="3.3" class="dot" fill="#12283d"/><polyline points="300,65 300,45" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="300" y="40" font-size="11.5" fill="#a8232a" text-anchor="middle" font-weight="700">+Vex</text><polyline points="300,300 300,333" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="300" y1="333" x2="300" y2="343" class="wire"/><line x1="287" y1="343" x2="313" y2="343" class="wire"/><line x1="292" y1="348" x2="308" y2="348" class="wire"/><line x1="296.5" y1="353" x2="303.5" y2="353" class="wire"/><polyline points="145,180 105,180 105,138 585,138 585,155 620,155" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="455,180 500,180 500,225 585,225 585,205 620,205" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="145" cy="180" r="3.3" class="dot" fill="#12283d"/><circle cx="455" cy="180" r="3.3" class="dot" fill="#12283d"/><rect x="620" y="140" width="190" height="80" rx="8" class="t-box2"/><text x="715" y="163" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">Instrumentation</text><text x="715" y="180" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">amplifier</text><text x="625" y="159" font-size="13" fill="#a8232a" text-anchor="middle" font-weight="700">+</text><text x="625" y="210" font-size="13" fill="#0f5fa8" text-anchor="middle" font-weight="700">−</text><polyline points="810,180 850,180" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="850" cy="180" r="3.3" class="dot" fill="#12283d"/><text x="848" y="172" class="t-lbl-s" fill="#157a4b">Vout</text><text x="440" y="380" font-size="11" fill="#12283d" text-anchor="middle">Strain changes R1–R4; opposite arms change in opposite directions, so the differential output is large while temperature drift cancels.</text></svg></div><figcaption><b>Fig. 2:</b> Wheatstone bridge with four active strain gauges feeding an instrumentation amplifier. Excitation is applied across one diagonal and the output is taken from the other.</figcaption></figure><p>For a bridge with excitation voltage V<sub>ex</sub> across one diagonal and four equal gauges of resistance R,</p><span class="eq">V<sub>out</sub> = (V<sub>ex</sub> / 4) &times; G<sub>f</sub> &times; &#949;    (for a full bridge with two gauges in tension and two in compression)</span><p>The output is still only a few millivolts, typically <b>1 mV/V to 3 mV/V</b> of excitation. A load cell rated 2 mV/V with 10 V excitation gives 20 mV at full load. This small signal needs an <b>instrumentation amplifier</b> with a gain of 100 to 1000, high input impedance and a high common-mode rejection ratio. Dedicated ICs such as the <b>HX711</b> (24-bit ADC with a built-in low-noise amplifier) or the AD620 are commonly used with microcontrollers.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="26" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">Shear-beam load cell with four strain gauges</text><path d="M 150 105 L 700 105 L 700 175 L 150 175 Z" class="mech"/><rect x="110" y="85" width="45" height="110" rx="8" class="hatch"/><text x="132" y="215" font-size="11" fill="#5b6b7c" text-anchor="middle">fixed end</text><rect x="420" y="105" width="60" height="14" rx="8" class="cmp-y"/><rect x="500" y="105" width="60" height="14" rx="8" class="cmp-y"/><rect x="420" y="161" width="60" height="14" rx="8" class="cmp-y"/><rect x="500" y="161" width="60" height="14" rx="8" class="cmp-y"/><text x="450" y="96" font-size="11.5" fill="#a8232a" text-anchor="middle" font-weight="700">R1</text><text x="530" y="96" font-size="11.5" fill="#a8232a" text-anchor="middle" font-weight="700">R2</text><text x="450" y="194" font-size="11.5" fill="#0f5fa8" text-anchor="middle" font-weight="700">R3</text><text x="530" y="194" font-size="11.5" fill="#0f5fa8" text-anchor="middle" font-weight="700">R4</text><polyline points="670,105 670,55" class="lnk" marker-end="url(#ah)"/><text x="670" y="44" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">load W</text><polyline points="700,140 760,140" class="lnk" marker-end="url(#ah)"/><text x="775" y="144" font-size="11" fill="#5b6b7c" text-anchor="start">to bridge</text><text x="440" y="235" font-size="11.5" fill="#12283d" text-anchor="middle">R1, R2 on top face; R3, R4 on bottom face &rarr; temperature effects cancel, sensitivity doubles</text></svg></div><figcaption><b>Fig. 3:</b> A shear-beam load cell. Two gauges on the top face are in tension and two on the bottom face are in compression, so their resistance changes add up while temperature effects cancel.</figcaption></figure><h4>Types of load cell</h4><ul><li><b>Shear beam / bending beam</b> &mdash; gauges bonded to a cantilever or a simply supported beam. Most common in platform scales and bench weighing.</li><li><b>Compression / column type</b> &mdash; a solid column with gauges along its length. Used for very large loads such as truck weighbridges.</li><li><b>S-type (tension-compression)</b> &mdash; an S-shaped body that can measure both pulling and pushing forces. Used in hopper and tank weighing.</li><li><b>Ring / proving ring</b> &mdash; a circular ring that deforms under load; very stable, used as a calibration standard.</li><li><b>Pancake / canister</b> &mdash; low profile, high capacity.</li><li><b>Single point</b> &mdash; designed for a small platform where the load may be applied off-centre.</li></ul><h4>Specifications and errors</h4><div class="tbl-scroll"><table><caption>Table 4.1 &mdash; Typical load cell specifications</caption><thead><tr><th>Specification</th><th>Typical value</th><th>Meaning</th></tr></thead><tbody><tr><td>Rated capacity</td><td>1 kg to 100 tonnes</td><td>Maximum load it can measure</td></tr><tr><td>Rated output</td><td>1 to 3 mV/V</td><td>Bridge output at rated load per volt of excitation</td></tr><tr><td>Excitation voltage</td><td>5 to 15 V DC or AC</td><td>Supply to the bridge</td></tr><tr><td>Non-linearity</td><td>&plusmn;0.02 % to &plusmn;0.05 % FSO</td><td>Deviation from a straight line</td></tr><tr><td>Hysteresis</td><td>&plusmn;0.02 % FSO</td><td>Difference between loading and unloading curves</td></tr><tr><td>Repeatability</td><td>&plusmn;0.01 % FSO</td><td>Consistency of readings</td></tr><tr><td>Creep</td><td>&plusmn;0.03 % in 30 min</td><td>Output change under a constant load</td></tr><tr><td>Temperature effect on zero</td><td>&plusmn;0.03 % / 10 &deg;C</td><td>Zero shift with temperature</td></tr><tr><td>Temperature effect on span</td><td>&plusmn;0.02 % / 10 &deg;C</td><td>Sensitivity change with temperature</td></tr><tr><td>Input / output resistance</td><td>350 &#937; / 350 &#937;</td><td>Bridge resistance (120 &#937;, 350 &#937; and 1000 &#937; are common)</td></tr><tr><td>Safe overload</td><td>150 % of rated capacity</td><td>Load that will not damage the cell</td></tr><tr><td>Protection class</td><td>IP65 to IP68</td><td>Dust and water ingress protection</td></tr></tbody></table></div><p>Sources of error in a load cell include temperature changes (compensated by using four gauges and by dummy gauges), off-centre loading, side loads, vibration, creep of the adhesive, and the <b>lead wire resistance</b> in long cables, which is avoided by using a <b>six-wire (sense) connection</b> that measures the voltage actually reaching the bridge.</p><h4>Applications</h4><p>Load cells are used in electronic weighing machines from kitchen scales to weighbridges, in force measurement during material testing (universal testing machines), in torque measurement through strain gauges on a shaft, in aircraft landing gear load monitoring, in industrial hoppers and silos, in medical scales and in the joints of some robots to sense the gripping force.</p><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> A load cell uses four 350 &#937; gauges with a gauge factor of 2.1, is excited with 10 V and is subjected to a strain of 800 &#181;&#949;. Output V = (10/4) &times; 2.1 &times; 800 &times; 10<sup>&minus;6</sup> = 2.5 &times; 2.1 &times; 8 &times; 10<sup>&minus;4</sup> = <b>4.2 mV</b>. If this is fed to an amplifier of gain 500, the final output is <b>2.1 V</b>, easily read by a 10-bit ADC.</p></div><h3 id="sec3"><span class="sec-no">3.</span>Tactile Sensor</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>tactile sensor</b> is a device that measures the information resulting from <b>contact</b> between the sensor and an object, and it produces a signal that represents the <i>distribution of contact force</i> over the sensing area. While a load cell measures one total force, a tactile sensor measures a <b>two-dimensional pattern</b> of forces, and therefore can tell not only how hard something is being held but also what shape and texture it has.</p></div><p>The words <b>tactile</b> and <b>touch</b> are used differently in robotics. A <b>touch sensor</b> simply indicates whether contact has occurred (binary yes/no), whereas a <b>tactile sensor</b> gives the magnitude and distribution of the contact force. A <b>force/torque sensor</b> measures the three forces and three torques at a single point, usually at a robot wrist.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 290" width="880" height="290" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="220" y="26" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(a) Tactile array sensor</text><rect x="70" y="55" width="300" height="190" rx="6" class="t-box"/><rect x="95" y="80" width="26" height="22" rx="3" class="cmp-f"/><rect x="135" y="80" width="26" height="22" rx="3" class="cmp-f"/><rect x="175" y="80" width="26" height="22" rx="3" class="cmp-f"/><rect x="215" y="80" width="26" height="22" rx="3" class="cmp-f"/><rect x="255" y="80" width="26" height="22" rx="3" class="cmp-f"/><rect x="295" y="80" width="26" height="22" rx="3" class="cmp-f"/><rect x="335" y="80" width="26" height="22" rx="3" class="cmp-f"/><rect x="95" y="114" width="26" height="22" rx="3" class="cmp-f"/><rect x="135" y="114" width="26" height="22" rx="3" class="cmp-f"/><rect x="175" y="114" width="26" height="22" rx="3" class="cmp-f"/><rect x="215" y="114" width="26" height="22" rx="3" class="cmp-f"/><rect x="255" y="114" width="26" height="22" rx="3" class="cmp-f"/><rect x="295" y="114" width="26" height="22" rx="3" class="cmp-f"/><rect x="335" y="114" width="26" height="22" rx="3" class="cmp-f"/><rect x="95" y="148" width="26" height="22" rx="3" class="cmp-f"/><rect x="135" y="148" width="26" height="22" rx="3" class="cmp-f"/><rect x="175" y="148" width="26" height="22" rx="3" class="cmp-y"/><rect x="215" y="148" width="26" height="22" rx="3" class="cmp-y"/><rect x="255" y="148" width="26" height="22" rx="3" class="cmp-y"/><rect x="295" y="148" width="26" height="22" rx="3" class="cmp-f"/><rect x="335" y="148" width="26" height="22" rx="3" class="cmp-f"/><rect x="95" y="182" width="26" height="22" rx="3" class="cmp-f"/><rect x="135" y="182" width="26" height="22" rx="3" class="cmp-f"/><rect x="175" y="182" width="26" height="22" rx="3" class="cmp-y"/><rect x="215" y="182" width="26" height="22" rx="3" class="cmp-y"/><rect x="255" y="182" width="26" height="22" rx="3" class="cmp-y"/><rect x="295" y="182" width="26" height="22" rx="3" class="cmp-f"/><rect x="335" y="182" width="26" height="22" rx="3" class="cmp-f"/><rect x="95" y="216" width="26" height="22" rx="3" class="cmp-f"/><rect x="135" y="216" width="26" height="22" rx="3" class="cmp-f"/><rect x="175" y="216" width="26" height="22" rx="3" class="cmp-f"/><rect x="215" y="216" width="26" height="22" rx="3" class="cmp-f"/><rect x="255" y="216" width="26" height="22" rx="3" class="cmp-f"/><rect x="295" y="216" width="26" height="22" rx="3" class="cmp-f"/><rect x="335" y="216" width="26" height="22" rx="3" class="cmp-f"/><text x="220" y="268" font-size="10.5" fill="#5b6b7c" text-anchor="middle">each cell = one force sensitive element</text><text x="400" y="140" font-size="11" fill="#a8232a" text-anchor="start">pressed</text><path d="M 395 138 L 250 130" class="lnk-d" marker-end="url(#ah)"/><text x="680" y="26" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(b) FSR (force sensitive resistor)</text><ellipse cx="680" cy="150" rx="115" ry="90" class="cmp-y"/><ellipse cx="680" cy="150" rx="78" ry="58" fill="none" stroke="#12283d" stroke-width="1.4"/><text x="680" y="145" font-size="12" fill="#12283d" text-anchor="middle" font-weight="600">sensing film</text><text x="680" y="165" font-size="11" fill="#5b6b7c" text-anchor="middle">R falls as force rises</text><line x1="795" y1="150" x2="850" y2="150" class="wire"/><text x="852" y="154" font-size="11.5" fill="#5b6b7c" text-anchor="start">A</text><line x1="680" y1="240" x2="680" y2="272" class="wire"/><text x="690" y="280" font-size="11.5" fill="#5b6b7c" text-anchor="start">B</text></svg></div><figcaption><b>Fig. 4:</b> Left: a tactile array sensor in which each cell reports its own force, so the pattern of the contacting object can be reconstructed. Right: a force sensitive resistor (FSR), whose resistance falls as the applied force increases.</figcaption></figure><h4>Types of tactile sensing element</h4><ul><li><b>Piezoresistive (FSR &mdash; force sensitive resistor)</b> &mdash; a polymer thick film whose resistance decreases as pressure increases. Very common, cheap, thin, large range (a few grams to several kilograms), but suffers from hysteresis, drift and temperature sensitivity.</li><li><b>Conductive elastomer / rubber</b> &mdash; a silicone rubber filled with carbon particles. Compression brings the particles closer, lowering the resistance. Used in arrays and in soft gripper pads.</li><li><b>Capacitive</b> &mdash; two conducting plates separated by a dielectric foam or elastomer. Pressure reduces the gap, so the capacitance increases. Very sensitive, good dynamic response and little hysteresis, but needs complex electronics and is affected by stray fields.</li><li><b>Piezoelectric</b> &mdash; materials such as PVDF film or quartz generate a charge when deformed. Excellent for measuring <i>changing</i> forces, vibration, slip and texture, but cannot measure a static force because the charge leaks away.</li><li><b>Strain gauge array</b> &mdash; miniature gauges on a flexible backing, arranged in a matrix.</li><li><b>Optical / fibre optic</b> &mdash; pressure changes the intensity, phase or wavelength of light in a fibre, or deforms a reflective membrane viewed by a camera.</li><li><b>Barometric / pneumatic</b> &mdash; an array of small air chambers whose pressure rises on contact; robust in harsh environments.</li><li><b>MEMS tactile sensors</b> &mdash; micro-machined cantilevers with piezoresistive read-out, used in electronic skin.</li></ul><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="25" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">FSR voltage divider with every junction explicitly shown</text><text x="250" y="57" font-size="12.5" fill="#a8232a" text-anchor="middle" font-weight="700">+5 V</text><polyline points="250,64 250,80" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="250" cy="105" rx="34" ry="22" class="cmp-y"/><text x="250" y="109" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">FSR</text><polyline points="250,127 250,150" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="250" cy="150" r="3.3" class="dot" fill="#12283d"/><text x="270" y="145" font-size="11.5" fill="#157a4b" text-anchor="start" font-weight="700">Vout</text><polyline points="250,150 470,150 470,135" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="470" y="105" width="170" height="60" rx="6" class="t-box4"/><text x="555" y="130" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">ADC input</text><text x="555" y="148" font-size="10.5" fill="#5b6b7c" text-anchor="middle">Arduino A0</text><path d="M 250.000,165.000 L 250.000,174.000 L 258.000,179.880 L 242.000,186.600 L 258.000,193.320 L 242.000,200.040 L 258.000,206.760 L 250.000,216.000 L 250.000,225.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="278" y="197" font-size="10.8" fill="#5b6b7c" text-anchor="start">R = 10 kΩ</text><polyline points="250,225 250,235" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="250" y1="235" x2="250" y2="245" class="wire"/><line x1="237" y1="245" x2="263" y2="245" class="wire"/><line x1="242" y1="250" x2="258" y2="250" class="wire"/><line x1="246.5" y1="255" x2="253.5" y2="255" class="wire"/><text x="440" y="247" font-size="11.5" fill="#12283d" text-anchor="middle">Vout = 5 × R / (R + RFSR); pressing the FSR lowers RFSR and raises the ADC voltage.</text></svg></div><figcaption><b>Fig. 5:</b> A simple voltage divider reads an FSR into a microcontroller ADC pin. Pressing the sensor lowers its resistance and raises the output voltage.</figcaption></figure><h4>Tactile array and signal processing</h4><p>Practical tactile sensors are built as an <b>array</b> or matrix, typically 8 &times; 8 to 32 &times; 32 sensing elements (called <b>taxels</b>, from tactile pixel) with a spacing of 1 mm to 2 mm. Reading every taxel individually would need too many wires, so the array is wired as a <b>matrix</b> and scanned row by row, or a multiplexer such as the CD4051 is used. The microcontroller stores the values as a two-dimensional array which forms a <b>tactile image</b>. From this image the system can compute the centroid of the pressure (to detect slip), the total force, the orientation of an edge, and even recognise the shape of the object being held.</p><h4>Applications of tactile sensors</h4><ul><li><b>Robot grippers</b> &mdash; to control gripping force so that a fragile object such as an egg or a glass tube is not crushed, and to detect the beginning of slip so the grip can be tightened.</li><li><b>Object recognition</b> &mdash; identifying shape, size, texture and hardness.</li><li><b>Assembly</b> &mdash; guiding a peg into a hole, inserting connectors, and detecting proper seating of a part.</li><li><b>Safety</b> &mdash; sensitive skins on collaborative robots that stop the machine when a person is touched.</li><li><b>Prosthetics and teleoperation</b> &mdash; giving the operator a sense of feel.</li><li><b>Medicine</b> &mdash; measuring the pulse, palpation, and pressure distribution under a patient lying in bed to prevent bed sores.</li><li><b>Consumer electronics</b> &mdash; pressure-sensitive keys and trackpads.</li><li><b>Industrial inspection</b> &mdash; checking the uniformity of pressure in a press or the seal of a package.</li></ul><h3 id="sec4"><span class="sec-no">4.</span>Float Sensor (Level Sensor)</h3><p>A float sensor is the simplest and most widely used device for detecting the <b>level of a liquid</b> in a tank. It works on <b>Archimedes' principle</b>: a body immersed in a liquid is buoyed up by a force equal to the weight of the liquid displaced. A float is made of a material less dense than the liquid (or is a hollow shell), so it always rides on the surface. As the level rises or falls, the float moves with it, and this mechanical movement is converted into an electrical signal.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 315" width="880" height="315" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="25" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">Float sensor: mechanical motion and a pull-up interface</text><text x="215" y="57" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(a) Float and reed / microswitch</text><rect x="55" y="85" width="330" height="170" rx="5" class="t-box"/><rect x="57" y="185" width="326" height="68" rx="0" class="cmp-f"/><path d="M 57 185 q 20 -8 40 0 t 40 0 t 40 0 t 40 0 t 40 0 t 40 0 t 40 0 t 40 0" class="wire-b"/><text x="220" y="233" font-size="11.5" fill="#0f5fa8" text-anchor="middle">water / liquid</text><circle cx="170" cy="185" r="32" class="mech2"/><text x="170" y="189" font-size="10.8" fill="#12283d" text-anchor="middle" font-weight="700">float</text><circle cx="240" cy="135" r="6" class="dot"/><line x1="170" y1="185" x2="240" y2="135" class="mech2" stroke-width="3"/><line x1="240" y1="135" x2="300" y2="110" class="mech2" stroke-width="3"/><circle cx="300" cy="110" r="3.3" class="dot" fill="#12283d"/><circle cx="340" cy="110" r="3.3" class="dot" fill="#12283d"/><line x1="300" y1="110" x2="330" y2="94" class="cmp" stroke-width="2.2"/><text x="320" y="84" font-size="10" fill="#5b6b7c" text-anchor="middle">reed / limit contact</text><polyline points="240,113 240,88" class="lnk" marker-end="url(#ah)"/><text x="257" y="92" font-size="10" fill="#a8232a" text-anchor="start">level rises</text><text x="220" y="282" font-size="10.8" fill="#12283d" text-anchor="middle">Level rises → float lifts → lever changes the switch state; the liquid never touches the contacts.</text><text x="660" y="57" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(b) Digital level-switch interface</text><text x="580" y="82" font-size="11" fill="#a8232a" text-anchor="middle" font-weight="700">+5 V</text><polyline points="620,88 620,100" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 620.000,100.000 L 620.000,106.000 L 628.000,111.600 L 612.000,118.000 L 628.000,124.400 L 612.000,130.800 L 628.000,137.200 L 620.000,146.000 L 620.000,152.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="645" y="130" font-size="9.8" fill="#5b6b7c" text-anchor="start">10 kΩ pull-up</text><polyline points="620,152 620,175" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="620" cy="175" r="3.3" class="dot" fill="#12283d"/><polyline points="620,175 780,175" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="780" y="148" width="80" height="54" rx="6" class="t-box4"/><text x="820" y="170" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">MCU</text><text x="820" y="188" font-size="9.5" fill="#5b6b7c" text-anchor="middle">digital input</text><polyline points="620,175 620,205" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="620" cy="205" r="3.3" class="dot" fill="#12283d"/><circle cx="620" cy="232" r="3.3" class="dot" fill="#12283d"/><line x1="620" y1="205" x2="660" y2="220" class="cmp" stroke-width="2.2"/><polyline points="620,232 620,255" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="620" y1="255" x2="620" y2="265" class="wire"/><line x1="607" y1="265" x2="633" y2="265" class="wire"/><line x1="612" y1="270" x2="628" y2="270" class="wire"/><line x1="616.5" y1="275" x2="623.5" y2="275" class="wire"/><text x="680" y="224" font-size="10" fill="#5b6b7c" text-anchor="start">float switch</text><text x="700" y="282" font-size="10.5" fill="#12283d" text-anchor="middle">switch open → input HIGH; switch closed → input LOW (use hysteresis or debouncing if the float chatters).</text></svg></div><figcaption><b>Fig. 6:</b> Left: a float-and-lever level switch. As the liquid rises the float lifts the lever and closes the switch. Right: a multi-level float rod in which each reed switch closes at a preset height.</figcaption></figure><h4>Types of float sensor</h4><ul><li><b>Float with lever and mechanical switch</b> &mdash; the float is attached to a pivoted arm which opens or closes a microswitch or a mercury switch. Simple and cheap; used in domestic water tanks and in the cistern of a toilet.</li><li><b>Vertical float with reed switch</b> &mdash; a hollow stem contains one or more <b>reed switches</b>, and the float contains a permanent <b>ring magnet</b>. As the float passes a reed switch, the magnet closes its contacts. Multiple reed switches at different heights give multiple level points. This type is very reliable because the electrical contacts are sealed inside glass and never touch the liquid.</li><li><b>Horizontal float switch</b> &mdash; mounted in the side wall of the tank; the float swings about a horizontal pivot and operates a reed switch. Used where vertical space is limited.</li><li><b>Cable-suspended float</b> &mdash; a weighted switch on a cable is dropped into a sump or a sewage pit; when the level rises the float tilts and a mercury or ball switch inside changes state. Used for pump control in drainage pits.</li><li><b>Magnetostrictive float</b> &mdash; a precision version in which the position of the magnet along a waveguide wire is measured electronically, giving a continuous level reading instead of discrete points. Used in fuel tanks and hydraulic systems.</li><li><b>Rotary paddle level switch</b> &mdash; for dry solids such as grain or cement: a small paddle rotates freely until the material buries it and stalls the motor, which trips a switch.</li></ul><h4>Other methods of level measurement</h4><p>Float sensors are not suitable for every liquid. Where the liquid is sticky, corrosive, or contains solids, other methods are preferred: <b>capacitive</b> probes (the liquid acts as the dielectric), <b>ultrasonic</b> sensors (time of flight of an echo from the surface), <b>radar / microwave</b>, <b>hydrostatic pressure</b> sensors at the bottom of the tank, <b>conductivity probes</b> for water, <b>load cells</b> under the tank, and <b>sight glasses</b> for visual indication.</p><h4>Interfacing a float switch</h4><p>A float switch is a simple contact, and it must never be wired directly to a microcontroller pin in an industrial environment. The correct arrangement is: the float switch controls a <b>relay</b> or a contactor coil, and the relay contact gives an isolated signal to the controller. For a small low-voltage reed switch, a <b>pull-up resistor</b> of 10 k&#937; to the supply is used, and the switch connects the pin to ground; a small capacitor of 100 nF across the switch reduces contact bounce, and the software also debounces by requiring the signal to be stable for 20 ms to 50 ms before accepting it.</p><h4>Applications and limitations</h4><ul><li><b>Applications:</b> automatic control of water level in overhead and underground tanks; pump start/stop control; high-level alarm to prevent overflow; low-level cut-out to protect a pump from running dry; boiler water level; fuel level in vehicles and generators; coffee machines, dishwashers and washing machines; chemical dosing tanks.</li><li><b>Limitations:</b> the float can be jammed by debris, scale or ice; it measures only at the point where it is fitted, not the whole tank; density and temperature changes alter the float's immersion depth; moving parts are subject to wear; not suitable for very viscous liquids or slurries.</li></ul><div class="example"><span class="tag">Example</span><p>A typical domestic overhead-tank controller uses two float switches: a <b>low level</b> switch that starts the pump and a <b>high level</b> switch that stops it. The two switches, together with a relay, form a latching circuit so that the pump does not chatter as the water surface waves near a single switch. This arrangement is studied in detail in Topic 17.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A strain gauge works on the piezoresistive effect: stretching a conductor makes it longer and thinner, so its resistance increases.</li><li>Gauge factor G<sub>f</sub> = (&#916;R/R)/&#949;, about 2 for metallic foil gauges and 50 to 200 for semiconductor gauges.</li><li>The resistance change is extremely small, so four gauges are used in a Wheatstone bridge; V<sub>out</sub> = (V<sub>ex</sub>/4) G<sub>f</sub> &#949; for a full bridge.</li><li>A load cell is an elastic member with four bonded gauges, two in tension and two in compression, giving double sensitivity and automatic temperature compensation.</li><li>Load cell output is only 1 to 3 mV/V and needs an instrumentation amplifier or a dedicated ADC such as the HX711.</li><li>A tactile sensor measures the distribution of contact force over an area (a tactile image made of taxels), whereas a touch sensor only says whether contact has occurred.</li><li>Tactile elements include piezoresistive FSRs, conductive elastomers, capacitive, piezoelectric, optical and MEMS types; arrays are scanned as a matrix.</li><li>A float sensor uses buoyancy to follow a liquid surface and converts the movement into a switch closure, usually through a magnet and a sealed reed switch.</li><li>Float switches should drive a relay, be debounced in hardware and software, and are unsuitable for viscous or dirty liquids.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Explain the working principle of a strain gauge and define gauge factor.</li><li>Draw and explain the Wheatstone bridge used with strain gauges. Why are four active gauges preferred over one?</li><li>Describe the construction and working of a shear-beam load cell. List its main specifications.</li><li>A load cell has four 350 &#937; gauges with gauge factor 2.0, excitation 12 V and a measured strain of 500 &#181;&#949;. Find the bridge output. (Answer: 3 mV)</li><li>What are the main sources of error in a load cell and how are they reduced?</li><li>Differentiate between a touch sensor, a tactile sensor and a force/torque sensor.</li><li>Explain any four types of tactile sensing elements with their advantages and limitations.</li><li>How is a tactile array sensor interfaced to a microcontroller? Give three applications of tactile sensors in robotics.</li><li>With a neat sketch, explain the construction and working of a float type level sensor.</li><li>List other methods of level measurement and state the limitations of float sensors.</li></ol></div><div class="pager"><a class="prev" href="03-lvdt-eddy-current-hall-effect-sensors.html"><span class="dir">&larr; Previous topic</span><span class="ttl">03. LVDT, Eddy Current Proximity Sensor and Hall Effect Sensor</span></a><a class="next" href="05-lm35-phototransistor-ir-sensor.html"><span class="dir">Next topic &rarr;</span><span class="ttl">05. LM35 Temperature Sensor, Phototransistor and IR Sensor</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

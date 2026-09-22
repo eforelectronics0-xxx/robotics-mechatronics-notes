@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sensors and Transducers &mdash; Performance Terminology | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="The difference between a sensor and a transducer, how signals travel through a measurement chain, and the complete set of static and dynamic terms use">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit I &middot; Topic 2 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit I &rsaquo; Topic 2</nav><div class="unit-tag">Unit I</div><h2 class="page-title"><span class="topic-no">02</span>Sensors and Transducers &mdash; Performance Terminology</h2><p class="lede">The difference between a sensor and a transducer, how signals travel through a measurement chain, and the complete set of static and dynamic terms used to judge the performance of any sensor.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Sensor, Transducer and the Measurement Chain</a></li><li><a href="#sec2">Static Characteristics</a></li><li><a href="#sec3">Dynamic Characteristics</a></li><li><a href="#sec4">Selection of a Sensor</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Sensor, Transducer and the Measurement Chain</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>sensor</b> is a device that detects a physical quantity (the <i>measurand</i>) and responds to it in some way. A <b>transducer</b> is a device that converts energy from one form into another. In measurement work the two words are used almost interchangeably, because a sensor used for measurement always converts the measured quantity into an electrical signal.</p></div><p>Strictly speaking, every sensor is a transducer, but not every transducer is a sensor. A loudspeaker converts electrical energy into sound, so it is a transducer but not a sensor. A microphone converts sound into an electrical signal, so it is both a sensor and a transducer. Similarly, a <b>thermocouple</b> converts a temperature difference directly into a voltage, so it is a <i>self-generating</i> or <i>active</i> transducer. A <b>thermistor</b> does not generate any voltage; it only changes its resistance when heated, and needs an external power supply, so it is a <i>passive</i> or <i>modulating</i> transducer.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 150" width="880" height="150" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><rect x="20" y="40" width="150" height="70" rx="8" class="t-box3"/><text x="95.0" y="58.0" class="t-lbl">Measured</text><text x="95.0" y="75.0" class="t-lbl">variable</text><text x="95.0" y="92.0" class="t-lbl-s">temperature, force...</text><rect x="215" y="40" width="155" height="70" rx="8" class="t-box2"/><text x="292.5" y="58.0" class="t-lbl">Sensor /</text><text x="292.5" y="75.0" class="t-lbl">Transducer</text><text x="292.5" y="92.0" class="t-lbl-s">output: electrical</text><rect x="415" y="40" width="160" height="70" rx="8" class="t-box2"/><text x="495.0" y="58.0" class="t-lbl">Signal</text><text x="495.0" y="75.0" class="t-lbl">conditioning</text><text x="495.0" y="92.0" class="t-lbl-s">amplifier, filter, ADC</text><rect x="620" y="40" width="150" height="70" rx="8" class="t-box4"/><text x="695.0" y="58.0" class="t-lbl">Display /</text><text x="695.0" y="75.0" class="t-lbl">Controller</text><text x="695.0" y="92.0" class="t-lbl-s">readout or action</text><line x1="170" y1="75" x2="213" y2="75" class="lnk" marker-end="url(#ah)"/><line x1="370" y1="75" x2="413" y2="75" class="lnk" marker-end="url(#ah)"/><line x1="575" y1="75" x2="618" y2="75" class="lnk" marker-end="url(#ah)"/></svg></div><figcaption><b>Fig. 1:</b> A typical measurement chain: the measurand is converted by the sensor, cleaned and digitised by the signal conditioning stage, and finally displayed or used for control.</figcaption></figure><p>The quantity being measured is called the <b>measurand</b>. The input to the transducer is the measurand and the output is an electrical signal. The ratio of output to input is the <b>sensitivity</b>. A sensor that produces a large output for a small input is more sensitive and is easier to interface.</p><div class="tbl-scroll"><table><caption>Table 2.1 &mdash; Classification of transducers</caption><thead><tr><th>Basis of classification</th><th>Types</th><th>Example</th></tr></thead><tbody><tr><td>Energy source</td><td>Active (self-generating) / Passive (needs external supply)</td><td>Thermocouple, piezoelectric / Thermistor, strain gauge, LVDT</td></tr><tr><td>Electrical parameter produced</td><td>Resistive, capacitive, inductive, voltage or current generating</td><td>Potentiometer, RTD / Capacitive level gauge / LVDT / Thermocouple, photovoltaic cell</td></tr><tr><td>Output signal form</td><td>Analogue / Digital</td><td>LM35, strain gauge / Optical encoder, Hall switch</td></tr><tr><td>Method of measurement</td><td>Contact / Non-contact</td><td>Thermocouple, strain gauge / Eddy current probe, ultrasonic, pyrometer</td></tr><tr><td>Application</td><td>Temperature, displacement, force, pressure, level, flow, proximity, light</td><td>As per the topic of measurement</td></tr></tbody></table></div><div class="tbl-scroll"><table><caption>Table 2.2 &mdash; Common input-output relationships</caption><thead><tr><th>Measurand</th><th>Transducer</th><th>Electrical output</th></tr></thead><tbody><tr><td>Displacement</td><td>Potentiometer</td><td>Resistance / voltage change</td></tr><tr><td>Displacement</td><td>LVDT</td><td>AC voltage, amplitude and phase</td></tr><tr><td>Displacement / proximity</td><td>Eddy current probe</td><td>Change in coil impedance</td></tr><tr><td>Force / weight / pressure</td><td>Strain gauge, piezoelectric crystal</td><td>Resistance change / charge</td></tr><tr><td>Temperature</td><td>Thermocouple, RTD, thermistor, LM35, IC sensor</td><td>Voltage / resistance change / proportional voltage</td></tr><tr><td>Light intensity</td><td>LDR, photodiode, phototransistor</td><td>Resistance / current change</td></tr><tr><td>Magnetic field / speed</td><td>Hall sensor, tachogenerator</td><td>Voltage / pulse frequency</td></tr><tr><td>Level</td><td>Float switch, capacitive probe, ultrasonic</td><td>Switch state / capacitance / time of flight</td></tr><tr><td>Human presence</td><td>PIR sensor, capacitive touch</td><td>Digital pulse / change in frequency</td></tr></tbody></table></div><h3 id="sec2"><span class="sec-no">2.</span>Static Characteristics</h3><p><b>Static characteristics</b> describe the performance of a sensor when the measured quantity is constant or changing very slowly with time. These are the terms that appear on a datasheet and that a buyer compares when choosing a sensor.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="215" y="24" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(a) Ideal straight line and a real curve</text><rect x="60" y="50" width="320" height="190" rx="6" class="t-box"/><line x1="85" y1="220" x2="85" y2="65" class="ax" marker-end="url(#ah)"/><line x1="85" y1="220" x2="360" y2="220" class="ax" marker-end="url(#ah)"/><text x="366" y="224" font-size="11.5" fill="#5b6b7c" text-anchor="start">input x</text><text x="79" y="59" font-size="11.5" fill="#5b6b7c" text-anchor="start">output y</text><line x1="85" y1="220" x2="355" y2="70" class="lnk" stroke-width="1.6" stroke-dasharray="6 4"/><text x="300" y="92" font-size="11" fill="#0f5fa8" text-anchor="middle">ideal line</text><path d="M 85 220 C 150 205, 200 150, 250 118 S 330 78, 352 68" class="lnk"/><text x="185" y="150" font-size="11" fill="#12283d" text-anchor="middle">actual</text><line x1="200" y1="160" x2="200" y2="145" class="lnk" stroke-width="1.3" stroke-dasharray="6 4"/><text x="232" y="176" font-size="10.5" fill="#a8232a" text-anchor="middle">non-linearity</text><line x1="85" y1="220" x2="118" y2="220" class="wire-r" stroke-width="3"/><text x="120" y="236" font-size="10.5" fill="#a8232a" text-anchor="start">dead band</text><text x="665" y="24" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(b) Hysteresis loop</text><rect x="500" y="50" width="330" height="190" rx="6" class="t-box"/><line x1="525" y1="220" x2="525" y2="65" class="ax" marker-end="url(#ah)"/><line x1="525" y1="220" x2="805" y2="220" class="ax" marker-end="url(#ah)"/><text x="811" y="224" font-size="11.5" fill="#5b6b7c" text-anchor="start">input x</text><text x="519" y="59" font-size="11.5" fill="#5b6b7c" text-anchor="start">output y</text><path d="M 525 220 C 620 205, 720 140, 795 78" class="lnk"/><text x="700" y="120" font-size="11" fill="#0f5fa8" text-anchor="middle">increasing input</text><path d="M 795 78 C 720 165, 620 218, 525 220" class="lnk"/><text x="640" y="200" font-size="11" fill="#a8232a" text-anchor="middle">decreasing input</text><line x1="660" y1="155" x2="660" y2="186" class="lnk" stroke-width="1.4" stroke-dasharray="6 4"/><text x="672" y="174" font-size="10.5" fill="#12283d" text-anchor="start">hysteresis error</text><text x="440" y="285" font-size="10" fill="#12283d" text-anchor="middle"></text></svg></div><figcaption><b>Fig. 2:</b> Calibration curve showing the ideal straight line, the actual response, non-linearity and dead band (left); hysteresis loop (right).</figcaption></figure><h4>Accuracy</h4><p>Accuracy tells us how close the indicated value is to the <b>true value</b> of the measurand. It is usually expressed as a percentage of full scale reading or as a percentage of the measured value. For example, a thermometer with a range of 0&ndash;100 &deg;C and an accuracy of &plusmn;1 % of full scale may be in error by up to 1 &deg;C anywhere in the range. Accuracy is not the same as precision.</p><h4>Precision and Repeatability</h4><p><b>Precision</b> is the closeness with which repeated measurements of the <i>same</i> quantity agree with each other. A sensor can be very precise but not accurate &mdash; it may give the same wrong reading every time. <b>Repeatability</b> is the ability of a sensor to give the same output when the same input is applied repeatedly, under the same conditions, in the same direction, over a short period. <b>Reproducibility</b> is the same idea but over a longer period, or after the instrument has been moved or switched off and on.</p><h4>Error</h4><p>Error is the difference between the measured value and the true value. Errors are grouped as follows.</p><ul><li><b>Systematic error</b> &mdash; repeatable and predictable, for example zero offset, wrong calibration or a loading effect. It can be reduced by calibration.</li><li><b>Random error</b> &mdash; unpredictable, caused by noise, vibration or fluctuations in the supply. It can only be reduced by averaging or better shielding.</li><li><b>Gross error</b> &mdash; caused by a mistake, such as misreading the scale or a wiring fault.</li><li><b>Zero error / offset</b> &mdash; the output is not zero when the input is zero.</li><li><b>Span error / gain error</b> &mdash; the slope of the calibration curve is wrong.</li></ul><h4>Range and Span</h4><p>The <b>range</b> is the set of values of the measurand over which the sensor is designed to work, stated as a minimum and maximum, for example &minus;55 &deg;C to +150 &deg;C for an LM35. The <b>span</b> is the algebraic difference between the maximum and minimum, which for the same example is 205 &deg;C. The <b>full scale output (FSO)</b> is the output produced at the maximum input.</p><h4>Sensitivity</h4><p>Sensitivity is the <b>ratio of the change in output to the change in input</b> that produced it. It is the slope of the calibration curve.</p><span class="eq">Sensitivity S = &#916;(output) / &#916;(input)</span><p>For an LM35 temperature sensor the output changes by 10 mV for each 1 &deg;C change, so the sensitivity is 10 mV/&deg;C. A high sensitivity is desirable because small changes become easy to detect, but very high sensitivity also makes the sensor respond to noise and to unwanted quantities.</p><h4>Linearity and Non-linearity Error</h4><p>An <b>ideal</b> sensor has a straight-line relationship between input and output. A <b>linear</b> sensor is easy to calibrate because two points are enough to define the whole scale. Real sensors depart from the straight line; this departure is called <b>non-linearity error</b> and is quoted as a percentage of full range. For example a load cell may have a non-linearity of &plusmn;0.02 % FSO, which is excellent, while a cheap thermistor may be non-linear by several percent and must be linearised by a circuit or by software.</p><h4>Hysteresis</h4><p>Hysteresis is the phenomenon in which the output of a sensor depends not only on the present input but also on the <b>direction from which the input arrived</b>. When the input is increased from zero to full scale and then decreased back, the two curves do not coincide; they form a loop. The maximum difference between the two curves, expressed as a percentage of full range, is the hysteresis error. Hysteresis arises from friction, from magnetic effects (as in eddy current and Hall devices), from elasticity of materials (as in a load cell) and from backlash in gears.</p><h4>Dead Band and Dead Zone</h4><p>The <b>dead band</b> (also called dead zone or threshold) is the largest change of input for which the sensor gives <b>no change of output</b>. It is caused by stiction, friction or a minimum energy requirement. For example a pressure switch may not operate until the pressure has risen a little above its nominal set point.</p><h4>Resolution and Threshold</h4><p><b>Resolution</b> is the smallest change in the input that the sensor can detect and indicate. It is often confused with precision but it is different: resolution is about the smallest <i>step</i> that can be seen. In a digital system the resolution is limited by the number of bits of the ADC. For an n-bit converter with a reference voltage V<sub>ref</sub>,</p><span class="eq">Resolution = V<sub>ref</sub> / 2<sup>n</sup>      (for n = 10 and V<sub>ref</sub> = 5 V, resolution = 5/1024 = 4.88 mV)</span><h4>Drift and Stability</h4><p><b>Drift</b> is an unwanted gradual change in the output that is not caused by a change in the input. It is usually due to ageing of components or to a change in temperature. <b>Zero drift</b> is a shift of the whole calibration curve up or down; <b>sensitivity drift</b> is a change of the slope. <b>Stability</b> is the ability of a sensor to give the same output over a long period for a constant input.</p><h4>Backlash and Loading Effect</h4><p><b>Backlash</b> is the lost motion in a mechanical system, for example the clearance between gear teeth, which causes a small change of input to produce no change of output when the direction of motion is reversed. A <b>loading effect</b> occurs when the act of connecting the measuring instrument changes the quantity being measured. A voltmeter with low input resistance draws current from the circuit and reads a lower voltage than the true one. This is why signal conditioning stages use op-amps with very high input impedance.</p><h3 id="sec3"><span class="sec-no">3.</span>Dynamic Characteristics</h3><p><b>Dynamic characteristics</b> describe how a sensor behaves when the measurand is <b>changing rapidly</b> with time. No sensor can respond instantaneously; there is always some delay because energy must be transferred and stored. Dynamic behaviour is studied by applying a standard test input and observing the output.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><rect x="40" y="40" width="380" height="175" rx="6" class="t-box"/><text x="230" y="30" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(a) Step input</text><line x1="70" y1="190" x2="70" y2="60" class="ax" marker-end="url(#ah)"/><line x1="70" y1="190" x2="390" y2="190" class="ax" marker-end="url(#ah)"/><text x="396" y="194" font-size="11.5" fill="#5b6b7c" text-anchor="start">time</text><text x="64" y="54" font-size="11.5" fill="#5b6b7c" text-anchor="start">input</text><path d="M 70 190 L 140 190 L 140 90 L 380 90" class="lnk" stroke-width="2"/><line x1="70" y1="90" x2="380" y2="90" class="ax" stroke-dasharray="6 4"/><rect x="470" y="40" width="380" height="175" rx="6" class="t-box"/><text x="660" y="30" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(b) Sensor output (first order response)</text><line x1="500" y1="190" x2="500" y2="60" class="ax" marker-end="url(#ah)"/><line x1="500" y1="190" x2="820" y2="190" class="ax" marker-end="url(#ah)"/><text x="826" y="194" font-size="11.5" fill="#5b6b7c" text-anchor="start">time</text><text x="494" y="54" font-size="11.5" fill="#5b6b7c" text-anchor="start">output</text><path d="M 500 190 L 570 190 C 640 190, 660 100, 810 92" class="lnk" stroke-width="2"/><line x1="570" y1="90" x2="820" y2="90" class="ax" stroke-dasharray="6 4"/><text x="828" y="92" font-size="10.5" fill="#5b6b7c" text-anchor="end">final value</text><line x1="668" y1="190" x2="668" y2="128" class="lnk" stroke-width="1.3" stroke-dasharray="6 4"/><text x="668" y="208" font-size="10.5" fill="#a8232a" text-anchor="middle">response time</text><text x="668" y="122" font-size="10" fill="#5b6b7c" text-anchor="middle">63.2% reached at t = &#964;</text></svg></div><figcaption><b>Fig. 3:</b> A step input (left) and the resulting first-order response of a sensor (right). The output reaches 63.2 % of its final value after one time constant &#964;.</figcaption></figure><h4>The three test inputs</h4><ul><li><b>Step input</b> &mdash; the measurand changes suddenly from one value to another, for example dropping a thermocouple into hot water.</li><li><b>Ramp (or linear) input</b> &mdash; the measurand changes at a constant rate, for example a temperature rising steadily at 2 &deg;C per minute.</li><li><b>Sinusoidal input</b> &mdash; the measurand varies sinusoidally at different frequencies, used to find the frequency response.</li></ul><h4>Response time, Rise time and Time constant</h4><p>The <b>time constant (&#964;)</b> of a first-order sensor is the time taken for the output to reach <b>63.2 %</b> of its final steady value after a step input. After 2&#964; it reaches 86.5 %, after 3&#964; it reaches 95 % and after 5&#964; it reaches 99.3 %, which is usually taken as steady. The <b>response time</b> is the total time taken for the output to reach and stay within a specified band (often &plusmn;2 % or &plusmn;5 %) of the final value. The <b>rise time</b> is the time taken to go from 10 % to 90 % of the final value.</p><div class="note"><span class="tag">Note</span><p>A small time constant means a <b>fast</b> sensor. A bare thermocouple bead may have &#964; of a few milliseconds, while the same thermocouple inside a protective sheath may have &#964; of several seconds.</p></div><h4>Time Delay (Dead Time)</h4><p>Some sensors do not begin to respond at all for a certain period after the input changes. This is called <b>time delay</b>, <b>dead time</b> or <b>transportation lag</b>. A gas sensor placed at the end of a long sampling tube shows a dead time equal to the time the gas takes to travel through the tube.</p><h4>Overshoot, Settling time and Damping</h4><p>In a second-order system such as a pressure gauge with a spring and mass, the output may go beyond the final value before coming back. The amount by which it exceeds the final value is the <b>overshoot</b>, usually given as a percentage. The <b>settling time</b> is the time after which the output stays within a specified tolerance band. The <b>damping ratio (&#950;)</b> describes how quickly oscillations die out: &#950; = 0 gives continuous oscillation, &#950; &lt; 1 gives an under-damped response with overshoot, &#950; = 1 is critically damped (fastest response without overshoot) and &#950; &gt; 1 is over-damped (slow, no overshoot). A damping ratio of about <b>0.7</b> is generally considered the best compromise.</p><h4>Frequency Response and Bandwidth</h4><p>When a sinusoidal input of increasing frequency is applied, the output amplitude falls and the output phase lags behind the input. The <b>bandwidth</b> is the range of frequencies over which the output amplitude stays within a specified limit, usually within 3 dB (that is, 70.7 %) of the low-frequency value. A sensor must have a bandwidth comfortably higher than the highest frequency present in the measurand, otherwise the reading will be too small and will arrive too late.</p><h4>Fidelity</h4><p><b>Fidelity</b> is the degree to which a sensor reproduces the input waveform without any distortion. A sensor with good fidelity gives an output whose shape matches the input shape; only the amplitude and possibly a time shift differ.</p><div class="tbl-scroll"><table><caption>Table 2.3 &mdash; Summary of performance terms</caption><thead><tr><th>Term</th><th>Meaning in one line</th><th>Unit / typical value</th></tr></thead><tbody><tr><td>Accuracy</td><td>Closeness to the true value</td><td>% of full scale or % of reading</td></tr><tr><td>Precision</td><td>Closeness of repeated readings to each other</td><td>% of reading</td></tr><tr><td>Sensitivity</td><td>Output change per unit input change</td><td>mV/&deg;C, mV/mm, mV/N</td></tr><tr><td>Resolution</td><td>Smallest detectable change of input</td><td>Same unit as input</td></tr><tr><td>Linearity error</td><td>Maximum deviation from a straight line</td><td>% FSO</td></tr><tr><td>Hysteresis</td><td>Difference between up and down calibration curves</td><td>% FSO</td></tr><tr><td>Dead band</td><td>Input change giving no output change</td><td>Input units</td></tr><tr><td>Range / Span</td><td>Minimum to maximum input / their difference</td><td>e.g. &minus;55 to 150 &deg;C / 205 &deg;C</td></tr><tr><td>Drift</td><td>Slow unwanted change of output</td><td>% per year or % per &deg;C</td></tr><tr><td>Time constant &#964;</td><td>Time to reach 63.2 % of final value</td><td>seconds or ms</td></tr><tr><td>Response time</td><td>Time to enter and stay in the tolerance band</td><td>seconds or ms</td></tr><tr><td>Rise time</td><td>Time from 10 % to 90 % of final value</td><td>seconds or ms</td></tr><tr><td>Overshoot</td><td>Maximum excursion beyond the final value</td><td>%</td></tr><tr><td>Damping ratio &#950;</td><td>How quickly oscillations die out</td><td>0.7 ideal</td></tr><tr><td>Bandwidth</td><td>Frequency range within 3 dB of nominal gain</td><td>Hz</td></tr><tr><td>Fidelity</td><td>Freedom from waveform distortion</td><td>Qualitative</td></tr></tbody></table></div><h3 id="sec4"><span class="sec-no">4.</span>Selection of a Sensor</h3><p>Choosing the right sensor for an application means balancing many factors. The engineer should ask the following questions in order.</p><ol><li><b>What is the measurand</b> and what is its expected range?</li><li><b>What accuracy and resolution</b> does the application really need? Do not over-specify, because accuracy costs money.</li><li><b>Is contact acceptable?</b> A rotating or very hot object may need a non-contact sensor such as an eddy current probe, a Hall sensor or a pyrometer.</li><li><b>How fast does it change?</b> This decides the required time constant and bandwidth.</li><li><b>What is the operating environment?</b> Temperature, humidity, dust, vibration, corrosive chemicals and electromagnetic interference all affect the choice and the enclosure rating.</li><li><b>What output form</b> is needed &mdash; analogue voltage, current loop (4&ndash;20 mA), digital, PWM or a simple switch contact?</li><li><b>What are the constraints</b> of size, weight, power supply, cost, life and availability?</li><li><b>Does it need calibration</b> and how often?</li></ol><div class="example"><span class="tag">Example</span><p>Suppose the water temperature in a domestic geyser has to be displayed with an accuracy of about 1 &deg;C over 0&ndash;100 &deg;C, the water is still, and the cost must be low. A thermocouple would be far too insensitive and would need cold junction compensation. An RTD is very accurate but costly and slow. A thermistor is cheap and sensitive but strongly non-linear. The <b>LM35</b> is the best choice here: it gives a linear 10 mV/&deg;C output, needs no calibration, works from a single 5 V supply and costs very little. This is exactly the sensor studied in Topic 5.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A sensor detects a measurand; a transducer converts one form of energy into another. Transducers are active (self-generating) or passive (needing an external supply).</li><li>Static characteristics apply when the input is steady: accuracy, precision, repeatability, error, range, span, sensitivity, linearity, hysteresis, dead band, resolution, drift, stability, backlash and loading effect.</li><li>Sensitivity is the slope of the calibration curve, S = &#916;output / &#916;input.</li><li>Hysteresis means the output depends on the direction of approach of the input; dead band is the input change that produces no output change.</li><li>Dynamic characteristics apply when the input changes with time: time constant, response time, rise time, dead time, overshoot, settling time, damping ratio, frequency response, bandwidth and fidelity.</li><li>For a first-order sensor the output reaches 63.2 % of its final value in one time constant and 99.3 % in five time constants.</li><li>A damping ratio of about 0.7 gives the best compromise between speed and overshoot.</li><li>Sensor selection is a trade-off between accuracy, speed, environment, output form, size and cost.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Differentiate between a sensor and a transducer. Classify transducers on any four bases with examples.</li><li>Define accuracy, precision and resolution. How are they different from one another?</li><li>Explain sensitivity, linearity error and hysteresis with the help of a calibration curve.</li><li>What is meant by dead band and drift? Give one practical example of each.</li><li>Explain the dynamic characteristics of a sensor. Define time constant, response time and rise time.</li><li>Define damping ratio. Why is a value of about 0.7 preferred in measurement instruments?</li><li>What is bandwidth and fidelity? Why must the sensor bandwidth exceed the frequency content of the measurand?</li><li>List the steps followed in selecting a sensor for a given application.</li></ol></div><div class="pager"><a class="prev" href="01-basics-of-mechatronic-systems.html"><span class="dir">&larr; Previous topic</span><span class="ttl">01. Basics of Mechatronic Systems</span></a><a class="next" href="03-lvdt-eddy-current-hall-effect-sensors.html"><span class="dir">Next topic &rarr;</span><span class="ttl">03. LVDT, Eddy Current Proximity Sensor and Hall Effect Sensor</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>
