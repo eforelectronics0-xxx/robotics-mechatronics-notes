@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kinematic Chains, Cams, Gears, Ratchet and Pawl, Belt and Chain Drives, Bearings | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="The classical machine elements used in mechatronic systems: kinematic chains and inversions, cams and followers, gear types and gear trains, the ratch">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit II &middot; Topic 8 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit II &rsaquo; Topic 8</nav><div class="unit-tag">Unit II</div><h2 class="page-title"><span class="topic-no">08</span>Kinematic Chains, Cams, Gears, Ratchet and Pawl, Belt and Chain Drives, Bearings</h2><p class="lede">The classical machine elements used in mechatronic systems: kinematic chains and inversions, cams and followers, gear types and gear trains, the ratchet and pawl, belt and chain drives, and rolling and plain bearings.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Kinematic Chains and Inversions</a></li><li><a href="#sec2">Cams and Followers</a></li><li><a href="#sec3">Gears</a></li><li><a href="#sec4">Ratchet and Pawl</a></li><li><a href="#sec5">Belt and Chain Drives</a></li><li><a href="#sec6">Bearings</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Kinematic Chains and Inversions</h3><p>A <b>kinematic chain</b> is a set of links connected by joints in a closed loop so that the motion of each link is completely determined by the motion of the others. If the chain is open, as in a robot arm, the motion of the last link depends on all the joints before it. Closed chains are the basis of most classical mechanisms.</p><h4>Four-bar chain</h4><p>The four-bar chain is the simplest closed chain that gives motion. It has four links and four turning pairs. Its mobility is 3(4 &minus; 1) &minus; 2(4) = 1. The links are named: the <b>frame</b> (fixed link), the <b>crank</b> (a link that can make a complete revolution), the <b>rocker</b> or <b>lever</b> (a link that only oscillates) and the <b>coupler</b> (the link joining the crank to the rocker, which has complex motion).</p><p><b>Grashof's law</b> decides whether a crank exists. For a four-bar chain with link lengths s (shortest), l (longest) and p, q (the other two),</p><span class="eq">s + l &le; p + q</span><p>If this condition is satisfied at least one link can make a full revolution, and by fixing different links we get: a <b>crank-rocker</b> (fix the link adjacent to the shortest), a <b>double-crank</b> or drag-link (fix the shortest link itself), and a <b>double-rocker</b> (fix the link opposite the shortest). If s + l &gt; p + q, no link can make a full revolution and only a double-rocker is possible.</p><h4>Slider-crank chain</h4><p>This chain has three turning pairs and one sliding pair. It converts rotary motion into reciprocating motion or the reverse. Its inversions are: the <b>reciprocating engine</b> (crank rotates, slider reciprocates), the <b>Whitworth quick-return mechanism</b> and the <b>oscillating cylinder engine</b> (the cylinder itself oscillates).</p><h4>Double slider-crank chain</h4><p>This chain has two sliding pairs and two turning pairs. Its inversions are the <b>elliptical trammel</b> (draws an ellipse), the <b>Scotch yoke</b> (converts rotation into exact simple harmonic motion) and <b>Oldham's coupling</b> (connects two parallel but slightly offset shafts).</p><div class="tbl-scroll"><table><caption>Table 8.1 &mdash; Kinematic chains and their inversions</caption><thead><tr><th>Chain</th><th class="num">Links</th><th>Pairs</th><th class="num">DOF</th><th>Inversions</th></tr></thead><tbody><tr><td>Four-bar chain</td><td class="num">4</td><td>4 turning</td><td class="num">1</td><td>Crank-rocker, double-crank, double-rocker</td></tr><tr><td>Single slider-crank</td><td class="num">4</td><td>3 turning + 1 sliding</td><td class="num">1</td><td>Engine mechanism, Whitworth quick return, oscillating cylinder engine, crank and slotted lever</td></tr><tr><td>Double slider-crank</td><td class="num">4</td><td>2 turning + 2 sliding</td><td class="num">1</td><td>Elliptical trammel, Scotch yoke, Oldham coupling</td></tr></tbody></table></div><h3 id="sec2"><span class="sec-no">2.</span>Cams and Followers</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>cam</b> is a machine member with a shaped profile that, by direct contact, imparts a predetermined motion to another member called the <b>follower</b>. A cam converts uniform rotary motion into a precisely programmed linear or oscillating motion.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="240" y="24" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(a) Cam and follower &mdash; construction</text><polygon points="324.5,165.0 326.6,174.1 327.2,183.5 326.3,193.0 323.7,202.3 319.7,211.0 314.2,218.9 307.4,225.7 299.6,231.2 291.2,235.4 282.2,238.2 273.2,239.6 264.3,239.7 255.7,238.8 247.6,237.0 240.0,234.5 233.0,231.6 226.5,228.4 220.4,225.2 214.6,221.9 209.0,218.7 203.6,215.2 198.5,211.1 193.9,206.5 189.8,201.4 186.3,196.0 183.4,190.2 181.0,184.2 179.4,177.9 178.3,171.5 178.0,165.0 178.3,158.5 179.4,152.1 181.0,145.8 183.4,139.8 186.3,134.0 189.8,128.6 193.9,123.5 198.5,118.9 203.6,114.8 209.0,111.3 214.8,108.4 220.8,106.0 227.1,104.4 233.5,103.3 240.0,103.0 246.5,103.3 252.9,104.4 259.2,106.0 265.2,108.4 271.0,111.3 276.6,114.6 282.4,118.0 288.2,121.6 294.2,125.6 300.2,130.2 306.1,135.6 311.7,141.7 316.9,148.7 321.2,156.5" fill="#f2d9b8" stroke="#8a5a1c" stroke-width="2"/><circle cx="240" cy="165" r="8" class="cmp-f"/><text x="262" y="168" font-size="10.5" fill="#5b6b7c" text-anchor="start">shaft</text><path d="M 285 118 A 55 55 0 0 1 296 158" class="lnk" marker-end="url(#ah)"/><text x="318" y="140" font-size="10.5" fill="#5b6b7c" text-anchor="start">cam rotation</text><line x1="240" y1="78" x2="240" y2="40" class="cmp" stroke-width="3"/><circle cx="240" cy="78" r="12" class="mech2"/><rect x="228" y="30" width="24" height="12" rx="8" class="mech"/><text x="290" y="60" font-size="10.5" fill="#5b6b7c" text-anchor="start">roller follower</text><polyline points="240,26 240,10" class="lnk" marker-end="url(#ah)"/><text x="150" y="250" font-size="10.5" fill="#a8232a" text-anchor="middle">base circle</text><text x="300" y="100" font-size="10.5" fill="#a8232a" text-anchor="middle">nose</text><text x="330" y="205" font-size="10.5" fill="#a8232a" text-anchor="middle">flank</text><path d="M 152 242 L 178 214" class="lnk-d" marker-end="url(#ah)"/><path d="M 300 108 L 288 128" class="lnk-d" marker-end="url(#ah)"/><text x="665" y="24" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(b) Follower displacement diagram</text><rect x="500" y="45" width="340" height="200" rx="6" class="t-box"/><line x1="535" y1="215" x2="535" y2="65" class="ax" marker-end="url(#ah)"/><line x1="535" y1="215" x2="815" y2="215" class="ax" marker-end="url(#ah)"/><text x="821" y="219" font-size="11.5" fill="#5b6b7c" text-anchor="start">cam angle &#952;</text><text x="529" y="59" font-size="11.5" fill="#5b6b7c" text-anchor="start">follower lift S</text><polyline points="535.0,215.0 544.3,214.8 553.6,214.2 562.9,213.3 572.2,212.0 581.5,210.3 590.8,208.3 600.1,206.0 609.4,203.4 618.7,200.6 628.0,197.5 637.3,194.2 646.6,190.8 655.9,187.3 665.2,183.7 674.5,180.0 683.8,176.3 693.1,172.7 702.4,169.2 711.7,165.8 721.0,162.5 730.3,159.4 739.6,156.6 748.9,154.0 758.2,151.7 767.5,149.7 776.8,148.0 786.1,146.7 795.4,145.8 804.7,145.2 814.0,145.0" fill="none" stroke="#0f5fa8" stroke-width="2"/><line x1="535" y1="145" x2="815" y2="145" class="ax" stroke-dasharray="6 4"/><text x="822" y="148" font-size="11.5" fill="#5b6b7c" text-anchor="start">h</text><text x="600" y="96" font-size="10.5" fill="#0f5fa8" text-anchor="start">rise (outstroke)</text><text x="742" y="190" font-size="10.5" fill="#a8232a" text-anchor="start">return (instroke)</text><text x="665" y="268" font-size="11" fill="#5b6b7c" text-anchor="middle">dwell periods appear as flat portions of the curve</text></svg></div><figcaption><b>Fig. 1:</b> A radial cam with a roller follower (left) and the corresponding follower displacement diagram (right) showing rise, dwell and return.</figcaption></figure><h4>Cam terminology</h4><ul><li><b>Base circle</b> &mdash; the smallest circle, centred on the cam shaft, that touches the cam profile. The cam is designed starting from this circle.</li><li><b>Trace point</b> &mdash; a reference point on the follower used to generate the pitch curve.</li><li><b>Pitch curve</b> &mdash; the path traced by the trace point when the cam is held fixed and the follower is rotated about it.</li><li><b>Prime circle</b> &mdash; the smallest circle from the cam centre that touches the pitch curve.</li><li><b>Lift or stroke (h)</b> &mdash; the maximum travel of the follower.</li><li><b>Nose</b> &mdash; the point of maximum radius on the cam.</li><li><b>Flank</b> &mdash; the surface joining the base circle to the nose.</li><li><b>Pressure angle</b> &mdash; the angle between the direction of follower motion and the normal to the pitch curve. A large pressure angle causes jamming and excessive side thrust; it is normally kept below 30&deg;.</li><li><b>Cam angle (&#952;)</b> &mdash; the angle through which the cam rotates during a particular phase of follower motion.</li><li><b>Outstroke (rise)</b> &mdash; the period during which the follower moves away from the cam centre.</li><li><b>Instroke (return)</b> &mdash; the period during which the follower moves towards the cam centre.</li><li><b>Dwell</b> &mdash; the period during which the follower remains stationary while the cam continues to rotate.</li></ul><h4>Types of cam</h4><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 230" width="880" height="230" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Types of cams and followers</text><text x="140" y="60" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Radial (disc) cam</text><circle cx="140" cy="135" r="48" class="mech2"/><path d="M 140 87 q 46 20 20 90" fill="none" stroke="#8a5a1c" stroke-width="2"/><circle cx="140" cy="135" r="7" class="cmp-f"/><line x1="140" y1="87" x2="140" y2="62" class="cmp" stroke-width="3"/><text x="360" y="60" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Cylindrical cam</text><rect x="305" y="95" width="110" height="80" rx="8" class="mech2"/><ellipse cx="360" cy="95" rx="55" ry="14" fill="#e6c79c" stroke="#8a5a1c" stroke-width="1.6"/><ellipse cx="360" cy="175" rx="55" ry="14" fill="none" stroke="#8a5a1c" stroke-width="1.6"/><path d="M 320 105 C 350 150, 380 120, 405 165" class="cmp" stroke-width="2.4"/><text x="580" y="60" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Wedge cam</text><polygon points="540,175 640,175 640,110" fill="#f2d9b8" stroke="#8a5a1c" stroke-width="2"/><polyline points="640,142 676,142" class="lnk" marker-end="url(#ah)"/><text x="790" y="60" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Followers</text><line x1="760" y1="90" x2="760" y2="130" class="cmp" stroke-width="3"/><line x1="745" y1="130" x2="775" y2="130" class="cmp" stroke-width="3"/><text x="790" y="118" font-size="10.5" fill="#5b6b7c" text-anchor="start">knife edge</text><line x1="810" y1="150" x2="810" y2="186" class="cmp" stroke-width="3"/><circle cx="810" cy="194" r="9" class="mech2"/><text x="760" y="210" font-size="10.5" fill="#5b6b7c" text-anchor="middle">roller</text></svg></div><figcaption><b>Fig. 2:</b> Common cam forms: radial (disc) cam, cylindrical cam and wedge cam; and the knife-edge and roller followers.</figcaption></figure><ul><li><b>Radial or disc cam</b> &mdash; the follower moves in a plane perpendicular to the cam axis. The most common type.</li><li><b>Cylindrical or barrel cam</b> &mdash; a groove is cut on the surface of a cylinder and the follower rides in the groove. Used where space is limited and positive drive in both directions is needed.</li><li><b>Wedge or plate cam</b> &mdash; a straight inclined plate that translates and pushes the follower.</li><li><b>Face cam</b> &mdash; the groove is cut on the flat face of a disc.</li></ul><h4>Types of follower</h4><ul><li><b>Knife-edge follower</b> &mdash; simplest, but wears very quickly because of the high contact stress. Rarely used in practice.</li><li><b>Roller follower</b> &mdash; a roller rotates on a pin, giving rolling contact and much less wear. Most widely used.</li><li><b>Flat-faced (mushroom) follower</b> &mdash; a flat surface in contact with the cam; good for high speeds and light loads, but needs perfect alignment.</li><li><b>Spherical-faced follower</b> &mdash; a curved face that tolerates small misalignments.</li><li><b>Radial follower</b> &mdash; its axis passes through the cam centre. <b>Offset follower</b> &mdash; its axis is offset, which reduces the pressure angle in one direction.</li></ul><h4>Follower motion programs</h4><p>The shape of the displacement curve decides the velocity, acceleration and therefore the forces and vibration. The standard motion programs are:</p><ul><li><b>Uniform velocity (constant slope)</b> &mdash; the simplest, but the acceleration is theoretically infinite at the ends, causing rigid shocks. Not used in practice except at very low speeds.</li><li><b>Simple harmonic motion (SHM)</b> &mdash; smooth and easy to draw; the acceleration is finite but changes suddenly at the ends, causing a soft jerk at each end. Suitable for medium speeds.</li><li><b>Uniform acceleration and retardation (parabolic)</b> &mdash; the acceleration is constant during the first half and constant in the opposite sense during the second half. Gives the lowest maximum acceleration for a given lift and time, so it is preferred for medium to high speeds.</li><li><b>Cycloidal motion</b> &mdash; the smoothest of all; both velocity and acceleration start and end at zero, so there is no jerk at all. Used for very high speeds.</li><li><b>Dwell-rise-dwell-return-dwell (DRD)</b> &mdash; the general pattern of most practical cam profiles.</li></ul><h4>Cam applications</h4><p>Cams are used wherever a motion has to be repeated exactly, cycle after cycle: the valve gear of internal combustion engines (the most important application), automatic lathes and screw machines, textile machinery, printing presses, packaging machines, toys, windshield wipers, and the feeding mechanism of machine guns. In mechatronics a cam is sometimes replaced by a servo motor running a programmed motion profile, but cams remain unbeatable where very high speed and very low cost are required.</p><div class="note"><span class="tag">Note</span><p>A cam and follower form a <b>higher pair</b> because contact is along a line (or a point). The contact is maintained by a spring, by gravity or by a positive groove (as in a cylindrical cam).</p></div><h3 id="sec3"><span class="sec-no">3.</span>Gears</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>gear</b> is a toothed wheel that meshes with another toothed wheel (or with a rack) to transmit motion and power between shafts with a definite velocity ratio and without slip. Gearing is called a <b>positive drive</b> for this reason.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Common gear types and their shaft arrangement</text><text x="115" y="62" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Spur</text><g transform="rotate(0,85,145)"><circle cx="85" cy="145" r="37.44" fill="#fff" stroke="#8a5a1c" stroke-width="1.4"/><polygon points="124.8,137.4 136.1,135.3 136.1,154.7 124.8,152.6" class="mech2"/><polygon points="124.2,155.4 135.2,158.4 126.8,175.9 117.6,169.1" class="mech2"/><polygon points="115.8,171.4 124.5,178.9 109.2,191.0 103.9,180.9" class="mech2"/><polygon points="101.3,182.2 105.9,192.6 86.9,197.0 86.5,185.5" class="mech2"/><polygon points="83.5,185.5 83.1,197.0 64.1,192.6 68.7,182.2" class="mech2"/><polygon points="66.1,180.9 60.8,191.0 45.5,178.9 54.2,171.4" class="mech2"/><polygon points="52.4,169.1 43.2,175.9 34.8,158.4 45.8,155.4" class="mech2"/><polygon points="45.2,152.6 33.9,154.7 33.9,135.3 45.2,137.4" class="mech2"/><polygon points="45.8,134.6 34.8,131.6 43.2,114.1 52.4,120.9" class="mech2"/><polygon points="54.2,118.6 45.5,111.1 60.8,99.0 66.1,109.1" class="mech2"/><polygon points="68.7,107.8 64.1,97.4 83.1,93.0 83.5,104.5" class="mech2"/><polygon points="86.5,104.5 86.9,93.0 105.9,97.4 101.3,107.8" class="mech2"/><polygon points="103.9,109.1 109.2,99.0 124.5,111.1 115.8,118.6" class="mech2"/><polygon points="117.6,120.9 126.8,114.1 135.2,131.6 124.2,134.6" class="mech2"/><circle cx="85" cy="145" r="40.56" fill="none" stroke="#8a5a1c" stroke-width="1.4"/><circle cx="85" cy="145" r="7" class="cmp-f"/></g><g transform="rotate(20,160,145)"><circle cx="160" cy="145" r="24.48" fill="#fff" stroke="#8a5a1c" stroke-width="1.4"/><polygon points="185.4,137.3 192.5,135.2 192.5,154.8 185.4,152.7" class="mech2"/><polygon points="184.4,155.4 191.3,158.4 178.6,173.4 174.5,167.2" class="mech2"/><polygon points="172.0,168.7 175.3,175.3 156.0,178.8 156.9,171.3" class="mech2"/><polygon points="153.9,170.8 152.2,178.1 135.2,168.3 140.7,163.2" class="mech2"/><polygon points="138.8,160.9 132.8,165.4 126.1,146.9 133.5,146.5" class="mech2"/><polygon points="133.5,143.5 126.1,143.1 132.8,124.6 138.8,129.1" class="mech2"/><polygon points="140.7,126.8 135.2,121.7 152.2,111.9 153.9,119.2" class="mech2"/><polygon points="156.9,118.7 156.0,111.2 175.3,114.7 172.0,121.3" class="mech2"/><polygon points="174.5,122.8 178.6,116.6 191.3,131.6 184.4,134.6" class="mech2"/><circle cx="160" cy="145" r="26.52" fill="none" stroke="#8a5a1c" stroke-width="1.4"/><circle cx="160" cy="145" r="7" class="cmp-f"/></g><text x="115" y="230" font-size="10.5" fill="#5b6b7c" text-anchor="middle">parallel shafts</text><text x="315" y="62" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Helical</text><circle cx="290" cy="145" r="46" class="mech2"/><circle cx="352" cy="145" r="34" class="mech2"/><line x1="258" y1="112" x2="270" y2="178" stroke="#8a5a1c" stroke-width="1.6"/><line x1="274" y1="112" x2="286" y2="178" stroke="#8a5a1c" stroke-width="1.6"/><line x1="290" y1="112" x2="302" y2="178" stroke="#8a5a1c" stroke-width="1.6"/><line x1="306" y1="112" x2="318" y2="178" stroke="#8a5a1c" stroke-width="1.6"/><line x1="322" y1="112" x2="334" y2="178" stroke="#8a5a1c" stroke-width="1.6"/><text x="315" y="230" font-size="10.5" fill="#5b6b7c" text-anchor="middle">parallel shafts, quieter</text><text x="505" y="62" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Bevel</text><polygon points="470,120 540,150 470,180" class="mech2"/><polygon points="560,105 528,168 592,168" class="mech3"/><line x1="470" y1="150" x2="440" y2="150" class="cmp" stroke-width="3"/><line x1="560" y1="168" x2="560" y2="205" class="cmp" stroke-width="3"/><text x="505" y="230" font-size="10.5" fill="#5b6b7c" text-anchor="middle">intersecting shafts (90&#176;)</text><text x="700" y="62" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Worm &amp; wheel</text><rect x="655" y="100" width="96" height="28" rx="8" class="mech2"/><line x1="662" y1="100" x2="674" y2="128" stroke="#8a5a1c" stroke-width="1.8"/><line x1="677" y1="100" x2="689" y2="128" stroke="#8a5a1c" stroke-width="1.8"/><line x1="692" y1="100" x2="704" y2="128" stroke="#8a5a1c" stroke-width="1.8"/><line x1="707" y1="100" x2="719" y2="128" stroke="#8a5a1c" stroke-width="1.8"/><line x1="722" y1="100" x2="734" y2="128" stroke="#8a5a1c" stroke-width="1.8"/><line x1="737" y1="100" x2="749" y2="128" stroke="#8a5a1c" stroke-width="1.8"/><g transform="rotate(0,703,178)"><circle cx="703" cy="178" r="31.68" fill="#fff" stroke="#8a5a1c" stroke-width="1.4"/><polygon points="736.9,172.4 746.4,170.8 746.4,185.2 736.9,183.6" class="mech3"/><polygon points="736.4,185.7 745.9,187.9 740.3,201.3 732.1,196.2" class="mech3"/><polygon points="730.9,198.0 738.8,203.6 728.6,213.8 723.0,205.9" class="mech3"/><polygon points="721.2,207.1 726.3,215.3 712.9,220.9 710.7,211.4" class="mech3"/><polygon points="708.6,211.9 710.2,221.4 695.8,221.4 697.4,211.9" class="mech3"/><polygon points="695.3,211.4 693.1,220.9 679.7,215.3 684.8,207.1" class="mech3"/><polygon points="683.0,205.9 677.4,213.8 667.2,203.6 675.1,198.0" class="mech3"/><polygon points="673.9,196.2 665.7,201.3 660.1,187.9 669.6,185.7" class="mech3"/><polygon points="669.1,183.6 659.6,185.2 659.6,170.8 669.1,172.4" class="mech3"/><polygon points="669.6,170.3 660.1,168.1 665.7,154.7 673.9,159.8" class="mech3"/><polygon points="675.1,158.0 667.2,152.4 677.4,142.2 683.0,150.1" class="mech3"/><polygon points="684.8,148.9 679.7,140.7 693.1,135.1 695.3,144.6" class="mech3"/><polygon points="697.4,144.1 695.8,134.6 710.2,134.6 708.6,144.1" class="mech3"/><polygon points="710.7,144.6 712.9,135.1 726.3,140.7 721.2,148.9" class="mech3"/><polygon points="723.0,150.1 728.6,142.2 738.8,152.4 730.9,158.0" class="mech3"/><polygon points="732.1,159.8 740.3,154.7 745.9,168.1 736.4,170.3" class="mech3"/><circle cx="703" cy="178" r="34.32" fill="none" stroke="#8a5a1c" stroke-width="1.4"/><circle cx="703" cy="178" r="7" class="cmp-f"/></g><line x1="640" y1="114" x2="655" y2="114" class="cmp" stroke-width="3"/><text x="700" y="248" font-size="10.5" fill="#5b6b7c" text-anchor="middle">non-intersecting, perpendicular,</text><text x="700" y="262" font-size="10.5" fill="#5b6b7c" text-anchor="middle">high reduction, self-locking</text></svg></div><figcaption><b>Fig. 3:</b> Spur, helical, bevel and worm gears, and the shaft arrangements each one serves.</figcaption></figure><h4>Gear terminology</h4><ul><li><b>Pitch circle</b> &mdash; the imaginary circle which, by pure rolling, would give the same motion as the actual toothed wheel.</li><li><b>Pitch circle diameter (D)</b> &mdash; the diameter of that circle; the size of a gear is specified by it.</li><li><b>Module (m)</b> &mdash; the ratio of the pitch circle diameter in millimetres to the number of teeth: m = D/T. Two gears mesh correctly only if they have the same module.</li><li><b>Diametral pitch</b> &mdash; the number of teeth per inch of pitch diameter (used in imperial practice).</li><li><b>Circular pitch (p<sub>c</sub>)</b> &mdash; the distance along the pitch circle from a point on one tooth to the same point on the next tooth: p<sub>c</sub> = &#960;D/T = &#960;m.</li><li><b>Addendum</b> &mdash; the height of the tooth above the pitch circle (usually equal to m). <b>Dedendum</b> &mdash; the depth below the pitch circle (usually 1.15 m to 1.25 m).</li><li><b>Clearance</b> &mdash; the radial gap between the tip of one tooth and the root of the mating tooth.</li><li><b>Face width</b> &mdash; the width of the gear measured along the axis.</li><li><b>Pressure angle (&#966;)</b> &mdash; the angle between the common normal to the tooth surfaces at the point of contact and the common tangent to the pitch circles. Standard values are 14.5&deg;, 20&deg; and 25&deg;; 20&deg; is most common today.</li><li><b>Backlash</b> &mdash; the small gap between mating teeth that allows for lubrication, thermal expansion and manufacturing error. It is the cause of lost motion when the direction of rotation is reversed.</li><li><b>Involute profile</b> &mdash; the curve used for almost all modern gear teeth. Its great advantage is that the velocity ratio remains constant even if the centre distance between the shafts changes slightly, and it is easy to manufacture.</li></ul><h4>Gear velocity ratio</h4><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Gear train &mdash; speed and torque relationship</text><g transform="rotate(0,200,130)"><polygon points="232.8,122.7 241.0,120.8 241.0,139.2 232.8,137.3" class="mech2"/><polygon points="232.1,140.0 240.1,142.6 230.9,158.4 224.7,152.7" class="mech2"/><polygon points="222.7,154.7 228.4,160.9 212.6,170.1 210.0,162.1" class="mech2"/><polygon points="207.3,162.8 209.2,171.0 190.8,171.0 192.7,162.8" class="mech2"/><polygon points="190.0,162.1 187.4,170.1 171.6,160.9 177.3,154.7" class="mech2"/><polygon points="175.3,152.7 169.1,158.4 159.9,142.6 167.9,140.0" class="mech2"/><polygon points="167.2,137.3 159.0,139.2 159.0,120.8 167.2,122.7" class="mech2"/><polygon points="167.9,120.0 159.9,117.4 169.1,101.6 175.3,107.3" class="mech2"/><polygon points="177.3,105.3 171.6,99.1 187.4,89.9 190.0,97.9" class="mech2"/><polygon points="192.7,97.2 190.8,89.0 209.2,89.0 207.3,97.2" class="mech2"/><polygon points="210.0,97.9 212.6,89.9 228.4,99.1 222.7,105.3" class="mech2"/><polygon points="224.7,107.3 230.9,101.6 240.1,117.4 232.1,120.0" class="mech2"/><circle cx="200" cy="130" r="33.6" fill="#fff" stroke="#8a5a1c" stroke-width="1.4"/><circle cx="200" cy="130" r="7" class="cmp-f"/></g><g transform="rotate(7.5,310,130)"><polygon points="376.8,122.6 393.5,120.8 393.5,139.2 376.8,137.4" class="mech2"/><polygon points="376.4,140.2 393.0,142.7 388.3,160.5 372.6,154.4" class="mech2"/><polygon points="371.5,157.0 386.9,163.8 377.7,179.7 364.2,169.8" class="mech2"/><polygon points="362.4,172.0 375.6,182.5 362.5,195.6 352.0,182.4" class="mech2"/><polygon points="349.8,184.2 359.7,197.7 343.8,206.9 337.0,191.5" class="mech2"/><polygon points="334.4,192.6 340.5,208.3 322.7,213.0 320.2,196.4" class="mech2"/><polygon points="317.4,196.8 319.2,213.5 300.8,213.5 302.6,196.8" class="mech2"/><polygon points="299.8,196.4 297.3,213.0 279.5,208.3 285.6,192.6" class="mech2"/><polygon points="283.0,191.5 276.2,206.9 260.3,197.7 270.2,184.2" class="mech2"/><polygon points="268.0,182.4 257.5,195.6 244.4,182.5 257.6,172.0" class="mech2"/><polygon points="255.8,169.8 242.3,179.7 233.1,163.8 248.5,157.0" class="mech2"/><polygon points="247.4,154.4 231.7,160.5 227.0,142.7 243.6,140.2" class="mech2"/><polygon points="243.2,137.4 226.5,139.2 226.5,120.8 243.2,122.6" class="mech2"/><polygon points="243.6,119.8 227.0,117.3 231.7,99.5 247.4,105.6" class="mech2"/><polygon points="248.5,103.0 233.1,96.2 242.3,80.3 255.8,90.2" class="mech2"/><polygon points="257.6,88.0 244.4,77.5 257.5,64.4 268.0,77.6" class="mech2"/><polygon points="270.2,75.8 260.3,62.3 276.2,53.1 283.0,68.5" class="mech2"/><polygon points="285.6,67.4 279.5,51.7 297.3,47.0 299.8,63.6" class="mech2"/><polygon points="302.6,63.2 300.8,46.5 319.2,46.5 317.4,63.2" class="mech2"/><polygon points="320.2,63.6 322.7,47.0 340.5,51.7 334.4,67.4" class="mech2"/><polygon points="337.0,68.5 343.8,53.1 359.7,62.3 349.8,75.8" class="mech2"/><polygon points="352.0,77.6 362.5,64.4 375.6,77.5 362.4,88.0" class="mech2"/><polygon points="364.2,90.2 377.7,80.3 386.9,96.2 371.5,103.0" class="mech2"/><polygon points="372.6,105.6 388.3,99.5 393.0,117.3 376.4,119.8" class="mech2"/><circle cx="310" cy="130" r="67.2" fill="#fff" stroke="#8a5a1c" stroke-width="1.4"/><circle cx="310" cy="130" r="7" class="cmp-f"/></g><text x="200" y="68" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">driver</text><text x="200" y="86" font-size="11" fill="#5b6b7c" text-anchor="middle">N1 = 1200 rpm</text><text x="200" y="200" font-size="11" fill="#0f5fa8" text-anchor="middle">T1 = 12 teeth</text><text x="310" y="44" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">driven</text><text x="310" y="240" font-size="11" fill="#0f5fa8" text-anchor="middle">T2 = 24 teeth</text><path d="M 228 100 A 46 46 0 0 1 240 128" class="lnk" marker-end="url(#ah)"/><path d="M 340 96 A 92 92 0 0 0 322 62" class="lnk" marker-end="url(#ah)"/><text x="255" y="88" font-size="12" fill="#a8232a" text-anchor="start" font-weight="700">&#969;1</text><text x="300" y="58" font-size="11" fill="#a8232a" text-anchor="start" font-weight="700">&#969;2 (opposite)</text><rect x="470" y="60" width="380" height="130" rx="8" class="t-box2"/><text x="660" y="88" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Velocity (gear) ratio</text><text x="660" y="116" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700" font-family="Consolas,Menlo,monospace">i = N1 / N2 = T2 / T1 = D2 / D1</text><text x="660" y="144" font-size="11" fill="#5b6b7c" text-anchor="middle">Power is conserved (neglecting losses):</text><text x="660" y="168" font-size="13" fill="#12283d" text-anchor="middle" font-weight="600">T1&#969;1 = T2&#969;2   &rarr;   speed &#8595; means torque &#8593;</text><text x="440" y="222" font-size="11.5" fill="#12283d" text-anchor="middle">Here i = 24/12 = 2, so N2 = 1200/2 = 600 rpm and the output torque is doubled.</text></svg></div><figcaption><b>Fig. 4:</b> A simple gear train. The speed ratio is the inverse of the tooth-count ratio, and the output torque changes in the opposite sense.</figcaption></figure><span class="eq">N<sub>1</sub> / N<sub>2</sub> = T<sub>2</sub> / T<sub>1</sub> = D<sub>2</sub> / D<sub>1</sub></span><p>where N is the speed in rpm, T the number of teeth and D the pitch circle diameter. Subscript 1 refers to the driver and 2 to the driven gear. Since power is conserved apart from friction losses,</p><span class="eq">T<sub>1</sub> &#969;<sub>1</sub> = T<sub>2</sub> &#969;<sub>2</sub>     (torque &times; angular speed = constant)</span><p>Therefore <b>gearing up the speed reduces the torque in the same proportion, and gearing down the speed increases the torque</b>. This is the single most important fact about gears in mechatronics, because electric motors naturally run fast with low torque whereas robot joints need slow motion with high torque.</p><p>In a <b>compound gear train</b>, two or more gears are fixed on the same shaft, and the overall ratio is the product of the individual stage ratios. In an <b>epicyclic (planetary) gear train</b>, gears rotate about a moving arm; this gives very large reduction ratios in a compact space and is used in automatic gearboxes, hub motors and robot joints. A <b>reverted gear train</b> is one in which the axes of the first and last gears are co-axial, as in a clock or a manual gearbox.</p><h4>Types of gears and their uses</h4><div class="tbl-scroll"><table><caption>Table 8.2 &mdash; Gear types</caption><thead><tr><th>Type</th><th>Shaft arrangement</th><th>Features</th><th>Typical application</th></tr></thead><tbody><tr><td>Spur gear</td><td>Parallel</td><td>Teeth straight and parallel to the axis; simplest and cheapest; noisy at high speed; no axial thrust</td><td>Gearboxes, clocks, conveyors, machine tools</td></tr><tr><td>Helical gear</td><td>Parallel</td><td>Teeth cut at an angle; smoother and quieter; higher load capacity; produces axial thrust needing thrust bearings</td><td>Automobile gearboxes, high-speed drives, turbines</td></tr><tr><td>Herringbone / double helical</td><td>Parallel</td><td>Two opposite helices on one wheel, cancelling axial thrust</td><td>Heavy rolling mill drives</td></tr><tr><td>Bevel gear</td><td>Intersecting (usually 90&deg;)</td><td>Teeth on a conical surface; straight, spiral or Zerol forms</td><td>Differentials, hand drills, printing presses</td></tr><tr><td>Worm and worm wheel</td><td>Non-intersecting, perpendicular</td><td>Very high reduction (up to 300:1) in one stage; self-locking; low efficiency (40 to 70 %) and generates heat</td><td>Lifts, conveyors, valve actuators, tuning mechanisms</td></tr><tr><td>Rack and pinion</td><td>Rotary to linear</td><td>A straight gear meshes with a round one</td><td>Car steering, lathe traverse, sliding gates, robot joints</td></tr><tr><td>Internal gear</td><td>Parallel, same direction</td><td>Teeth on the inside of a ring; used in planetary trains</td><td>Automatic transmissions, robot reducers</td></tr><tr><td>Non-circular gear</td><td>Parallel, variable ratio</td><td>Deliberately varying speed ratio</td><td>Textile machinery, press feeds</td></tr></tbody></table></div><h4>Advantages and disadvantages of gear drives</h4><ul><li><b>Advantages:</b> positive drive with no slip, so an exact and constant velocity ratio; can transmit very large power; compact for short centre distances; high efficiency (95 % to 99 %); long life; can be used for a wide range of speed and torque.</li><li><b>Disadvantages:</b> require accurate manufacturing and precise alignment; need lubrication and a sealed housing; noisy at high speed; backlash causes lost motion and positioning error; sudden overload can break teeth; cannot be used for very long centre distances; there is no protection against shock loads.</li></ul><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> A motor running at 1440 rpm drives a 15-tooth pinion which meshes with a 60-tooth gear. On the same shaft as the 60-tooth gear is a 20-tooth pinion driving a 80-tooth output gear. Find the output speed. Stage 1 ratio = 60/15 = 4. Stage 2 ratio = 80/20 = 4. Overall ratio = 16. Output speed = 1440/16 = <b>90 rpm</b>, and the output torque is 16 times the motor torque (less losses).</p></div><h3 id="sec4"><span class="sec-no">4.</span>Ratchet and Pawl</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>ratchet and pawl</b> is a mechanism that allows rotary or linear motion in <b>one direction only</b> and prevents it in the opposite direction. It converts an oscillating input motion into an intermittent rotary motion in one direction.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Ratchet and pawl mechanism</text><polygon points="322.0,140.0 335.0,161.4 315.9,166.9 318.3,191.8 298.7,188.5 290.0,212.0 273.8,200.4 255.8,217.9 246.2,200.4 222.4,208.4 221.3,188.5 196.5,185.3 204.1,166.9 183.1,153.2 198.0,140.0 185.0,118.6 204.1,113.1 201.7,88.2 221.3,91.5 230.0,68.0 246.2,79.6 264.2,62.1 273.8,79.6 297.6,71.6 298.7,91.5 323.5,94.7 315.9,113.1 336.9,126.8" fill="#f2d9b8" stroke="#8a5a1c" stroke-width="2"/><circle cx="260" cy="140" r="12" class="cmp-f"/><circle cx="260" cy="140" r="4" class="dot"/><path d="M 310 88 A 72 72 0 0 1 334 126" class="lnk" marker-end="url(#ah)"/><text x="356" y="100" font-size="11" fill="#a8232a" text-anchor="start">drive direction</text><polygon points="332,116 384,74 390,94 340,134" class="mech3"/><circle cx="386" cy="84" r="7" class="cmp-f"/><text x="412" y="74" font-size="11.5" fill="#12283d" text-anchor="start" font-weight="600">pawl (pivoted)</text><text x="412" y="92" font-size="10.5" fill="#5b6b7c" text-anchor="start">spring keeps it</text><text x="412" y="108" font-size="10.5" fill="#5b6b7c" text-anchor="start">engaged with teeth</text><line x1="378" y1="100" x2="358" y2="132" class="cmp" stroke-width="2"/><text x="440" y="240" font-size="11.5" fill="#12283d" text-anchor="middle">In one direction the pawl rides over the sloping faces and the wheel turns freely; in the opposite direction the pawl jams against the vertical faces and the wheel is locked.</text></svg></div><figcaption><b>Fig. 5:</b> Ratchet wheel and spring-loaded pawl. The wheel turns freely in one direction and is locked in the other.</figcaption></figure><h4>Construction and working</h4><p>The <b>ratchet wheel</b> has teeth with an asymmetric profile: one face is nearly radial (the locking face) and the other is sloped. The <b>pawl</b> (also called a detent or click) is a lever pivoted on the frame and pressed against the teeth by a light spring. When the wheel turns in the permitted direction, the pawl rides up the sloped faces and slips over the teeth, producing the familiar clicking sound. When the wheel tries to turn in the opposite direction, the pawl jams against the radial locking faces and holds the wheel firmly.</p><p>In a typical drive, an oscillating lever carries a <b>driving pawl</b>. On the forward stroke the driving pawl pushes the wheel through one or more teeth; on the return stroke it slips over the teeth while a second <b>holding pawl</b> prevents the wheel from turning back. The result is intermittent motion in one direction.</p><h4>Types</h4><ul><li><b>External ratchet</b> &mdash; teeth on the outside of a wheel; the most common form.</li><li><b>Internal ratchet</b> &mdash; teeth on the inside of a ring.</li><li><b>Silent ratchet</b> &mdash; uses a friction or roller clutch instead of teeth, so there is no clicking and the motion is smooth.</li><li><b>Roller clutch (one-way bearing)</b> &mdash; spring-loaded rollers wedge in a narrowing space to lock in one direction and free-wheel in the other. Very common in modern machines.</li><li><b>Reversible ratchet</b> &mdash; the pawl can be flipped over so that the permitted direction is reversed, as on a socket wrench.</li></ul><h4>Applications</h4><ul><li><b>Preventing back-driving</b> &mdash; in hoists, winches, lifts and jacks, so that the load cannot fall when the operator lets go of the handle.</li><li><b>Feed mechanisms</b> &mdash; the table feed of a shaping machine, film advance in a camera, paper feed in a printer, and the index feed of automatic lathes.</li><li><b>Counting</b> &mdash; in mechanical counters and odometers.</li><li><b>Bicycles</b> &mdash; the freewheel allows the rider to stop pedalling while the bicycle keeps moving.</li><li><b>Socket wrenches and spanners</b> &mdash; the ratchet lets the tool be used in tight spaces without lifting it off the nut.</li><li><b>Watch mechanisms</b>, cable ties, hand-held hole punches and some toy mechanisms.</li></ul><div class="note"><span class="tag">Note</span><p>A ratchet gives <b>discrete</b> steps, so the minimum advance is one tooth pitch. Where finer control is needed, a <b>escapement</b> (as in a clock) or an electronic stepper motor is used instead.</p></div><h3 id="sec5"><span class="sec-no">5.</span>Belt and Chain Drives</h3><h4>Belt drives</h4><div class="defbox"><span class="tag">Definition</span><p>A <b>belt drive</b> transmits rotary motion and power between two parallel shafts by means of a flexible belt running over pulleys, relying on <b>friction</b> between the belt and the pulley surface.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 280" width="880" height="280" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Belt drives</text><text x="160" y="62" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(a) Open belt &mdash; same direction</text><circle cx="105" cy="155" r="42" class="mech2"/><circle cx="225" cy="155" r="24" class="mech2"/><circle cx="105" cy="155" r="7" class="cmp-f"/><circle cx="225" cy="155" r="7" class="cmp-f"/><path d="M 105 113 L 225 131 M 105 197 L 225 179" class="cmp" stroke-width="2.4"/><path d="M 70 130 A 46 46 0 0 0 78 176" class="lnk" marker-end="url(#ah)"/><path d="M 246 138 A 28 28 0 0 1 250 172" class="lnk" marker-end="url(#ah)"/><text x="440" y="62" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(b) Crossed belt &mdash; opposite direction</text><circle cx="390" cy="155" r="40" class="mech2"/><circle cx="500" cy="155" r="24" class="mech2"/><circle cx="390" cy="155" r="7" class="cmp-f"/><circle cx="500" cy="155" r="7" class="cmp-f"/><path d="M 390 115 L 500 179 M 390 195 L 500 131" class="cmp" stroke-width="2.4"/><path d="M 356 132 A 44 44 0 0 0 362 180" class="lnk" marker-end="url(#ah)"/><path d="M 522 140 A 26 26 0 0 0 520 172" class="lnk" marker-end="url(#ah)"/><text x="720" y="62" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(c) V-belt on cone pulleys (variable speed)</text><polygon points="640,110 700,155 640,200" class="mech2"/><polygon points="800,120 740,155 800,190" class="mech2"/><path d="M 668 132 L 772 138 M 668 178 L 772 172" class="cmp" stroke-width="2.4"/><line x1="640" y1="155" x2="610" y2="155" class="cmp" stroke-width="3"/><line x1="800" y1="155" x2="830" y2="155" class="cmp" stroke-width="3"/><text x="720" y="236" font-size="11" fill="#5b6b7c" text-anchor="middle">shifting the belt along the cones changes the speed ratio</text><text x="440" y="264" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Velocity ratio of a belt drive:  N2 / N1 = D1 / D2   (D = pulley diameter). Slip reduces the actual ratio slightly.</text></svg></div><figcaption><b>Fig. 6:</b> Open belt (same direction of rotation), crossed belt (opposite direction) and cone pulleys for step-less speed variation.</figcaption></figure><p>The <b>driver pulley</b> is on the input shaft and the <b>driven or follower pulley</b> is on the output shaft. The side of the belt that pulls is the <b>tight side</b> (tension T<sub>1</sub>) and the returning side is the <b>slack side</b> (tension T<sub>2</sub>). Power is transmitted because T<sub>1</sub> &gt; T<sub>2</sub>.</p><span class="eq">Velocity ratio  N<sub>2</sub> / N<sub>1</sub> = D<sub>1</sub> / D<sub>2</sub>        Power = (T<sub>1</sub> &minus; T<sub>2</sub>) &times; v        Ratio of tensions  T<sub>1</sub>/T<sub>2</sub> = e<sup>&#956;&#952;</sup></span><p>where v is the belt speed in m/s, &#956; is the coefficient of friction and &#952; is the angle of wrap (contact) in radians on the smaller pulley. Increasing the angle of wrap or the friction increases the power that can be transmitted.</p><ul><li><b>Open belt drive</b> &mdash; both shafts rotate in the same direction; used for horizontal or slightly inclined shafts up to about 10 m apart.</li><li><b>Crossed belt drive</b> &mdash; the belt is crossed so the shafts rotate in opposite directions; gives a larger angle of wrap but the belt rubs at the crossing point and wears faster.</li><li><b>Quarter-turn belt</b> &mdash; transmits motion between shafts at 90&deg;.</li><li><b>Cone pulley drive</b> &mdash; a pair of stepped cones with a shifting belt gives a few discrete speeds.</li><li><b>Fast and loose pulley</b> &mdash; used to start and stop a machine shaft without stopping the line shaft.</li></ul><p><b>Types of belt:</b> flat belts (leather, rubberised fabric; used for long centre distances and moderate power), <b>V-belts</b> (trapezoidal section running in a grooved pulley; the wedge action gives much higher friction, so a V-belt transmits more power than a flat belt of the same size &mdash; this is why V-belts are universal in industry), <b>multi-V or ribbed belts</b>, <b>round belts</b> (for light loads and long distances), and <b>timing or synchronous belts</b> (toothed belts that mesh with toothed pulleys and therefore give a positive drive with no slip, used in camshaft drives, 3D printers, CNC machines and robotic axes).</p><ul><li><b>Advantages of belt drives:</b> simple and cheap; absorb shock and vibration, so the drive is smooth and quiet; tolerate some misalignment; act as a safety device because the belt slips if the machine jams; suitable for long centre distances; easy to install and replace.</li><li><b>Disadvantages:</b> slip and creep make the exact velocity ratio uncertain; not a positive drive (except toothed belts); lower efficiency (90 % to 98 %); belts stretch and need periodic re-tensioning; not suitable for very high temperatures or for oil-contaminated places; the belt must be replaced periodically; takes up more space than gears for the same power.</li></ul><p><b>Creep</b> is a different phenomenon from slip. Because the tension is higher on the tight side, the belt stretches slightly more there; as it passes onto the pulley it contracts, causing a small relative movement between belt and pulley surface. Creep is unavoidable and reduces the velocity ratio a little.</p><h4>Chain drives</h4><div class="defbox"><span class="tag">Definition</span><p>A <b>chain drive</b> transmits power between parallel shafts by means of an endless chain of links that engages with the teeth of two <b>sprockets</b>. It is a <b>positive drive</b> because there is no slip.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 240" width="880" height="240" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Chain and sprocket drive</text><circle cx="180" cy="120" r="49.6" class="mech2"/><line x1="228.4" y1="120.0" x2="242.0" y2="120.0" stroke="#8a5a1c" stroke-width="4"/><line x1="225.4" y1="136.5" x2="238.3" y2="141.2" stroke="#8a5a1c" stroke-width="4"/><line x1="217.0" y1="151.1" x2="227.5" y2="159.9" stroke="#8a5a1c" stroke-width="4"/><line x1="204.2" y1="161.9" x2="211.0" y2="173.7" stroke="#8a5a1c" stroke-width="4"/><line x1="188.4" y1="167.6" x2="190.8" y2="181.1" stroke="#8a5a1c" stroke-width="4"/><line x1="171.6" y1="167.6" x2="169.2" y2="181.1" stroke="#8a5a1c" stroke-width="4"/><line x1="155.8" y1="161.9" x2="149.0" y2="173.7" stroke="#8a5a1c" stroke-width="4"/><line x1="143.0" y1="151.1" x2="132.5" y2="159.9" stroke="#8a5a1c" stroke-width="4"/><line x1="134.6" y1="136.5" x2="121.7" y2="141.2" stroke="#8a5a1c" stroke-width="4"/><line x1="131.6" y1="120.0" x2="118.0" y2="120.0" stroke="#8a5a1c" stroke-width="4"/><line x1="134.6" y1="103.5" x2="121.7" y2="98.8" stroke="#8a5a1c" stroke-width="4"/><line x1="143.0" y1="88.9" x2="132.5" y2="80.1" stroke="#8a5a1c" stroke-width="4"/><line x1="155.8" y1="78.1" x2="149.0" y2="66.3" stroke="#8a5a1c" stroke-width="4"/><line x1="171.6" y1="72.4" x2="169.2" y2="58.9" stroke="#8a5a1c" stroke-width="4"/><line x1="188.4" y1="72.4" x2="190.8" y2="58.9" stroke="#8a5a1c" stroke-width="4"/><line x1="204.2" y1="78.1" x2="211.0" y2="66.3" stroke="#8a5a1c" stroke-width="4"/><line x1="217.0" y1="88.9" x2="227.5" y2="80.1" stroke="#8a5a1c" stroke-width="4"/><line x1="225.4" y1="103.5" x2="238.3" y2="98.8" stroke="#8a5a1c" stroke-width="4"/><circle cx="180" cy="120" r="7" class="cmp-f"/><circle cx="470" cy="120" r="30.400000000000002" class="mech2"/><line x1="499.6" y1="120.0" x2="508.0" y2="120.0" stroke="#8a5a1c" stroke-width="4"/><line x1="494.9" y1="136.0" x2="502.0" y2="140.5" stroke="#8a5a1c" stroke-width="4"/><line x1="482.3" y1="147.0" x2="485.8" y2="154.6" stroke="#8a5a1c" stroke-width="4"/><line x1="465.8" y1="149.3" x2="464.6" y2="157.6" stroke="#8a5a1c" stroke-width="4"/><line x1="450.6" y1="142.4" x2="445.1" y2="148.7" stroke="#8a5a1c" stroke-width="4"/><line x1="441.6" y1="128.4" x2="433.5" y2="130.7" stroke="#8a5a1c" stroke-width="4"/><line x1="441.6" y1="111.6" x2="433.5" y2="109.3" stroke="#8a5a1c" stroke-width="4"/><line x1="450.6" y1="97.6" x2="445.1" y2="91.3" stroke="#8a5a1c" stroke-width="4"/><line x1="465.8" y1="90.7" x2="464.6" y2="82.4" stroke="#8a5a1c" stroke-width="4"/><line x1="482.3" y1="93.0" x2="485.8" y2="85.4" stroke="#8a5a1c" stroke-width="4"/><line x1="494.9" y1="104.0" x2="502.0" y2="99.5" stroke="#8a5a1c" stroke-width="4"/><circle cx="470" cy="120" r="7" class="cmp-f"/><path d="M 180 58 L 470 82 M 180 182 L 470 158" class="cmp" stroke-width="3"/><rect x="200" y="62.0" width="20" height="9" rx="2" class="mech3"/><rect x="200" y="170.0" width="20" height="9" rx="2" class="mech3"/><rect x="232" y="64.4" width="20" height="9" rx="2" class="mech3"/><rect x="232" y="167.6" width="20" height="9" rx="2" class="mech3"/><rect x="264" y="66.8" width="20" height="9" rx="2" class="mech3"/><rect x="264" y="165.2" width="20" height="9" rx="2" class="mech3"/><rect x="296" y="69.2" width="20" height="9" rx="2" class="mech3"/><rect x="296" y="162.8" width="20" height="9" rx="2" class="mech3"/><rect x="328" y="71.6" width="20" height="9" rx="2" class="mech3"/><rect x="328" y="160.4" width="20" height="9" rx="2" class="mech3"/><rect x="360" y="74.0" width="20" height="9" rx="2" class="mech3"/><rect x="360" y="158.0" width="20" height="9" rx="2" class="mech3"/><rect x="392" y="76.4" width="20" height="9" rx="2" class="mech3"/><rect x="392" y="155.6" width="20" height="9" rx="2" class="mech3"/><rect x="424" y="78.8" width="20" height="9" rx="2" class="mech3"/><rect x="424" y="153.2" width="20" height="9" rx="2" class="mech3"/><rect x="456" y="81.2" width="20" height="9" rx="2" class="mech3"/><rect x="456" y="150.8" width="20" height="9" rx="2" class="mech3"/><text x="180" y="216" font-size="11.5" fill="#5b6b7c" text-anchor="middle">driver sprocket</text><text x="470" y="196" font-size="11.5" fill="#5b6b7c" text-anchor="middle">driven sprocket</text><rect x="590" y="62" width="260" height="120" rx="8" class="t-box2"/><text x="720" y="88" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Chain drive features</text><text x="720" y="112" font-size="11.5" fill="#12283d" text-anchor="middle">positive drive &mdash; no slip</text><text x="720" y="132" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700" font-family="Consolas,Menlo,monospace">N2 / N1 = T1 / T2</text><text x="720" y="156" font-size="11.5" fill="#12283d" text-anchor="middle">high efficiency (97 to 98 %)</text><text x="720" y="174" font-size="11.5" fill="#12283d" text-anchor="middle">needs lubrication, more noise</text></svg></div><figcaption><b>Fig. 7:</b> Chain and sprocket drive. The chain engages the sprocket teeth, so there is no slip and the velocity ratio is exact.</figcaption></figure><ul><li><b>Roller chain</b> &mdash; the most common type; rollers fit over bushings and roll onto the sprocket teeth. Used in bicycles, motorcycles, conveyors and industrial drives.</li><li><b>Silent (inverted tooth) chain</b> &mdash; links with two flat faces that seat against the sprocket teeth; very quiet and used for high-speed drives such as camshaft drives.</li><li><b>Leaf chain</b> &mdash; used for lifting, as in fork-lift masts, because it has high tensile strength and does not wrap around sprockets.</li><li><b>Block chain</b> &mdash; an earlier, simpler form.</li></ul><span class="eq">N<sub>2</sub> / N<sub>1</sub> = T<sub>1</sub> / T<sub>2</sub>        (T = number of teeth on the sprocket)</span><ul><li><b>Advantages:</b> positive drive with an exact velocity ratio; no slip; can transmit more power than a belt of similar size; suitable for both short and moderately long centre distances (up to about 8 m); high efficiency (97 % to 98 %); compact; works in hot and oily environments; can drive several shafts from one chain.</li><li><b>Disadvantages:</b> needs accurate alignment and careful lubrication; noisy, especially at high speed; heavier and costlier than a belt; the chain elongates as the pins and bushings wear, so it must be re-tensioned and eventually replaced; transmits vibration because of the <b>polygonal (chordal) action</b> &mdash; the chain does not run at a constant radius around the sprocket; no overload protection.</li></ul><div class="tbl-scroll"><table><caption>Table 8.3 &mdash; Belt, chain and gear drives compared</caption><thead><tr><th>Feature</th><th>Belt drive</th><th>Chain drive</th><th>Gear drive</th></tr></thead><tbody><tr><td>Type of drive</td><td>Friction (slip possible)</td><td>Positive</td><td>Positive</td></tr><tr><td>Velocity ratio</td><td>Not exactly constant</td><td>Constant</td><td>Exactly constant</td></tr><tr><td>Centre distance</td><td>Long (up to 10 m)</td><td>Medium (up to 8 m)</td><td>Short</td></tr><tr><td>Efficiency</td><td>90 to 98 %</td><td>97 to 98 %</td><td>95 to 99 %</td></tr><tr><td>Noise</td><td>Very quiet</td><td>Noisy</td><td>Moderate to noisy</td></tr><tr><td>Shock absorption</td><td>Excellent</td><td>Poor</td><td>Poor</td></tr><tr><td>Maintenance</td><td>Low, but belt needs tensioning</td><td>Needs lubrication and tensioning</td><td>Needs lubrication and sealing</td></tr><tr><td>Overload protection</td><td>Yes, belt slips</td><td>No</td><td>No</td></tr><tr><td>Cost</td><td>Low</td><td>Medium</td><td>High</td></tr><tr><td>Life</td><td>Short (belt is a wear item)</td><td>Medium</td><td>Long</td></tr></tbody></table></div><h3 id="sec6"><span class="sec-no">6.</span>Bearings</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>bearing</b> is a machine element that supports a rotating or sliding shaft, constrains its motion to the desired direction, and carries the load while minimising friction and wear.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 280" width="880" height="280" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Types of bearings</text><text x="120" y="62" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(a) Plain (journal)</text><circle cx="120" cy="140" r="56" class="mech"/><circle cx="120" cy="140" r="34" class="mech2"/><circle cx="120" cy="140" r="8" class="cmp-f"/><text x="120" y="226" font-size="10.5" fill="#5b6b7c" text-anchor="middle">sliding contact,</text><text x="120" y="240" font-size="10.5" fill="#5b6b7c" text-anchor="middle">needs oil film</text><text x="330" y="62" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(b) Ball bearing</text><circle cx="330" cy="140" r="56" class="mech"/><circle cx="330" cy="140" r="30" class="mech2"/><circle cx="373.0" cy="140.0" r="11" class="cmp-f"/><circle cx="360.40559159102156" cy="170.40559159102153" r="11" class="cmp-f"/><circle cx="330.0" cy="183.0" r="11" class="cmp-f"/><circle cx="299.59440840897844" cy="170.40559159102153" r="11" class="cmp-f"/><circle cx="287.0" cy="140.0" r="11" class="cmp-f"/><circle cx="299.59440840897844" cy="109.59440840897847" r="11" class="cmp-f"/><circle cx="330.0" cy="97.0" r="11" class="cmp-f"/><circle cx="360.40559159102156" cy="109.59440840897845" r="11" class="cmp-f"/><circle cx="330" cy="140" r="8" class="cmp-f"/><text x="330" y="226" font-size="10.5" fill="#5b6b7c" text-anchor="middle">point contact, low load,</text><text x="330" y="240" font-size="10.5" fill="#5b6b7c" text-anchor="middle">high speed</text><text x="540" y="62" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(c) Roller bearing</text><circle cx="540" cy="140" r="56" class="mech"/><circle cx="540" cy="140" r="28" class="mech2"/><g transform="translate(578.9417218918051,155.73347692346832) rotate(112)"><rect x="-7" y="-14" width="14" height="28" rx="3" class="cmp-f"/></g><g transform="translate(556.4107073965495,178.6612038450025) rotate(157)"><rect x="-7" y="-14" width="14" height="28" rx="3" class="cmp-f"/></g><g transform="translate(524.2665230765317,178.94172189180506) rotate(202)"><rect x="-7" y="-14" width="14" height="28" rx="3" class="cmp-f"/></g><g transform="translate(501.3387961549975,156.4107073965495) rotate(247)"><rect x="-7" y="-14" width="14" height="28" rx="3" class="cmp-f"/></g><g transform="translate(501.05827810819494,124.2665230765317) rotate(292)"><rect x="-7" y="-14" width="14" height="28" rx="3" class="cmp-f"/></g><g transform="translate(523.5892926034505,101.33879615499751) rotate(337)"><rect x="-7" y="-14" width="14" height="28" rx="3" class="cmp-f"/></g><g transform="translate(555.7334769234683,101.05827810819493) rotate(382)"><rect x="-7" y="-14" width="14" height="28" rx="3" class="cmp-f"/></g><g transform="translate(578.6612038450025,123.5892926034505) rotate(427)"><rect x="-7" y="-14" width="14" height="28" rx="3" class="cmp-f"/></g><circle cx="540" cy="140" r="8" class="cmp-f"/><text x="540" y="226" font-size="10.5" fill="#5b6b7c" text-anchor="middle">line contact, higher</text><text x="540" y="240" font-size="10.5" fill="#5b6b7c" text-anchor="middle">radial load capacity</text><text x="750" y="62" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(d) Thrust bearing</text><rect x="680" y="100" width="140" height="16" rx="8" class="mech2"/><circle cx="698" cy="128" r="9" class="cmp-f"/><circle cx="720" cy="128" r="9" class="cmp-f"/><circle cx="742" cy="128" r="9" class="cmp-f"/><circle cx="764" cy="128" r="9" class="cmp-f"/><circle cx="786" cy="128" r="9" class="cmp-f"/><circle cx="808" cy="128" r="9" class="cmp-f"/><rect x="680" y="140" width="140" height="16" rx="8" class="mech2"/><polyline points="750,82 750,62" class="lnk" marker-end="url(#ah)"/><text x="750" y="190" font-size="10.5" fill="#5b6b7c" text-anchor="middle">carries axial load</text><text x="750" y="206" font-size="10.5" fill="#5b6b7c" text-anchor="middle">along the shaft</text><text x="440" y="268" font-size="11.5" fill="#12283d" text-anchor="middle">Rolling contact bearings have low starting friction; plain bearings are quieter, cheaper and carry very heavy loads.</text></svg></div><figcaption><b>Fig. 8:</b> Plain (journal) bearing, ball bearing, roller bearing and thrust bearing.</figcaption></figure><h4>Classification</h4><ul><li><b>According to the type of contact:</b> <b>sliding contact (plain) bearings</b>, where the shaft rubs on the bearing surface separated only by a film of lubricant; and <b>rolling contact (anti-friction) bearings</b>, where balls or rollers roll between the shaft and the housing.</li><li><b>According to the direction of the load:</b> <b>radial (journal) bearings</b> carry a load perpendicular to the shaft axis; <b>thrust bearings</b> carry a load parallel to the shaft axis; and combined types carry both.</li><li><b>According to the lubrication regime:</b> boundary lubrication, mixed film and full fluid-film (hydrodynamic) lubrication.</li></ul><h4>Plain (sliding contact) bearings</h4><p>A plain bearing is simply a bush or sleeve of a soft material such as white metal (Babbitt), bronze, gunmetal, cast iron or a polymer such as PTFE or nylon, into which the steel shaft (the <b>journal</b>) fits. When the shaft starts turning it drags lubricant into the converging wedge between the journal and the bearing, building up a pressure that lifts the shaft clear of the surface. This is called <b>hydrodynamic lubrication</b> and once established the friction is very low and there is no wear. The ratio of the bearing length to the journal diameter is called the L/D ratio and is usually 1 to 2.</p><ul><li><b>Advantages:</b> simple, cheap and compact; quiet in operation; can carry very heavy loads; tolerant of shock loads and of dirty conditions; large contact area distributes the load; can be split into two halves for easy assembly.</li><li><b>Disadvantages:</b> high starting friction (the shaft is metal-to-metal until the oil film builds up); needs a continuous supply of clean lubricant; more power is lost in friction than in a rolling bearing; the bearing material wears and needs replacement; not suitable for frequent start-stop duty.</li></ul><h4>Rolling contact (anti-friction) bearings</h4><p>A rolling bearing consists of an <b>inner race</b> fitted on the shaft, an <b>outer race</b> fitted in the housing, a set of <b>rolling elements</b> (balls or rollers) and a <b>cage or separator</b> that keeps the rolling elements evenly spaced. The races are made of high-carbon chromium steel (such as 52100 or EN31), hardened and ground to a very fine finish.</p><div class="tbl-scroll"><table><caption>Table 8.4 &mdash; Types of rolling bearings</caption><thead><tr><th>Type</th><th>Contact</th><th>Load capacity</th><th>Speed</th><th>Use</th></tr></thead><tbody><tr><td>Single-row deep groove ball bearing</td><td>Point contact</td><td>Mainly radial, some axial both ways</td><td>Very high</td><td>The most common bearing &mdash; electric motors, gearboxes, wheels</td></tr><tr><td>Angular contact ball bearing</td><td>Point contact</td><td>Radial plus axial in one direction</td><td>High</td><td>Machine tool spindles, usually used in pairs</td></tr><tr><td>Thrust ball bearing</td><td>Point contact</td><td>Axial only</td><td>Low to moderate</td><td>Vertical shafts, clutches, turntables</td></tr><tr><td>Cylindrical roller bearing</td><td>Line contact</td><td>Heavy radial, little axial</td><td>High</td><td>Gearboxes, rolling mills</td></tr><tr><td>Tapered roller bearing</td><td>Line contact</td><td>Heavy radial and axial together</td><td>Moderate</td><td>Automobile wheel hubs, differential</td></tr><tr><td>Spherical roller bearing</td><td>Line contact</td><td>Very heavy radial, self-aligning</td><td>Moderate</td><td>Heavy machinery with shaft deflection</td></tr><tr><td>Needle roller bearing</td><td>Line contact</td><td>High radial in a small space</td><td>Moderate</td><td>Gearboxes, universal joints, compressors</td></tr><tr><td>Linear ball bushing</td><td>Point contact</td><td>Linear motion only</td><td>High</td><td>3D printers, CNC axes, robot prismatic joints</td></tr></tbody></table></div><ul><li><b>Advantages of rolling bearings:</b> very low starting and running friction; less heat generated; standardised and interchangeable; low maintenance (often sealed and pre-greased for life); accurate location of the shaft; long and predictable life.</li><li><b>Disadvantages:</b> more expensive; larger radial space is needed; noisy at high speed; sensitive to shock loads and to dirt; sudden failure is possible through fatigue spalling; the shaft and housing must be machined accurately.</li></ul><h4>Bearing designation and selection</h4><p>A standard bearing number such as <b>6204</b> carries information: the first digit (6) indicates the type (deep groove ball bearing), the second digit (2) the width/duty series, and the last two digits multiplied by 5 give the bore diameter in millimetres (04 &times; 5 = 20 mm). Bearings are selected on the basis of the radial and axial loads, the speed, the required life (usually expressed in hours at a given reliability), the rigidity needed, the space available, and the mounting and lubrication arrangements.</p><div class="note"><span class="tag">Note</span><p>Bearing life is calculated using the basic dynamic load rating C and the equivalent load P: L<sub>10</sub> = (C/P)<sup>3</sup> million revolutions for ball bearings and (C/P)<sup>10/3</sup> for roller bearings. L<sub>10</sub> means 90 % of a group of identical bearings will survive at least that life.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A cam converts uniform rotation into a programmed follower motion. Important terms are base circle, pitch curve, lift, nose, flank, pressure angle, outstroke, instroke and dwell.</li><li>Follower motion programs include uniform velocity, simple harmonic, uniform acceleration and retardation, and cycloidal; cycloidal is smoothest and best for high speed.</li><li>Gears give a positive drive with an exact velocity ratio: N1/N2 = T2/T1 = D2/D1, and speed reduction multiplies torque by the same factor.</li><li>Module m = D/T must be the same for two gears to mesh; the standard pressure angle is 20&deg;; backlash is the clearance that causes lost motion.</li><li>Spur gears are simplest, helical are quieter but produce axial thrust, bevel gears serve intersecting shafts, and worm gears give very high self-locking reduction at low efficiency.</li><li>A ratchet and pawl permits motion in one direction only and is used for feeds, freewheels, hoist locking and counting.</li><li>Belt drives rely on friction: N2/N1 = D1/D2 and Power = (T1 &minus; T2) v. They are quiet, cheap, absorb shock and slip safely on overload, but they are not positive drives.</li><li>Chain drives are positive, efficient and compact but need lubrication, are noisy and transmit chordal vibration.</li><li>Plain bearings are cheap, quiet and carry very heavy loads but have high starting friction; rolling bearings have low friction and are standardised but cost more and are shock sensitive.</li><li>A rolling bearing carries an inner race, an outer race, rolling elements and a cage; the bearing number gives the type, series and bore diameter.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Explain the inversions of the four-bar chain and state Grashof's law.</li><li>Define a cam and a follower. Explain the terms base circle, pitch curve, lift, pressure angle and dwell.</li><li>Classify cams and followers. Which follower is most commonly used and why?</li><li>Compare uniform velocity, simple harmonic, uniform acceleration and cycloidal follower motions.</li><li>Define module, circular pitch, addendum, dedendum, pressure angle and backlash.</li><li>Derive the velocity ratio of a simple gear train and show why speed reduction increases torque.</li><li>A 20-tooth pinion at 1200 rpm drives a 100-tooth gear. Find the output speed and the torque multiplication. (Answer: 240 rpm, 5 times)</li><li>Explain the construction and working of a ratchet and pawl mechanism with a neat sketch. Give four applications.</li><li>Derive the power transmitted by a belt drive and explain the significance of the angle of wrap.</li><li>Differentiate between slip and creep in belt drives.</li><li>Compare belt, chain and gear drives with respect to slip, efficiency, noise and centre distance.</li><li>Classify bearings. Compare plain bearings with rolling contact bearings.</li><li>Explain the designation of a 6204 ball bearing and state the factors considered in bearing selection.</li></ol></div><div class="pager"><a class="prev" href="07-mechanical-actuation-types-of-motion-freedom.html"><span class="dir">&larr; Previous topic</span><span class="ttl">07. Mechanical Actuation Systems &mdash; Types of Motion and Degrees of Freedom</span></a><a class="next" href="09-mechanical-switch-solid-state-switch.html"><span class="dir">Next topic &rarr;</span><span class="ttl">09. Electrical Actuation Systems &mdash; Mechanical and Solid State Switches</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

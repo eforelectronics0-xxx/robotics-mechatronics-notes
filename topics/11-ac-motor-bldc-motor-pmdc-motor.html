@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AC Motor, BLDC Motor and PMDC Motor | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="The induction motor that runs industry, the brushless DC motor that combines the simplicity of DC control with the reliability of AC construction, and">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit II &middot; Topic 11 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit II &rsaquo; Topic 11</nav><div class="unit-tag">Unit II</div><h2 class="page-title"><span class="topic-no">11</span>AC Motor, BLDC Motor and PMDC Motor</h2><p class="lede">The induction motor that runs industry, the brushless DC motor that combines the simplicity of DC control with the reliability of AC construction, and the small permanent magnet DC motor found in every toy and automobile accessory.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">AC Motor</a></li><li><a href="#sec2">BLDC Motor (Brushless DC Motor)</a></li><li><a href="#sec3">PMDC Motor (Permanent Magnet DC Motor)</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>AC Motor</h3><p>Alternating current motors are used wherever the supply is AC (230 V single-phase or 400 V three-phase, 50 Hz in India) and where large power, ruggedness and low maintenance are required. The most important type by far is the <b>three-phase squirrel cage induction motor</b>, which accounts for the great majority of all industrial drives. Other types are the <b>synchronous motor</b>, the <b>single-phase induction motor</b> and the <b>universal motor</b>.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Three-phase squirrel cage induction motor</text><circle cx="230" cy="150" r="105" class="mech"/><circle cx="230" cy="150" r="82" class="cmp-f"/><g transform="translate(230.0,57.0) rotate(0)"><rect x="-16" y="-14" width="32" height="28" class="mech2"/></g><text x="230.0" y="61.0" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="700">U</text><g transform="translate(310.5403625519528,103.5) rotate(60)"><rect x="-16" y="-14" width="32" height="28" class="mech2"/></g><text x="310.5403625519528" y="107.5" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="700">W'</text><g transform="translate(310.5403625519528,196.5) rotate(120)"><rect x="-16" y="-14" width="32" height="28" class="mech2"/></g><text x="310.5403625519528" y="200.5" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="700">V</text><g transform="translate(230.0,243.0) rotate(180)"><rect x="-16" y="-14" width="32" height="28" class="mech2"/></g><text x="230.0" y="247.0" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="700">U'</text><g transform="translate(149.4596374480472,196.5) rotate(240)"><rect x="-16" y="-14" width="32" height="28" class="mech2"/></g><text x="149.4596374480472" y="200.5" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="700">W</text><g transform="translate(149.4596374480472,103.5) rotate(300)"><rect x="-16" y="-14" width="32" height="28" class="mech2"/></g><text x="149.4596374480472" y="107.5" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="700">V'</text><circle cx="230" cy="150" r="58" class="mech2"/><circle cx="280.0" cy="150.0" r="5" class="cmp-f"/><circle cx="275.04844339512096" cy="171.6941869558779" r="5" class="cmp-f"/><circle cx="261.1744900929367" cy="189.0915741234015" r="5" class="cmp-f"/><circle cx="241.12604669781572" cy="198.74639560909117" r="5" class="cmp-f"/><circle cx="218.87395330218428" cy="198.74639560909117" r="5" class="cmp-f"/><circle cx="198.82550990706332" cy="189.09157412340147" r="5" class="cmp-f"/><circle cx="184.95155660487904" cy="171.6941869558779" r="5" class="cmp-f"/><circle cx="180.0" cy="150.0" r="5" class="cmp-f"/><circle cx="184.95155660487904" cy="128.3058130441221" r="5" class="cmp-f"/><circle cx="198.82550990706332" cy="110.90842587659851" r="5" class="cmp-f"/><circle cx="218.8739533021843" cy="101.2536043909088" r="5" class="cmp-f"/><circle cx="241.12604669781575" cy="101.25360439090883" r="5" class="cmp-f"/><circle cx="261.17449009293665" cy="110.9084258765985" r="5" class="cmp-f"/><circle cx="275.04844339512096" cy="128.3058130441221" r="5" class="cmp-f"/><circle cx="230" cy="150" r="14" class="mech3"/><text x="230" y="275" font-size="10.5" fill="#5b6b7c" text-anchor="middle">squirrel cage rotor: aluminium bars short-circuited by end rings</text><path d="M 300 82 A 92 92 0 0 1 322 130" class="lnk" marker-end="url(#ah)"/><text x="345" y="100" font-size="11" fill="#a8232a" text-anchor="start">rotor speed N r</text><path d="M 160 82 A 92 92 0 0 1 210 56" class="lnk-d" marker-end="url(#ah)"/><text x="150" y="62" font-size="10.5" fill="#0f5fa8" text-anchor="end">rotating magnetic field N s</text><rect x="450" y="60" width="400" height="190" rx="8" class="t-box2"/><text x="650" y="88" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">Induction motor relations</text><text x="650" y="122" font-size="13" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">N s = 120 f / P     (synchronous speed, rpm)</text><text x="650" y="152" font-size="13" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">slip  s = (N s &minus; N r) / N s</text><text x="650" y="182" font-size="13" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">rotor frequency  f r = s &times; f</text><text x="650" y="216" font-size="11" fill="#5b6b7c" text-anchor="middle">f = supply frequency (50 Hz in India),  P = number of poles</text><text x="650" y="238" font-size="11" fill="#5b6b7c" text-anchor="middle">s = 2 to 5 % at full load,  s = 1 at standstill,  s = 0 only ideally</text></svg></div><figcaption><b>Fig. 1:</b> Three-phase squirrel cage induction motor: stator with three-phase windings producing a rotating magnetic field, and a rotor made of aluminium bars short-circuited by end rings.</figcaption></figure><h4>Construction of a three-phase induction motor</h4><ul><li><b>Stator</b> &mdash; a cylindrical frame (yoke) of cast iron or rolled steel, carrying a laminated core of silicon steel stampings with semi-closed slots. Three-phase windings are placed in the slots, displaced by 120 electrical degrees and connected either in star or delta. The laminations are insulated from each other by a thin varnish to reduce eddy current loss.</li><li><b>Rotor</b> &mdash; two types exist. The <b>squirrel cage rotor</b> consists of a laminated cylinder with axial slots containing solid aluminium or copper bars, all short-circuited at both ends by end rings. It looks like a squirrel cage, hence the name. It is extremely rugged, cheap and needs no maintenance because there are no brushes, no slip rings and no commutator. About 90 % of induction motors are of this type. The <b>slip ring (wound) rotor</b> has a three-phase winding connected to three slip rings, allowing external resistance to be inserted in the rotor circuit for higher starting torque and lower starting current.</li><li><b>End shields, bearings, shaft and fan</b> &mdash; support the rotor, and the shaft-mounted fan provides cooling.</li></ul><h4>Working principle</h4><p>When a balanced three-phase supply is given to the stator windings, a <b>rotating magnetic field (RMF)</b> of constant magnitude is produced, which revolves at the <b>synchronous speed</b> N<sub>s</sub>. This rotating field cuts the stationary rotor conductors. Because the rotor bars form a closed circuit, an EMF is induced in them by electromagnetic induction and a current flows. The current-carrying rotor conductors, lying in the rotating field, experience a force, and by Lenz's law the rotor begins to turn <b>in the same direction as the rotating field</b>, trying to catch up with it.</p><p>The rotor can never reach the synchronous speed. If it did, there would be no relative motion between the field and the rotor, hence no induced EMF, no rotor current and no torque. The rotor therefore always runs slightly slower than the field, and the difference is called the <b>slip</b>.</p><div class="formula"><span class="tag">Formula</span><p><b>Induction motor relations</b><span class='eq'>N<sub>s</sub> = 120 f / P     (rpm)</span><span class='eq'>slip  s = (N<sub>s</sub> &minus; N<sub>r</sub>) / N<sub>s</sub>     (as a fraction, or &times; 100 for percentage)</span><span class='eq'>rotor frequency  f<sub>r</sub> = s &times; f</span><span class='eq'>rotor speed  N<sub>r</sub> = N<sub>s</sub> (1 &minus; s)</span>where f = supply frequency in Hz, P = number of stator poles, N<sub>r</sub> = actual rotor speed in rpm. At standstill s = 1 and f<sub>r</sub> = f; at synchronous speed s = 0; at full load s is typically 2 % to 5 %.</p></div><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> A 4-pole, 3-phase, 50 Hz induction motor has a full-load slip of 4 %. Find the synchronous speed, the rotor speed and the rotor frequency. N<sub>s</sub> = 120 &times; 50/4 = <b>1500 rpm</b>. N<sub>r</sub> = 1500 (1 &minus; 0.04) = <b>1440 rpm</b>. f<sub>r</sub> = 0.04 &times; 50 = <b>2 Hz</b>.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Torque-slip characteristic of an induction motor</text><rect x="120" y="40" width="640" height="185" rx="6" class="t-box"/><line x1="160" y1="195" x2="160" y2="45" class="ax" marker-end="url(#ah)"/><line x1="160" y1="195" x2="730" y2="195" class="ax" marker-end="url(#ah)"/><text x="736" y="199" font-size="11.5" fill="#5b6b7c" text-anchor="start">slip s</text><text x="154" y="39" font-size="11.5" fill="#5b6b7c" text-anchor="start">torque T</text><line x1="160" y1="120" x2="730" y2="120" class="ax" stroke-dasharray="6 4"/><polyline points="162.8,187.6 167.6,175.5 172.3,163.7 177.0,152.4 181.8,141.7 186.5,131.8 191.2,122.7 196.0,114.5 200.7,107.2 205.4,100.8 210.2,95.3 214.9,90.7 219.6,86.9 224.4,83.8 229.1,81.4 233.8,79.6 238.5,78.3 243.3,77.5 248.0,77.1 252.7,77.0 257.5,77.3 262.2,77.8 266.9,78.5 271.7,79.4 276.4,80.4 281.1,81.6 285.9,82.9 290.6,84.2 295.3,85.6 300.0,87.1 304.8,88.6 309.5,90.1 314.2,91.6 319.0,93.1 323.7,94.7 328.4,96.2 333.2,97.7 337.9,99.2 342.6,100.7 347.4,102.1 352.1,103.6 356.8,105.0 361.6,106.4 366.3,107.7 371.0,109.1 375.7,110.4 380.5,111.6 385.2,112.9 389.9,114.1 394.7,115.3 399.4,116.5 404.1,117.6 408.9,118.8 413.6,119.8 418.3,120.9 423.1,122.0 427.8,123.0 432.5,124.0 437.2,124.9 442.0,125.9 446.7,126.8 451.4,127.7 456.2,128.6 460.9,129.5 465.6,130.3 470.4,131.2 475.1,132.0 479.8,132.8 484.6,133.5 489.3,134.3 494.0,135.0 498.8,135.8 503.5,136.5 508.2,137.2 512.9,137.8 517.7,138.5 522.4,139.1 527.1,139.8 531.9,140.4 536.6,141.0 541.3,141.6 546.1,142.2 550.8,142.8 555.5,143.3 560.3,143.9 565.0,144.4 569.7,144.9 574.4,145.5 579.2,146.0 583.9,146.5 588.6,147.0 593.4,147.4 598.1,147.9 602.8,148.4 607.6,148.8 612.3,149.3 617.0,149.7 621.8,150.1 626.5,150.6 631.2,151.0 636.0,151.4 640.7,151.8 645.4,152.2 650.1,152.6 654.9,152.9 659.6,153.3 664.3,153.7 669.1,154.0 673.8,154.4 678.5,154.7 683.3,155.1 688.0,155.4 692.7,155.7 697.5,156.1 702.2,156.4 706.9,156.7 711.6,157.0 716.4,157.3 721.1,157.6 725.8,157.9 730.6,158.2" fill="none" stroke="#0f5fa8" stroke-width="2.2"/><circle cx="251.2" cy="77" r="4" class="dot"/><text x="263.2" y="71" font-size="11" fill="#a8232a" text-anchor="start">T max  (breakdown / pull-out torque)</text><circle cx="163" cy="187.6321951219512" r="4" class="dot"/><text x="186" y="207.6321951219512" font-size="11" fill="#157a4b" text-anchor="start">T fl  full-load torque (s = 2 to 5 %)</text><circle cx="730" cy="158.18252730109205" r="4" class="dot"/><text x="722" y="150.18252730109205" font-size="11" fill="#e07b00" text-anchor="end">T st  starting torque (s = 1)</text><text x="196" y="122" font-size="10.5" fill="#5b6b7c" text-anchor="start">synchronous speed (s = 0)</text><text x="440" y="242" font-size="11.5" fill="#12283d" text-anchor="middle">The motor normally runs in the stable region between no load (s = 0) and full load; beyond the breakdown torque it stalls.</text></svg></div><figcaption><b>Fig. 2:</b> Torque-slip characteristic. Full-load operation is at low slip; beyond the breakdown torque the motor stalls.</figcaption></figure><h4>Starting and speed control</h4><p>At starting the slip is 1, the rotor frequency equals the supply frequency, and the motor draws 5 to 8 times its full-load current. Direct-on-line starting is used only for small motors; larger motors use <b>star-delta starting</b>, an <b>auto-transformer starter</b>, a <b>soft starter</b> (back-to-back thyristors that ramp the voltage up), or slip-ring motors with rotor resistance starters.</p><p>The speed of an induction motor can be controlled by: changing the number of poles (discrete speeds only), changing the supply frequency (the best method, using a <b>variable frequency drive</b> or VFD, which keeps V/f constant so that the flux stays constant), changing the supply voltage (limited range), inserting rotor resistance (slip-ring motors only), and by <b>cascading</b> two motors. Modern mechatronic systems almost always use a VFD.</p><h4>Single-phase induction motor</h4><p>A single-phase supply produces a pulsating field, not a rotating one, so a single-phase induction motor is <b>not self-starting</b>. Auxiliary means are used to create a rotating field at start: <b>split-phase</b> (a high-resistance starting winding), <b>capacitor-start</b> (a capacitor in series with the starting winding, giving higher starting torque), <b>capacitor-start capacitor-run</b>, <b>permanent split capacitor (PSC)</b> and <b>shaded pole</b> (a copper shading ring, used for very small loads such as fans). A centrifugal switch disconnects the starting winding once the motor reaches about 75 % of synchronous speed.</p><h4>Synchronous motor and universal motor</h4><p>A <b>synchronous motor</b> runs at exactly the synchronous speed regardless of load. Its rotor is separately excited by DC through slip rings or carries permanent magnets, and it locks into step with the rotating field. It is used where constant speed is essential and also for power factor improvement. A <b>universal motor</b> is essentially a DC series motor built with a laminated field so that it can run on AC as well; it reaches very high speeds (up to 20 000 rpm) and is used in mixers, grinders, drills, vacuum cleaners and hair dryers.</p><div class="tbl-scroll"><table><caption>Table 11.1 &mdash; Types of AC motor compared</caption><thead><tr><th>Type</th><th>Speed</th><th>Starting torque</th><th>Maintenance</th><th>Typical use</th></tr></thead><tbody><tr><td>3-phase squirrel cage induction</td><td>Nearly constant (2 to 5 % slip)</td><td>Moderate (1.5 to 2.5 times full load)</td><td>Very little</td><td>Pumps, fans, compressors, conveyors, machine tools</td></tr><tr><td>3-phase slip ring induction</td><td>Controllable by rotor resistance</td><td>Very high</td><td>Brushes and slip rings need attention</td><td>Cranes, hoists, crushers, large compressors</td></tr><tr><td>Synchronous</td><td>Exactly constant</td><td>Low (needs damper windings)</td><td>Brushes if not permanent magnet</td><td>Constant-speed drives, power factor correction, clocks</td></tr><tr><td>Single-phase induction (capacitor start)</td><td>Nearly constant</td><td>High</td><td>Very little</td><td>Domestic pumps, refrigerators, air conditioners</td></tr><tr><td>Shaded pole</td><td>Nearly constant</td><td>Very low</td><td>None</td><td>Small fans, record players, hair dryers</td></tr><tr><td>Universal (AC series)</td><td>Very high, variable</td><td>Very high</td><td>Brushes wear</td><td>Mixers, drills, vacuum cleaners, sewing machines</td></tr></tbody></table></div><h3 id="sec2"><span class="sec-no">2.</span>BLDC Motor (Brushless DC Motor)</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>brushless DC motor</b> is a permanent magnet synchronous motor with a trapezoidal back EMF waveform, driven by a DC supply through an electronic inverter that performs the commutation instead of a mechanical commutator and brushes. In effect, the BLDC motor is a DC motor turned <b>inside out</b>: the magnets are on the rotor and the windings are on the stator.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" width="900" height="320" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="450" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">BLDC drive: inverter, motor phases, Hall feedback and supply wiring</text><rect x="45" y="95" width="180" height="120" rx="8" class="t-box4"/><text x="135" y="130" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">BLDC motor</text><text x="135" y="151" font-size="10.5" fill="#5b6b7c" text-anchor="middle">three stator phases</text><text x="135" y="174" font-size="12" fill="#0f5fa8" text-anchor="middle" font-weight="700">U   V   W</text><rect x="320" y="80" width="220" height="150" rx="8" class="t-box2"/><text x="430" y="110" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">3-phase inverter</text><text x="430" y="132" font-size="10.5" fill="#5b6b7c" text-anchor="middle">six MOSFET switches</text><text x="430" y="160" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">U   V   W outputs</text><rect x="320" y="245" width="220" height="50" rx="7" class="t-box3"/><text x="430" y="267" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">commutation controller</text><rect x="650" y="70" width="185" height="75" rx="8" class="t-box4"/><text x="742" y="98" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">DC link</text><text x="742" y="118" font-size="10.5" fill="#5b6b7c" text-anchor="middle">+Vdc / 0 V</text><rect x="650" y="190" width="185" height="75" rx="8" class="t-box3"/><text x="742" y="218" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">speed command</text><text x="742" y="238" font-size="10.5" fill="#5b6b7c" text-anchor="middle">PWM duty</text><polyline points="225,120 275,120 275,120 320,120" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="285" y="113" font-size="9.8" fill="#0f5fa8" text-anchor="middle">U</text><polyline points="225,150 275,150 275,150 320,150" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="285" y="143" font-size="9.8" fill="#0f5fa8" text-anchor="middle">V</text><polyline points="225,180 275,180 275,180 320,180" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="285" y="173" font-size="9.8" fill="#0f5fa8" text-anchor="middle">W</text><polyline points="430,80 430,50 650,50 650,88" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="545" y="44" font-size="10.5" fill="#a8232a" text-anchor="middle">+Vdc</text><polyline points="430,230 430,240" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="430" y1="240" x2="430" y2="250" class="wire"/><line x1="417" y1="250" x2="443" y2="250" class="wire"/><line x1="422" y1="255" x2="438" y2="255" class="wire"/><line x1="426.5" y1="260" x2="433.5" y2="260" class="wire"/><text x="445" y="240" font-size="9.8" fill="#5b6b7c" text-anchor="start">0 V</text><polyline points="742,145 742,165" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="742" y1="165" x2="742" y2="175" class="wire"/><line x1="729" y1="175" x2="755" y2="175" class="wire"/><line x1="734" y1="180" x2="750" y2="180" class="wire"/><line x1="738.5" y1="185" x2="745.5" y2="185" class="wire"/><text x="755" y="165" font-size="9.8" fill="#5b6b7c" text-anchor="start">DC return</text><polyline points="742,190 742,175 560,175 560,260 540,260" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="600" y="187" font-size="9.8" fill="#157a4b" text-anchor="middle">PWM command</text><polyline points="135,215 135,285 300,285 300,270 320,270" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="220" y="279" font-size="9.8" fill="#e07b00" text-anchor="middle">Hall U/V/W feedback</text><text x="450" y="312" font-size="10.8" fill="#12283d" text-anchor="middle">The controller uses Hall position signals to select which two inverter legs conduct; the third phase is floating in six-step commutation.</text></svg></div><figcaption><b>Fig. 3:</b> BLDC motor construction and drive. Permanent magnets rotate on the outside (or inside), the three-phase windings are on the stator, and three Hall sensors tell the controller the rotor position so it can energise the correct pair of phases.</figcaption></figure><h4>Construction</h4><ul><li><b>Stator</b> &mdash; made of laminated steel with three-phase windings distributed in the slots, exactly like an AC motor. Most BLDC motors have three phases in a star (wye) connection. Because the windings are stationary, heat is easily conducted away and the current does not have to pass through sliding contacts.</li><li><b>Rotor</b> &mdash; carries permanent magnets of sintered neodymium-iron-boron (NdFeB) or ferrite, giving a strong field. The number of poles may be 2, 4, 6 or more; more poles mean lower speed and higher torque. Some BLDC motors have the magnets on the outside rotating around the stator (<b>outrunner</b>, used in drones for high torque) and some have them inside (<b>inrunner</b>, used for high speed).</li><li><b>Position sensor</b> &mdash; three Hall effect sensors mounted on the stator at 120 electrical degrees tell the controller the rotor position within one electrical cycle. Alternatively, the position can be estimated without sensors (<b>sensorless</b> control) by measuring the back EMF of the floating third phase.</li><li><b>Drive electronics</b> &mdash; a three-phase inverter bridge of six power MOSFETs (three half bridges), a controller (microcontroller or DSP) that generates the six-step commutation pattern, and often a gate driver IC. Integrated driver ICs such as the L6234, DRV10983 or MP6540 are available.</li></ul><h4>Working principle</h4><p>The stator windings are energised in a sequence that produces a rotating magnetic field in discrete 60 electrical degree steps. In each step, exactly <b>two phases conduct</b> (one connected to the positive rail and one to the negative) while the third phase is left floating. The interaction between this stator field and the permanent magnet field of the rotor produces a torque, and the rotor turns towards alignment. Just before it aligns, the Hall sensors signal the change of position and the controller switches to the next step, so the stator field jumps ahead by 60 degrees and the rotor follows again. Six such steps complete one electrical cycle. This is called <b>six-step</b> or <b>120-degree trapezoidal commutation</b>.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Trapezoidal back EMF and six-step conduction</text><text x="70" y="74" font-size="11.5" fill="#a8232a" text-anchor="end" font-weight="700">E A</text><line x1="80" y1="70" x2="830" y2="70" class="ax"/><polyline points="80,48 205,48 330,70 455,92 580,92 705,70 830,70" fill="none" stroke="#a8232a" stroke-width="2"/><text x="70" y="134" font-size="11.5" fill="#157a4b" text-anchor="end" font-weight="700">E B</text><line x1="80" y1="130" x2="830" y2="130" class="ax"/><polyline points="80,108 205,108 330,130 455,152 580,152 705,130 830,130" fill="none" stroke="#157a4b" stroke-width="2"/><text x="70" y="194" font-size="11.5" fill="#0f5fa8" text-anchor="end" font-weight="700">E C</text><line x1="80" y1="190" x2="830" y2="190" class="ax"/><polyline points="80,168 205,168 330,190 455,212 580,212 705,190 830,190" fill="none" stroke="#0f5fa8" stroke-width="2"/><line x1="80" y1="48" x2="80" y2="240" class="ax" stroke-dasharray="6 4"/><text x="142" y="42" font-size="11" fill="#5b6b7c" text-anchor="middle" font-weight="700">S1</text><line x1="205" y1="48" x2="205" y2="240" class="ax" stroke-dasharray="6 4"/><text x="267" y="42" font-size="11" fill="#5b6b7c" text-anchor="middle" font-weight="700">S2</text><line x1="330" y1="48" x2="330" y2="240" class="ax" stroke-dasharray="6 4"/><text x="392" y="42" font-size="11" fill="#5b6b7c" text-anchor="middle" font-weight="700">S3</text><line x1="455" y1="48" x2="455" y2="240" class="ax" stroke-dasharray="6 4"/><text x="517" y="42" font-size="11" fill="#5b6b7c" text-anchor="middle" font-weight="700">S4</text><line x1="580" y1="48" x2="580" y2="240" class="ax" stroke-dasharray="6 4"/><text x="642" y="42" font-size="11" fill="#5b6b7c" text-anchor="middle" font-weight="700">S5</text><line x1="705" y1="48" x2="705" y2="240" class="ax" stroke-dasharray="6 4"/><text x="767" y="42" font-size="11" fill="#5b6b7c" text-anchor="middle" font-weight="700">S6</text><line x1="830" y1="48" x2="830" y2="240" class="ax" stroke-dasharray="6 4"/><text x="440" y="254" font-size="11.5" fill="#12283d" text-anchor="middle">In each 60&#176; step exactly two phases carry current; the rotor advances by one pole pitch. Hall sensors tell the controller which step it is in.</text></svg></div><figcaption><b>Fig. 4:</b> Trapezoidal back EMF of the three phases and the six-step conduction sequence. In every 60-degree step, two phases carry current and the third is used for back-EMF sensing in sensorless drives.</figcaption></figure><p>Speed is controlled by varying the DC link voltage or, more commonly, by applying <b>PWM</b> to the conducting switches. Torque is proportional to the current. Reversal is achieved by reversing the order of the commutation sequence.</p><span class="eq">N = (120 &times; f<sub>e</sub>) / P  ,   where f<sub>e</sub> = electrical commutation frequency in Hz and P = number of poles</span><h4>BLDC versus brushed DC versus AC induction</h4><div class="tbl-scroll"><table><caption>Table 11.2 &mdash; Comparison of motor types</caption><thead><tr><th>Feature</th><th>Brushed DC</th><th>BLDC</th><th>AC induction</th></tr></thead><tbody><tr><td>Commutation</td><td>Mechanical (brushes and commutator)</td><td>Electronic (inverter + Hall sensors)</td><td>Not needed &mdash; induced rotor currents</td></tr><tr><td>Efficiency</td><td>75 to 85 %</td><td>85 to 95 %</td><td>80 to 92 %</td></tr><tr><td>Maintenance</td><td>Brushes need replacement</td><td>Almost none</td><td>Very little</td></tr><tr><td>Life</td><td>Shorter (brush wear)</td><td>Long (bearing limited)</td><td>Long</td></tr><tr><td>Power density</td><td>Low to moderate</td><td>Very high</td><td>Moderate</td></tr><tr><td>Speed control</td><td>Very simple (vary armature voltage)</td><td>Needs an electronic driver</td><td>Needs a VFD for good control</td></tr><tr><td>Noise and sparking</td><td>Sparking, radio interference</td><td>Silent, no sparks</td><td>Quiet</td></tr><tr><td>Cost</td><td>Low</td><td>Motor cheap, driver costly</td><td>Motor cheap, driver costly</td></tr><tr><td>Heat dissipation</td><td>Poor (windings on rotor)</td><td>Excellent (windings on stator)</td><td>Good</td></tr><tr><td>Typical use</td><td>Toys, wipers, small appliances</td><td>Drones, computer fans, e-bikes, servos, medical</td><td>Industrial drives, pumps, compressors</td></tr></tbody></table></div><h4>Advantages, disadvantages and applications</h4><ul><li><b>Advantages:</b> no brushes, so no wear, no sparking and very long life; higher efficiency and power density; excellent heat dissipation because the windings are on the stator; very high speed capability; precise speed and torque control; low electromagnetic interference; quiet operation; can operate in explosive or clean environments; rotor inertia is low so dynamic response is fast.</li><li><b>Disadvantages:</b> needs an electronic controller and position sensing, so the overall system is costlier and more complex; the controller can fail; permanent magnets can be demagnetised by excessive current or high temperature, and NdFeB magnets are expensive; torque ripple exists because of the six-step commutation; sensorless starting from rest is difficult.</li><li><b>Applications:</b> computer cooling fans and hard disc spindle drives; electric bicycles, scooters and vehicles; drones and model aircraft; washing machines and air conditioners (direct drive); medical equipment such as ventilators, centrifuges and surgical tools; CNC spindles; robotic joints and actuators; blowers and pumps; automotive power steering, fuel pumps and electric water pumps.</li></ul><h3 id="sec3"><span class="sec-no">3.</span>PMDC Motor (Permanent Magnet DC Motor)</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>PMDC motor</b> is a brushed DC motor in which the stator field is produced by <b>permanent magnets</b> instead of a field winding. It is the smallest, simplest and cheapest of all DC motors and is used wherever fractional-horsepower power and simple speed control are required.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 280" width="880" height="280" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Permanent magnet DC (PMDC) motor</text><circle cx="200" cy="145" r="100" class="mech"/><path d="M 104 105 A 100 100 0 0 0 104 185 L 138 171 A 66 66 0 0 1 138 119 Z" fill="#f7c9c9" stroke="#a8232a" stroke-width="1.8"/><path d="M 296 105 A 100 100 0 0 1 296 185 L 262 171 A 66 66 0 0 0 262 119 Z" fill="#c9dcf7" stroke="#0f5fa8" stroke-width="1.8"/><text x="118" y="149" font-size="14" fill="#a8232a" text-anchor="middle" font-weight="700">N</text><text x="282" y="149" font-size="14" fill="#0f5fa8" text-anchor="middle" font-weight="700">S</text><circle cx="200" cy="145" r="60" class="mech2"/><line x1="222.0" y1="145.0" x2="256.0" y2="145.0" class="cmp" stroke-width="2"/><line x1="217.79837387624883" y1="157.9312755504344" x2="245.30495168499706" y2="177.91597412837848" class="cmp" stroke-width="2"/><line x1="206.79837387624883" y1="165.92324335849338" x2="217.30495168499706" y2="198.2591649125286" class="cmp" stroke-width="2"/><line x1="193.20162612375117" y1="165.92324335849338" x2="182.69504831500296" y2="198.2591649125286" class="cmp" stroke-width="2"/><line x1="182.20162612375117" y1="157.9312755504344" x2="154.69504831500296" y2="177.9159741283785" class="cmp" stroke-width="2"/><line x1="178.0" y1="145.0" x2="144.0" y2="145.0" class="cmp" stroke-width="2"/><line x1="182.20162612375117" y1="132.0687244495656" x2="154.69504831500294" y2="112.08402587162152" class="cmp" stroke-width="2"/><line x1="193.20162612375114" y1="124.07675664150662" x2="182.69504831500294" y2="91.7408350874714" class="cmp" stroke-width="2"/><line x1="206.79837387624883" y1="124.07675664150662" x2="217.30495168499704" y2="91.7408350874714" class="cmp" stroke-width="2"/><line x1="217.79837387624883" y1="132.0687244495656" x2="245.30495168499704" y2="112.08402587162149" class="cmp" stroke-width="2"/><circle cx="200" cy="145" r="14" class="cmp-f"/><path d="M 186 161 A 20 20 0 0 0 214 161" class="mech3"/><rect x="178" y="179" width="16" height="20" rx="8" class="mech"/><rect x="206" y="179" width="16" height="20" rx="8" class="mech"/><line x1="186" y1="199" x2="186" y2="237" class="wire"/><line x1="214" y1="199" x2="214" y2="237" class="wire"/><text x="160" y="251" font-size="11.5" fill="#a8232a" text-anchor="end" font-weight="700">+V</text><text x="240" y="251" font-size="11.5" fill="#0f5fa8" text-anchor="start" font-weight="700">0 V</text><text x="200" y="268" font-size="10.5" fill="#5b6b7c" text-anchor="middle">armature + commutator + brushes</text><rect x="380" y="55" width="460" height="190" rx="8" class="t-box2"/><text x="610" y="82" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">PMDC motor &mdash; key points</text><text x="400" y="112" font-size="11.5" fill="#12283d" text-anchor="start">&#8226; Field flux &#934; is constant, fixed by the permanent magnets</text><text x="400" y="134" font-size="11.5" fill="#12283d" text-anchor="start">&#8226; So  T = k &#934; I a  =  K t I a   and   E b = K e N</text><text x="400" y="156" font-size="11.5" fill="#12283d" text-anchor="start">&#8226; Speed  N = (V &minus; I a R a) / K e  &mdash; falls linearly with load</text><text x="400" y="178" font-size="11.5" fill="#12283d" text-anchor="start">&#8226; No field winding, no field current, so efficiency is higher</text><text x="400" y="200" font-size="11.5" fill="#12283d" text-anchor="start">&#8226; Small, light, cheap; used where low power is needed</text><text x="400" y="222" font-size="11.5" fill="#12283d" text-anchor="start">&#8226; Reversing needs an H-bridge; flux cannot be weakened for field control</text></svg></div><figcaption><b>Fig. 5:</b> PMDC motor: permanent magnet stator poles, slotted armature with winding, commutator and carbon brushes.</figcaption></figure><h4>Construction</h4><ul><li><b>Stator</b> &mdash; a steel cylindrical yoke to which two (or more) curved permanent magnet poles are bonded or clipped. Ferrite (ceramic) magnets are used for low-cost motors and NdFeB or samarium-cobalt for high-performance ones. The magnets are already magnetised, so the motor needs no field supply at all.</li><li><b>Rotor (armature)</b> &mdash; a laminated slotted iron core on the shaft, carrying a multi-coil copper winding, exactly as in any DC motor.</li><li><b>Commutator and brushes</b> &mdash; a segmented copper commutator and two carbon or precious-metal brushes reverse the armature current twice per revolution.</li><li><b>Bearings and shaft</b> &mdash; sintered bronze bushes for small motors, ball bearings for larger or higher-speed ones.</li></ul><h4>Working principle</h4><p>The working is identical to that of any DC motor. When DC voltage is applied to the armature through the brushes and commutator, current flows in the armature conductors. These conductors lie in the fixed field of the permanent magnets and experience a force F = B I l. The forces on the two sides of each coil produce a torque that turns the rotor, and the commutator reverses the coil current every half revolution so that the torque remains in one direction.</p><p>Because the field flux &#934; is <b>constant</b> (fixed by the magnets and not adjustable), the equations simplify. Torque is directly proportional to armature current, back EMF is directly proportional to speed, and the speed-torque characteristic is a <b>straight line</b>.</p><div class="formula"><span class="tag">Formula</span><p><b>PMDC equations</b><span class='eq'>T = K<sub>t</sub> I<sub>a</sub>        (K<sub>t</sub> = torque constant in N m/A)</span><span class='eq'>E<sub>b</sub> = K<sub>e</sub> &#969;        (K<sub>e</sub> = back EMF constant in V/(rad/s))</span><span class='eq'>V = E<sub>b</sub> + I<sub>a</sub> R<sub>a</sub> = K<sub>e</sub> &#969; + I<sub>a</sub> R<sub>a</sub></span><span class='eq'>&#969; = (V &minus; I<sub>a</sub> R<sub>a</sub>) / K<sub>e</sub>  =  V/K<sub>e</sub> &minus; (R<sub>a</sub> / K<sub>e</sub>K<sub>t</sub>) T</span>In SI units K<sub>t</sub> = K<sub>e</sub>. The no-load speed is V/K<sub>e</sub> and the stall torque is K<sub>t</sub>V/R<sub>a</sub>. The slope of the speed-torque line is fixed by the armature resistance.</p></div><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> A PMDC motor has K<sub>t</sub> = K<sub>e</sub> = 0.02 N m/A (equivalently V per rad/s), R<sub>a</sub> = 2 &#937; and is supplied with 12 V. No-load speed = V/K<sub>e</sub> = 12/0.02 = 600 rad/s = 600 &times; 60/(2&#960;) = <b>5730 rpm</b>. Stall current = V/R<sub>a</sub> = 6 A, so stall torque = 0.02 &times; 6 = <b>0.12 N m</b>. If the load torque is 0.04 N m, armature current = 0.04/0.02 = 2 A, E<sub>b</sub> = 12 &minus; 2&times;2 = 8 V, and speed = 8/0.02 = 400 rad/s = <b>3820 rpm</b>.</p></div><h4>Characteristics, advantages, disadvantages and applications</h4><ul><li><b>Characteristics:</b> linear speed-torque curve; speed falls steadily as load torque increases; high starting torque; very simple control &mdash; speed is nearly proportional to the applied voltage, so PWM control is easy; reversing needs only reversal of the supply polarity (or an H-bridge).</li><li><b>Advantages:</b> simple, compact, light and cheap; no field winding so no field copper loss, giving higher efficiency for its size; linear and predictable characteristics; easy to control; good torque at low speed; available in very small sizes (a few millimetres diameter).</li><li><b>Disadvantages:</b> brushes and commutator wear out, so life is limited (typically 1000 to 5000 hours) and sparking causes radio interference; the field flux cannot be varied, so <b>field weakening</b> for speeds above base speed is not possible; the magnets can be demagnetised by excessive armature current (a stall), by mechanical shock or by high temperature, and cannot be restored; maximum power is limited to a few hundred watts; not suitable for hazardous atmospheres because of sparking.</li><li><b>Applications:</b> toys, models and hobby robotics; automobile accessories such as windshield wipers, power windows, seat adjustment, blower fans, mirror adjustment and fuel pumps; domestic appliances such as mixers, shavers, toothbrushes and small fans; computer peripherals such as CD/DVD tray drives and printers; battery-operated tools; small servo systems and instrument drives; medical devices; vending machines and coin-operated equipment.</li></ul><div class="note"><span class="tag">Note</span><p>PMDC motors are very often combined with a <b>gearbox</b> to make a <b>geared DC motor</b>. A gear reduction of 30:1 or 100:1 lowers the speed and multiplies the torque by the same factor, which is exactly what a robot wheel or joint needs. Encoder-equipped versions are called gear motors with feedback and form the basis of many servo drives.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A three-phase induction motor has a laminated stator with three-phase windings and a squirrel cage or slip-ring rotor. The rotating magnetic field induces rotor currents, which produce torque.</li><li>N<sub>s</sub> = 120f/P; slip s = (N<sub>s</sub> &minus; N<sub>r</sub>)/N<sub>s</sub>; rotor frequency f<sub>r</sub> = sf. The rotor can never reach synchronous speed.</li><li>Induction motors draw 5 to 8 times full-load current at starting; star-delta, soft starters and VFDs are used to limit it. A VFD keeps V/f constant to control speed.</li><li>A single-phase induction motor is not self-starting and needs a starting winding with a capacitor or a shading ring.</li><li>A BLDC motor is a DC motor turned inside out: permanent magnets on the rotor, three-phase windings on the stator, and electronic six-step commutation from an inverter bridge.</li><li>BLDC motors need rotor position information, from three Hall sensors or from back-EMF sensing in sensorless drives. Speed and torque are controlled by PWM.</li><li>BLDC advantages are no brush wear, higher efficiency and power density, quiet operation and long life; the disadvantage is that an electronic controller is essential.</li><li>A PMDC motor uses permanent magnet stator poles, so the flux is constant. Torque T = K<sub>t</sub>I<sub>a</sub> and back EMF E<sub>b</sub> = K<sub>e</sub>&#969;, giving a straight-line speed-torque characteristic.</li><li>PMDC motors are cheap, compact and easy to control, but they have brush wear, cannot be field weakened and can be permanently demagnetised by a stall.</li><li>PMDC motors are almost always used with a gearbox in robotics and automotive accessory drives.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Describe the construction of a three-phase squirrel cage induction motor.</li><li>Explain why an induction motor can never run at synchronous speed. Define slip.</li><li>A 6-pole, 50 Hz induction motor runs at 960 rpm. Find the synchronous speed, the slip and the rotor frequency. (Answers: 1000 rpm, 4 %, 2 Hz)</li><li>Sketch and explain the torque-slip characteristic of an induction motor.</li><li>Why does a single-phase induction motor need a starting arrangement? Name four types.</li><li>Describe the construction of a BLDC motor. Why is it said to be a DC motor turned inside out?</li><li>Explain six-step commutation of a BLDC motor with a waveform diagram. What role do the Hall sensors play?</li><li>Compare BLDC, brushed DC and AC induction motors on any six points.</li><li>Explain the construction and working of a PMDC motor. Why is its speed-torque characteristic a straight line?</li><li>A PMDC motor has K<sub>t</sub> = 0.03 N m/A, R<sub>a</sub> = 1.5 &#937; and is supplied with 9 V. Find the no-load speed in rad/s and the stall torque. (Answers: 300 rad/s, 0.18 N m)</li><li>State the advantages and limitations of a PMDC motor and list four applications.</li><li>What is a variable frequency drive and how does it control the speed of an induction motor?</li></ol></div><div class="pager"><a class="prev" href="10-solenoid-dc-motor-stepper-motor.html"><span class="dir">&larr; Previous topic</span><span class="ttl">10. Solenoids, Brushed DC Motor and Stepper Motor</span></a><a class="next" href="12-servo-motor-construction-working-specification.html"><span class="dir">Next topic &rarr;</span><span class="ttl">12. Servo Motor &mdash; Construction, Working Principle and Specifications</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

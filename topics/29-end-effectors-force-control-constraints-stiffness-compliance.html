@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>End Effectors and Force Control &mdash; Static Force/Torque, Constraints, Stiffness and Compliance | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="The devices at the end of a robot arm and how a robot controls contact force: grippers and tools, the Jacobian transpose relation, natural and artific">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit IV &middot; Topic 29 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit IV &rsaquo; Topic 29</nav><div class="unit-tag">Unit IV</div><h2 class="page-title"><span class="topic-no">29</span>End Effectors and Force Control &mdash; Static Force/Torque, Constraints, Stiffness and Compliance</h2><p class="lede">The devices at the end of a robot arm and how a robot controls contact force: grippers and tools, the Jacobian transpose relation, natural and artificial constraints, and the crucial idea of compliance.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">End Effectors</a></li><li><a href="#sec2">Why Force Control is Needed</a></li><li><a href="#sec3">Static Force and Torque Relationships</a></li><li><a href="#sec4">Natural and Artificial Constraints</a></li><li><a href="#sec5">Stiffness and Compliance</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>End Effectors</h3><div class="defbox"><span class="tag">Definition</span><p>An <b>end effector</b> is the device mounted on the robot wrist that actually performs the task. It is the &ldquo;hand&rdquo; of the robot. The end effector is not part of the robot itself; it is chosen and designed for the specific job, and it is often changed several times during a shift.</p></div><p>End effectors fall into two families: <b>grippers</b>, which hold and move a workpiece, and <b>tools</b>, which perform an operation on the workpiece such as welding, painting, cutting or drilling. A third category is <b>sensors</b> mounted at the wrist, such as a force/torque sensor or a camera, which are not themselves effectors but are mounted in the same position.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 330" width="880" height="330" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Types of end effector</text><text x="140" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(a) Parallel jaw gripper</text><rect x="90" y="70" width="100" height="40" rx="4" class="mech"/><line x1="110" y1="110" x2="110" y2="150" class="cmp" stroke-width="6"/><line x1="170" y1="110" x2="170" y2="150" class="cmp" stroke-width="6"/><rect x="96" y="150" width="30" height="60" rx="3" class="mech2"/><rect x="154" y="150" width="30" height="60" rx="3" class="mech2"/><rect x="124" y="158" width="32" height="44" rx="3" class="t-box3"/><text x="140" y="184" font-size="10" fill="#12283d" text-anchor="middle" font-weight="600">part</text><polyline points="92,180 66,180" class="lnk" marker-end="url(#ah)"/><polyline points="188,180 214,180" class="lnk" marker-end="url(#ah)"/><text x="140" y="232" font-size="10.5" fill="#5b6b7c" text-anchor="middle">friction or shape grip;</text><text x="140" y="246" font-size="10.5" fill="#5b6b7c" text-anchor="middle">most common type</text><text x="350" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(b) Angular (swinging)</text><rect x="310" y="70" width="80" height="34" rx="4" class="mech"/><line x1="330" y1="104" x2="300" y2="160" class="cmp" stroke-width="6"/><line x1="370" y1="104" x2="400" y2="160" class="cmp" stroke-width="6"/><rect x="290" y="158" width="26" height="44" rx="3" class="mech2"/><rect x="386" y="158" width="26" height="44" rx="3" class="mech2"/><circle cx="350" cy="130" r="14" class="t-box3"/><text x="350" y="232" font-size="10.5" fill="#5b6b7c" text-anchor="middle">fingers pivot; grips from</text><text x="350" y="246" font-size="10.5" fill="#5b6b7c" text-anchor="middle">outside or inside</text><text x="560" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(c) Vacuum (suction)</text><rect x="520" y="70" width="80" height="40" rx="4" class="mech"/><line x1="560" y1="110" x2="560" y2="148" class="cmp" stroke-width="6"/><path d="M 540 148 L 580 148 L 588 176 L 532 176 Z" class="mech3"/><ellipse cx="560" cy="178" rx="30" ry="9" fill="#cfe6d6" stroke="#2c6a48" stroke-width="1.6"/><rect x="524" y="186" width="72" height="14" rx="2" class="t-box3"/><text x="560" y="220" font-size="10.5" fill="#5b6b7c" text-anchor="middle">vacuum generator + cup;</text><text x="560" y="234" font-size="10.5" fill="#5b6b7c" text-anchor="middle">flat, smooth, non-porous parts</text><text x="760" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(d) Magnetic</text><rect x="720" y="70" width="80" height="40" rx="4" class="mech"/><line x1="760" y1="110" x2="760" y2="148" class="cmp" stroke-width="6"/><rect x="726" y="148" width="68" height="34" rx="4" class="cmp-y"/><text x="742" y="170" font-size="11" fill="#a8232a" text-anchor="middle" font-weight="700">N</text><text x="778" y="170" font-size="11" fill="#0f5fa8" text-anchor="middle" font-weight="700">S</text><rect x="726" y="184" width="68" height="14" rx="2" class="mech2"/><text x="760" y="220" font-size="10.5" fill="#5b6b7c" text-anchor="middle">permanent (with release</text><text x="760" y="234" font-size="10.5" fill="#5b6b7c" text-anchor="middle">lever) or electromagnetic</text><rect x="60" y="258" width="760" height="56" rx="8" class="t-box2"/><text x="440" y="280" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">TOOLS (the other family of end effectors): welding torch &middot; paint spray gun &middot; grinding and polishing spindle &middot; drilling head &middot; laser cutter &middot; waterjet &middot; screwdriver &middot; dispensing nozzle &middot; knife &middot; hot melt gun</text><text x="440" y="300" font-size="10.5" fill="#5b6b7c" text-anchor="middle">A tool changer allows one robot to switch automatically between a gripper and several tools.</text></svg></div><figcaption><b>Fig. 1:</b> The main types of end effector: parallel jaw, angular, vacuum and magnetic grippers, and the family of process tools.</figcaption></figure><h4>Grippers</h4><ul><li><b>Parallel jaw gripper</b> &mdash; two flat fingers that close in a straight line. The most common type. It grips by friction or by enclosing the part between shaped fingers. Driven by a pneumatic cylinder, an electric motor through a screw or a cam, or a solenoid. Two fingers are standard; three fingers are used for cylindrical parts.</li><li><b>Angular (swinging or pivoting) gripper</b> &mdash; the fingers pivot about a point, so they can grip a part from outside or from inside (internal gripping of a hole or a tube). Useful where straight-line access is not available.</li><li><b>Scissor (shear) gripper</b> &mdash; fingers that cross, for thin or delicate items.</li><li><b>Vacuum (suction) gripper</b> &mdash; a rubber, polyurethane or foam cup is pressed against the part and the air is evacuated by a venturi ejector or an electric pump. Excellent for flat, smooth, non-porous parts such as glass, sheet metal, tiles, plastic panels and cardboard. Very light and fast, and it does not damage the surface. It fails on porous, oily, very hot or very small parts.</li><li><b>Magnetic gripper</b> &mdash; a permanent magnet with a mechanical release, or an electromagnet. Used for ferrous sheet metal, discs and rings. Very strong and simple, but residual magnetism can make release difficult, and it cannot be used near sensitive electronics.</li><li><b>Adhesive / hook-and-loop gripper</b> &mdash; for very light items such as fabric.</li><li><b>Bernoulli gripper</b> &mdash; uses a high-speed air flow to create a lifting force without contact; used for silicon wafers and delicate sheets.</li><li><b>Needle / pin gripper</b> &mdash; many small pins retract into a compliant surface and lock around the object; used for textiles, foam and irregular soft items.</li><li><b>Soft / compliant gripper</b> &mdash; elastomer fingers actuated by air, fluid or shape-memory alloy. They conform to the shape of the object and can grip delicate, irregular items such as fruit, eggs and cables.</li><li><b>Dexterous (multi-fingered) hand</b> &mdash; three to five fingers with several joints each, driven by tendons or small motors, with tactile sensing. Used in research and in advanced assembly.</li><li><b>Collet, chuck and expanding mandrel</b> &mdash; for holding cylindrical parts and for internal gripping.</li></ul><h4>Gripper design considerations</h4><ol><li><b>Gripping force.</b> Calculate the force needed to hold the part against gravity and against the acceleration of the robot. For a friction grip, F<sub>grip</sub> = (m a<sub>total</sub>) / (&#956; n), where a<sub>total</sub> is the resultant of gravity and the maximum acceleration, &#956; is the coefficient of friction and n the number of fingers. A <b>safety factor of 2 to 3</b> is applied to cover oil, vibration and wear.</li><li><b>Stroke.</b> The finger travel must accommodate the tolerance on the part size and must allow easy entry.</li><li><b>Speed.</b> Opening and closing time adds to the cycle time. Pneumatic grippers are fastest.</li><li><b>Accuracy and repeatability</b> of the finger position, which affects how the part is placed.</li><li><b>Weight.</b> The gripper counts as payload and adds inertia, so it must be as light as possible.</li><li><b>Sensing.</b> Open/close confirmation switches are essential; force sensing, part-present sensing and slip detection are used for higher-quality applications.</li><li><b>Fail-safe behaviour.</b> On loss of air or power the gripper should not drop the part. Spring-applied and normally-closed designs, or check valves that trap the air, are used.</li><li><b>Environment.</b> Cleanroom, food-grade, high temperature, explosive atmosphere or washdown may all be required.</li><li><b>Changeover.</b> A <b>tool changer</b> allows one robot to switch automatically between several end effectors, with automatic connection of air, power and signals.</li></ol><div class="example"><span class="tag">Example</span><p><b>Gripping force calculation.</b> A part of mass 2 kg is held by a two-finger gripper with a coefficient of friction of 0.15. The robot may accelerate at up to 2 g = 19.6 m/s&#178;. The worst case is when the part is held horizontally and accelerated vertically upward: the total force to be resisted is m(g + a) = 2(9.81 + 19.6) = 58.8 N. Each finger provides friction &#956;F, and there are two fingers, so 2 &times; 0.15 &times; F = 58.8, giving F = <b>196 N</b>. With a safety factor of 2, the gripper must supply <b>392 N</b> per finger. This shows why friction gripping of a heavy part at high acceleration needs a very powerful gripper, and why a shaped (encapsulating) finger that does not rely on friction is often a better solution.</p></div><h4>Tools</h4><ul><li><b>Welding</b> &mdash; a spot welding gun (heavy, water cooled, with a transformer) or an arc welding torch with a wire feeder and gas supply.</li><li><b>Painting and coating</b> &mdash; a spray gun with atomising air, a paint supply and an electrostatic charging electrode. The whole robot must be explosion proof.</li><li><b>Cutting</b> &mdash; laser head, plasma torch, waterjet nozzle, ultrasonic knife, routing spindle, shearing blade.</li><li><b>Material removal</b> &mdash; grinding wheel, deburring tool, polishing and buffing spindle, wire brush.</li><li><b>Assembly</b> &mdash; nut runner and screwdriver with torque and angle monitoring, riveting gun, press, adhesive dispensing gun, soldering iron, ultrasonic welding horn.</li><li><b>Dispensing</b> &mdash; glue, sealant, silicone, solder paste and encapsulant guns with metering.</li><li><b>Inspection</b> &mdash; camera, laser scanner, ultrasonic probe, feeler gauge, touch probe.</li></ul><h3 id="sec2"><span class="sec-no">2.</span>Why Force Control is Needed</h3><p>Ordinary position control assumes that the robot moves freely in space. As soon as the tool touches something, that assumption fails. If a position-controlled robot is commanded to move 1 mm into a rigid surface, it will try to do so, and because the structure is stiff the resulting force can be enormous &mdash; enough to break the tool, damage the part or damage the robot. This is the fundamental problem of contact tasks.</p><p>Many industrial tasks are defined by <b>force</b> rather than by position: polishing must apply a constant pressure; assembly must push a peg in without jamming; grinding must maintain a constant normal force so the removal rate is uniform; deburring must follow an uneven edge at constant force; and a robot handing an object to a person must be gentle. These tasks need <b>force control</b>.</p><h3 id="sec3"><span class="sec-no">3.</span>Static Force and Torque Relationships</h3><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Static force and torque relationship &mdash; the Jacobian transpose</text><circle cx="140" cy="200" r="16" class="mech"/><circle cx="140" cy="200" r="6" class="cmp-f"/><line x1="140" y1="200" x2="250" y2="130" class="cmp" stroke-width="10"/><circle cx="250" cy="130" r="10" class="cmp-f"/><line x1="250" y1="130" x2="350" y2="150" class="cmp" stroke-width="8"/><rect x="344" y="138" width="30" height="24" rx="3" class="t-box3"/><text x="200" y="236" font-size="11.5" fill="#a8232a" text-anchor="middle" font-weight="700">&#952;1</text><text x="268" y="116" font-size="11.5" fill="#a8232a" text-anchor="middle" font-weight="700">&#952;2</text><polyline points="378,150 428,150" class="lnk" marker-end="url(#ah)"/><text x="436" y="154" font-size="11.5" fill="#157a4b" text-anchor="start" font-weight="600">F  (force at the tool)</text><path d="M 190 186 A 56 56 0 0 1 196 222" class="lnk" marker-end="url(#ah)"/><text x="214" y="210" font-size="10.5" fill="#a8232a" text-anchor="start">&#964;1 (joint torque)</text><rect x="480" y="60" width="360" height="200" rx="8" class="t-box2"/><text x="660" y="88" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">Static force / torque relations</text><text x="660" y="122" font-size="17" fill="#12283d" text-anchor="middle" font-weight="700" font-family="Consolas,Menlo,monospace">&#964; = J<sup>T</sup> F</text><text x="660" y="150" font-size="15" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">F = ( J<sup>T</sup> )<sup>&minus;1</sup> &#964;</text><text x="660" y="182" font-size="11" fill="#5b6b7c" text-anchor="middle">&#964; = joint torque vector (n &times; 1)</text><text x="660" y="200" font-size="11" fill="#5b6b7c" text-anchor="middle">F = force / torque vector at the tool (6 &times; 1)</text><text x="660" y="218" font-size="11" fill="#5b6b7c" text-anchor="middle">J = Jacobian matrix, relates joint rates to</text><text x="660" y="236" font-size="11" fill="#5b6b7c" text-anchor="middle">tool velocities:   &#7819; = J &#952;&#775;</text><text x="440" y="282" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">For a single joint, the simple relation is torque = force &times; perpendicular distance: &#964; = F r sin&#966;.</text></svg></div><figcaption><b>Fig. 2:</b> Static force and torque relationship. The Jacobian transpose maps a force at the tool into the torques required at the joints.</figcaption></figure><p>When the robot is stationary and the tool is in contact with the environment, a force and torque F acts at the tool centre point. Each joint must supply a torque to resist it. The relationship is given by the <b>transpose of the Jacobian</b>:</p><span class="eq">&#964; = J<sup>T</sup>(&#952;) F</span><p>where &#964; is the n &times; 1 vector of joint torques, J is the 6 &times; n Jacobian matrix and F is the 6 &times; 1 vector of forces and torques at the tool, expressed in the base frame:</p><span class="eq">F = [ F<sub>x</sub>  F<sub>y</sub>  F<sub>z</sub>  M<sub>x</sub>  M<sub>y</sub>  M<sub>z</sub> ]<sup>T</sup>       &#964; = [ &#964;<sub>1</sub>  &#964;<sub>2</sub>  &hellip;  &#964;<sub>n</sub> ]<sup>T</sup></span><p>This relation is the principle of <b>virtual work</b>: the work done by the joint torques through the joint displacements equals the work done by the tool force through the tool displacement. It works in both directions:</p><ul><li><b>From force to torque</b> (&#964; = J<sup>T</sup>F) &mdash; used to calculate the motor torque needed to apply a given process force, and in <b>joint torque control</b> where the controller commands a torque instead of a position.</li><li><b>From torque to force</b> (F = (J<sup>T</sup>)<sup>&minus;1</sup>&#964;) &mdash; used to estimate the contact force from the measured motor currents, which is how a robot without a wrist sensor can still detect a collision. This is called <b>sensorless force estimation</b> and is now standard in collaborative robots.</li></ul><p>For a single joint the relation reduces to the familiar lever rule, &#964; = F r sin&#966;, where r is the distance from the joint axis to the point of application and &#966; the angle between the force and the radius. This means the <b>same</b> tool force requires <b>more</b> joint torque when the arm is stretched out than when it is folded in &mdash; another reason to keep the working points close to the robot base.</p><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> A grinding robot must apply a normal force of 150 N at the tool. The tool is 0.9 m horizontally from joint 2 and 0.5 m from joint 3. The static torque required at joint 3 is 150 &times; 0.5 = <b>75 N m</b>, and at joint 2 it is 150 &times; 0.9 = <b>135 N m</b>, in addition to the torque needed to support the weight of the arm and the grinder. This is why grinding robots are rated for a large payload even though the grinder itself is light.</p></div><h3 id="sec4"><span class="sec-no">4.</span>Natural and Artificial Constraints</h3><p>The idea of constraints was formalised by Mason and by Raibert and Craig in the development of <b>hybrid position/force control</b>. A task is described by listing which directions of motion are constrained by the environment and which are free.</p><div class="defbox"><span class="tag">Definition</span><p><b>Natural constraints</b> are those imposed by the <b>geometry and physics of the task itself</b>. They exist whether or not a robot is present, and they cannot be violated. They define which motions are possible and which forces can be applied.<br><br><b>Artificial constraints</b> are those <b>imposed by the control system or by the programmer</b> in order to perform the task in the desired way. They are a choice, and they can be changed by rewriting the program.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Natural and artificial constraints (task frame)</text><text x="180" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(a) Natural constraint &mdash; peg in a hole</text><rect x="60" y="200" width="250" height="40" rx="3" class="mech"/><rect x="150" y="200" width="60" height="40" rx="0" class="t-box"/><path d="M 150 200 L 150 240 M 210 200 L 210 240" stroke="#fff" stroke-width="6"/><rect x="158" y="90" width="44" height="130" rx="4" class="mech2"/><text x="180" y="82" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">peg</text><polyline points="180,150 180,190" class="lnk" marker-end="url(#ah)"/><text x="196" y="176" font-size="10" fill="#157a4b" text-anchor="start">free to move along z (select axis)</text><polyline points="206,160 238,160" class="lnk-d" marker-end="url(#ah)"/><text x="246" y="164" font-size="10" fill="#a8232a" text-anchor="start">constrained in x and y</text><polyline points="216,120 240,120" class="lnk" marker-end="url(#ah)"/><text x="196" y="262" font-size="10.5" fill="#5b6b7c" text-anchor="middle">the geometry of the task itself</text><text x="196" y="276" font-size="10.5" fill="#5b6b7c" text-anchor="middle">prevents motion &mdash; this is NATURAL</text><text x="560" y="58" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">(b) Artificial constraint &mdash; software limits</text><rect x="430" y="90" width="300" height="150" rx="8" class="t-box2"/><text x="450" y="118" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Motion permitted only along selected axes</text><text x="450" y="138" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Force limited along the constrained axes</text><text x="450" y="158" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Joint limit switches and soft limits</text><text x="450" y="178" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Forbidden zones programmed in the controller</text><text x="450" y="198" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Compliance programmed into the servo loop</text><text x="450" y="218" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Maximum speed and maximum force limits</text><text x="560" y="268" font-size="10.5" fill="#5b6b7c" text-anchor="middle">imposed by the control system or the</text><text x="560" y="282" font-size="10.5" fill="#5b6b7c" text-anchor="middle">environment &mdash; this is ARTIFICIAL</text><polyline points="760,130 810,130" class="lnk" marker-end="url(#ah)"/><polyline points="760,130 760,80" class="lnk" marker-end="url(#ah)"/><text x="818" y="134" font-size="11" fill="#5b6b7c" text-anchor="start" font-weight="700">x</text><text x="756" y="74" font-size="11" fill="#5b6b7c" text-anchor="end" font-weight="700">z</text><text x="790" y="106" font-size="10" fill="#5b6b7c" text-anchor="middle">task frame</text></svg></div><figcaption><b>Fig. 3:</b> Natural constraints arise from the geometry of the task (a peg in a hole); artificial constraints are imposed by the control system.</figcaption></figure><h4>Examples of natural constraints</h4><ul><li><b>Peg in a hole.</b> A round peg of diameter slightly less than the hole can slide freely along the hole axis (z) and can rotate about that axis. It cannot move in x or y, and it cannot tilt about x or y without jamming. So the natural constraints are: velocity constrained to zero in x, y, and in rotation about x and y; force constrained to zero in z and in rotation about z. The task is to move along z (free) while applying no force in x and y (constrained).</li><li><b>Wiping a surface.</b> Motion perpendicular to the surface is impossible (position constrained); motion along the surface is free; a normal force must be applied but the tangential force is not specified.</li><li><b>Turning a crank or a handwheel.</b> The hand is constrained to move on a circle; the radial force is unconstrained.</li><li><b>Inserting a key, screwdriving, opening a door, pulling a drawer, polishing, deburring, writing on a whiteboard</b> &mdash; each has its own set of natural constraints.</li><li><b>Rolling without slipping</b> &mdash; a non-holonomic constraint, because it restricts velocities but not positions.</li></ul><h4>Examples of artificial constraints</h4><ul><li><b>Motion along the free directions</b> at a specified speed &mdash; the programmer chooses how fast to push the peg in.</li><li><b>Force along the constrained directions</b> &mdash; the programmer chooses to apply 20 N of polishing pressure.</li><li><b>Joint limits, soft limits and forbidden zones</b> programmed into the controller.</li><li><b>Maximum speed and maximum force limits</b> for safety, especially in collaborative robots.</li><li><b>Compliance or stiffness values</b> set in the servo loop for each direction.</li><li><b>The choice of the task frame</b> &mdash; the coordinate system in which the constraints are expressed. This is an arbitrary choice by the programmer, and choosing it well makes the task description very simple.</li><li><b>The path</b> taken between two points.</li><li><b>The selection matrix</b> in hybrid control, which decides for each of the six directions whether position or force is controlled.</li></ul><h4>Hybrid position/force control</h4><p>The classical solution is to divide the six directions of the <b>task frame</b> into two sets: those in which <b>position</b> is controlled (the naturally constrained directions, where motion is impossible, so we command a force) and those in which <b>force</b> is controlled (the naturally free directions, where motion is possible, so we command a position or a velocity). A diagonal <b>selection matrix S</b> with 0s and 1s does the switching:</p><span class="eq">u = S [ force controller output ] + (I &minus; S) [ position controller output ]</span><p>For peg-in-hole, S selects force control in x, y, roll and pitch, and position control in z and yaw. For surface polishing, S selects force control along the surface normal and position control in the two tangential directions and in the orientations.</p><div class="note"><span class="tag">Note</span><p>In practice, the task frame must be <b>aligned with the constraints</b>. If the hole is tilted 5&deg; from the robot's z axis and the controller uses the robot frame, it will command motion in a direction that is partly constrained, and it will jam. This is why the frame must be defined carefully, sometimes by first probing the surface to find its orientation.</p></div><h3 id="sec5"><span class="sec-no">5.</span>Stiffness and Compliance</h3><div class="defbox"><span class="tag">Definition</span><p><b>Stiffness</b> k is the force needed to produce a unit displacement: k = F/x, measured in N/m (or in N m/rad for rotational stiffness). <b>Compliance</b> c is the reciprocal: c = x/F = 1/k, measured in m/N. A stiff system barely moves under load; a compliant system moves easily.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Stiffness and compliance</text><rect x="60" y="55" width="340" height="180" rx="6" class="t-box"/><line x1="96" y1="210" x2="96" y2="75" class="ax" marker-end="url(#ah)"/><line x1="96" y1="210" x2="376" y2="210" class="ax" marker-end="url(#ah)"/><text x="382" y="214" font-size="11.5" fill="#5b6b7c" text-anchor="start">displacement x</text><text x="90" y="69" font-size="11.5" fill="#5b6b7c" text-anchor="start">force F</text><path d="M 96 210 L 370 82" class="lnk" stroke-width="2.4"/><text x="300" y="92" font-size="10.5" fill="#a8232a" text-anchor="start">stiff  k = F / x  (large slope)</text><path d="M 96 210 L 372 176" class="lnk" stroke-width="2.4"/><text x="300" y="194" font-size="10.5" fill="#157a4b" text-anchor="start">compliant  c = x / F  (small slope)</text><text x="230" y="254" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Stiffness k = F / x  (N/m);   Compliance c = 1 / k = x / F  (m/N)</text><rect x="470" y="55" width="370" height="180" rx="8" class="t-box2"/><text x="655" y="82" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Why compliance matters</text><text x="490" y="112" font-size="10.8" fill="#12283d" text-anchor="start">A rigid robot pressing into a rigid part generates</text><text x="490" y="131" font-size="10.8" fill="#12283d" text-anchor="start">enormous force from a tiny position error &rarr; damage.</text><text x="490" y="150" font-size="10.8" fill="#12283d" text-anchor="start">Compliance allows the tool to absorb misalignment.</text><text x="490" y="169" font-size="10.8" fill="#12283d" text-anchor="start">Passive compliance: springs, elastomer pads, RCC</text><text x="490" y="188" font-size="10.8" fill="#12283d" text-anchor="start">devices, remote centre compliance wrist.</text><text x="490" y="207" font-size="10.8" fill="#12283d" text-anchor="start">Active compliance: force sensor in the wrist plus a</text><text x="490" y="226" font-size="10.8" fill="#12283d" text-anchor="start">control loop that adjusts position to hold force.</text><text x="440" y="274" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Insertion tasks need compliance in the directions where the part is constrained by the hole, and stiffness in the direction of insertion.</text></svg></div><figcaption><b>Fig. 4:</b> Stiffness is the slope of the force-displacement curve; compliance is its reciprocal. Insertion tasks need compliance in the constrained directions and stiffness along the insertion direction.</figcaption></figure><h4>Why compliance is essential for contact tasks</h4><p>Consider a rigid robot trying to insert a peg into a hole with a clearance of only 0.1 mm. If the hole is misplaced by 0.2 mm, a rigid position-controlled robot will simply push harder, generating a force of thousands of newtons and jamming or breaking something. If the wrist is <b>compliant</b> in the lateral directions, the same 0.2 mm error produces only a small lateral force, and that force tilts the peg so that it finds the hole. <b>Compliance converts a position error into a harmless small force and a self-correcting motion.</b></p><p>The same principle explains why a person can insert a key by feel: the fingers and wrist are compliant, so the key is guided into the slot by the contact forces themselves rather than by precise positioning.</p><h4>Passive compliance</h4><p>Compliance built into the hardware, with no sensing or control.</p><ul><li><b>Elastomer pads and spring mounts</b> &mdash; a rubber or spring element between the wrist and the tool. Cheap and simple, but the compliance is the same in all directions unless shaped carefully.</li><li><b>Remote Centre Compliance (RCC) device</b> &mdash; the classic passive compliant wrist. It consists of two plates separated by elastomer shear pads arranged so that the <b>compliance centre</b> is located remotely, near the tip of the peg. A lateral force at the peg tip then produces a small lateral displacement and a small tilt, which guides the peg into the hole instead of jamming it. The axial direction remains stiff, so the peg can be pushed in. RCC devices made automatic assembly possible in the 1970s and 1980s and are still used.</li><li><b>Compliant fingers and soft grippers</b> &mdash; foam, rubber or elastomer finger pads.</li><li><b>Bellows, flexures and notch hinges</b> &mdash; precisely designed elastic elements that give compliance in chosen directions only.</li><li><b>Series elastic actuator (SEA)</b> &mdash; a spring placed deliberately between the motor gearbox and the load. The spring deflection measures the torque, and the compliance makes the robot safe on impact and able to store and release energy. Used in legged robots such as those developed at MIT and in modern humanoids and exoskeletons.</li><li><b>Inherent compliance</b> &mdash; the elasticity of the links, gears and bearings. It is always present but is usually too small and too unpredictable to rely on.</li></ul><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Remote Centre Compliance (RCC) device</text><rect x="330" y="50" width="220" height="26" rx="3" class="mech"/><text x="440" y="44" font-size="11" fill="#5b6b7c" text-anchor="middle">robot wrist flange</text><rect x="380" y="76" width="120" height="22" rx="3" class="mech2"/><rect x="392" y="98" width="22" height="26" rx="4" class="cmp-y"/><rect x="422" y="98" width="22" height="26" rx="4" class="cmp-y"/><rect x="452" y="98" width="22" height="26" rx="4" class="cmp-y"/><rect x="482" y="98" width="22" height="26" rx="4" class="cmp-y"/><text x="560" y="116" font-size="11" fill="#e07b00" text-anchor="start">elastomer shear pads</text><rect x="380" y="124" width="120" height="22" rx="3" class="mech2"/><line x1="440" y1="146" x2="440" y2="190" class="cmp" stroke-width="8"/><rect x="418" y="190" width="44" height="30" rx="3" class="t-box3"/><text x="440" y="234" font-size="10.5" fill="#5b6b7c" text-anchor="middle">peg / tool</text><circle cx="440" cy="210" r="4" class="dot"/><text x="520" y="216" font-size="10.5" fill="#157a4b" text-anchor="start">remote compliance centre is located</text><text x="520" y="232" font-size="10.5" fill="#157a4b" text-anchor="start">near the peg tip, so lateral forces</text><text x="520" y="248" font-size="10.5" fill="#157a4b" text-anchor="start">cause the peg to tilt into the hole</text><polyline points="300,160 300,196" class="lnk" marker-end="url(#ah)"/><text x="292" y="180" font-size="10.5" fill="#a8232a" text-anchor="end">lateral error</text><path d="M 424 172 A 30 30 0 0 0 404 196" class="lnk-d" marker-end="url(#ah)"/><text x="392" y="168" font-size="10" fill="#0f5fa8" text-anchor="end">small tilt</text></svg></div><figcaption><b>Fig. 5:</b> A Remote Centre Compliance device. The elastomer shear pads place the compliance centre near the tool tip, so a lateral force tilts the peg into the hole instead of jamming it.</figcaption></figure><h4>Active compliance</h4><p>Compliance produced by the control system rather than by hardware. A <b>force/torque sensor</b> in the wrist measures the actual contact force, and the controller adjusts the commanded position so that the force equals the desired value. This is far more flexible than passive compliance: the stiffness can be programmed separately in each of the six directions, it can be changed during the task, and it can be made non-linear.</p><ul><li><b>Impedance control</b> &mdash; the robot behaves as if it were a mass-spring-damper system with a programmed stiffness, damping and inertia. It does not track a force exactly but produces a natural, stable interaction. Widely used in assembly, polishing and human-robot interaction.</li><li><b>Admittance control</b> &mdash; the measured force is used to modify the commanded position; the robot &ldquo;gives way&rdquo; when pushed. Used in collaborative robots and in hand-guiding teach mode.</li><li><b>Explicit force control</b> &mdash; a PID loop on the measured force, used where the force must be held exactly, as in grinding.</li><li><b>Hybrid position/force control</b> &mdash; as described above, with a selection matrix.</li><li><b>Stiffness matrix control</b> &mdash; a 6 &times; 6 matrix specifying the stiffness in and between all directions, giving a full description of the compliant behaviour.</li></ul><h4>Compliance and stability</h4><p>There is an important trade-off. A compliant robot is safe and forgiving but is less accurate and responds more slowly. A stiff robot is accurate and fast but is dangerous on contact and will jam in assembly. Also, when a robot with a force sensor contacts a stiff environment, the force control loop can become <b>unstable</b> and chatter, because the sensor, the structure and the environment form a resonant system. Reducing the force loop gain, adding damping, filtering the force signal and increasing the compliance all improve stability. This is one of the classic problems of force control.</p><div class="tbl-scroll"><table><caption>Table 29.1 &mdash; Passive and active compliance compared</caption><thead><tr><th>Feature</th><th>Passive compliance</th><th>Active compliance</th></tr></thead><tbody><tr><td>How it is obtained</td><td>Springs, elastomers, flexures, RCC, SEA</td><td>Force sensor plus a control loop</td></tr><tr><td>Cost</td><td>Low</td><td>High (sensor, amplifier, computing)</td></tr><tr><td>Adjustability</td><td>Fixed by the hardware</td><td>Programmable in every direction, and changeable during the task</td></tr><tr><td>Bandwidth</td><td>Instantaneous &mdash; no delay</td><td>Limited by the sensor, the sampling rate and the loop gain</td></tr><tr><td>Accuracy</td><td>Reduced by the deflection</td><td>High &mdash; the deflection is measured and compensated</td></tr><tr><td>Stability</td><td>Always stable</td><td>Can chatter against a stiff environment</td></tr><tr><td>Suitability</td><td>Small, well-defined errors such as peg-in-hole</td><td>Grinding, polishing, deburring, human interaction, any varying force</td></tr><tr><td>Typical stiffness</td><td>Set by the spring rate</td><td>Programmed, from very soft to very stiff</td></tr></tbody></table></div><h4>Force control applications</h4><ul><li><b>Assembly</b> &mdash; peg-in-hole insertion, snap fitting, connector mating, gear meshing, bearing installation.</li><li><b>Surface finishing</b> &mdash; grinding, polishing, deburring, sanding and buffing, where a constant normal force is essential for a uniform finish.</li><li><b>Machining</b> &mdash; robotic milling and drilling with force-limited feed.</li><li><b>Testing</b> &mdash; pressing, spring testing, insertion force measurement, tactile probing.</li><li><b>Medical</b> &mdash; robotic surgery, ultrasound scanning and rehabilitation, where the contact force with the patient must be safe and constant.</li><li><b>Human-robot collaboration</b> &mdash; detecting contact with a person and stopping or yielding; hand-guiding teach mode.</li><li><b>Walking and legged robots</b> &mdash; controlling the foot contact force and the leg impedance.</li><li><b>Winding, tensioning and unwinding</b> &mdash; maintaining constant tension in a wire, a tape or a textile.</li><li><b>Welding and sealing</b> &mdash; maintaining a constant stand-off distance or contact force with the torch or nozzle.</li></ul><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>An end effector is the device at the wrist that performs the task; it belongs to one of two families, grippers or tools.</li><li>Grippers include parallel jaw, angular, scissor, vacuum, magnetic, Bernoulli, needle, soft and dexterous multi-fingered types.</li><li>Gripping force for a friction grip is F = ma/(&#956;n), with a safety factor of 2 to 3; a shaped encapsulating finger is better than friction for heavy parts.</li><li>Gripper design must consider force, stroke, speed, weight, sensing, fail-safe behaviour and the environment; a tool changer allows automatic switching.</li><li>Tools include welding guns, spray guns, cutting heads, grinding spindles, nut runners and dispensing nozzles.</li><li>Force control is needed because a rigid position-controlled robot in contact with a rigid environment generates very large forces.</li><li>The static relationship between tool force and joint torque is &#964; = J<sup>T</sup>F; the reverse, F = (J<sup>T</sup>)<sup>&minus;1</sup>&#964;, allows sensorless force estimation from motor currents.</li><li>Natural constraints are imposed by the geometry of the task and cannot be violated; artificial constraints are imposed by the control system and can be changed by reprogramming.</li><li>Hybrid position/force control uses a selection matrix to control force in the naturally constrained directions and position in the free directions.</li><li>Stiffness k = F/x and compliance c = x/F = 1/k. Compliance converts a position error into a small harmless force.</li><li>Passive compliance is built into hardware: elastomer pads, flexures, the Remote Centre Compliance device and series elastic actuators.</li><li>Active compliance uses a wrist force/torque sensor with impedance, admittance or explicit force control, and is programmable in all six directions.</li><li>Force control loops can chatter against a stiff environment, so gain, damping and filtering must be chosen carefully.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Define an end effector. Classify end effectors into families with two examples of each.</li><li>Describe any five types of gripper with their advantages, limitations and applications.</li><li>Derive the expression for the gripping force required to hold a part against gravity and acceleration.</li><li>A 3 kg part is held by a two-finger gripper with a coefficient of friction of 0.2 while the robot accelerates at 1.5 g. Find the required gripping force with a safety factor of 2.5.</li><li>List the factors to be considered when designing a gripper. What is a tool changer?</li><li>Why is force control necessary in addition to position control?</li><li>Derive the static force/torque relationship &#964; = J<sup>T</sup>F and explain its two uses.</li><li>How can a robot estimate contact force without a wrist sensor?</li><li>Define natural and artificial constraints. Give three examples of each.</li><li>Draw the task frame for a peg-in-hole insertion and specify the natural constraints in all six directions.</li><li>Explain hybrid position/force control and the role of the selection matrix.</li><li>Define stiffness and compliance. Why is compliance essential for an insertion task?</li><li>Describe a Remote Centre Compliance device and explain how it prevents jamming.</li><li>What is a series elastic actuator and what advantages does it give?</li><li>Compare passive and active compliance on any six points.</li><li>Why can an active force control loop become unstable, and how is this prevented?</li><li>List any six applications of force control in industry.</li></ol></div><div class="pager"><a class="prev" href="28-kinematic-chains-the-manipulator.html"><span class="dir">&larr; Previous topic</span><span class="ttl">28. Kinematic Chains &mdash; The Manipulator</span></a><a class="next" href="../index.html"><span class="dir">Back to &rarr;</span><span class="ttl">Contents</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

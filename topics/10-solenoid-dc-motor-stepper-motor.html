@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solenoids, Brushed DC Motor and Stepper Motor | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="Three electrical actuators in detail: the solenoid that produces a short straight-line stroke, the brushed DC motor whose speed and torque are easily ">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit II &middot; Topic 10 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit II &rsaquo; Topic 10</nav><div class="unit-tag">Unit II</div><h2 class="page-title"><span class="topic-no">10</span>Solenoids, Brushed DC Motor and Stepper Motor</h2><p class="lede">Three electrical actuators in detail: the solenoid that produces a short straight-line stroke, the brushed DC motor whose speed and torque are easily controlled, and the stepper motor that moves in exact digital steps without feedback.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Solenoid</a></li><li><a href="#sec2">Brushed DC Motor</a></li><li><a href="#sec3">Stepper Motor</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Solenoid</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>solenoid</b> is an electromagnetic actuator that converts electrical energy into a short, straight-line mechanical stroke. It consists of a coil of insulated copper wire wound on a former and a movable soft iron core called the <b>plunger</b> or <b>armature</b>.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Solenoid &mdash; construction and force-displacement characteristic</text><rect x="80" y="80" width="300" height="90" rx="6" class="t-box2"/><path d="M 100 165 a 14 14 0 0 1 28 0" class="cmp"/><path d="M 130 165 a 14 14 0 0 1 28 0" class="cmp"/><path d="M 160 165 a 14 14 0 0 1 28 0" class="cmp"/><path d="M 190 165 a 14 14 0 0 1 28 0" class="cmp"/><path d="M 220 165 a 14 14 0 0 1 28 0" class="cmp"/><path d="M 250 165 a 14 14 0 0 1 28 0" class="cmp"/><path d="M 280 165 a 14 14 0 0 1 28 0" class="cmp"/><path d="M 310 165 a 14 14 0 0 1 28 0" class="cmp"/><path d="M 340 165 a 14 14 0 0 1 28 0" class="cmp"/><line x1="100" y1="165" x2="100" y2="205" class="wire"/><line x1="356" y1="165" x2="356" y2="205" class="wire"/><line x1="100" y1="205" x2="356" y2="205" class="wire"/><line x1="228" y1="205" x2="228" y2="215" class="wire"/><line x1="215" y1="215" x2="241" y2="215" class="wire"/><line x1="220" y1="220" x2="236" y2="220" class="wire"/><line x1="224.5" y1="225" x2="231.5" y2="225" class="wire"/><text x="230" y="68" font-size="11" fill="#5b6b7c" text-anchor="middle">coil (many turns of enamelled copper)</text><rect x="200" y="100" width="150" height="46" rx="8" class="mech2"/><text x="275" y="126" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">soft iron plunger</text><line x1="350" y1="123" x2="420" y2="123" class="cmp" stroke-width="3"/><text x="425" y="127" font-size="11" fill="#5b6b7c" text-anchor="start">rod / link to the load</text><polyline points="400,100 356,100" class="lnk" marker-end="url(#ah)"/><text x="378" y="88" font-size="11" fill="#a8232a" text-anchor="middle">pull</text><path d="M 80 123 L 60 123 M 60 108 L 44 138 L 30 108 L 16 138 L 4 123" class="cmp" stroke-width="2"/><text x="40" y="168" font-size="10" fill="#5b6b7c" text-anchor="middle">return spring</text><rect x="520" y="55" width="320" height="175" rx="6" class="t-box"/><line x1="555" y1="200" x2="555" y2="65" class="ax" marker-end="url(#ah)"/><line x1="555" y1="200" x2="815" y2="200" class="ax" marker-end="url(#ah)"/><text x="821" y="204" font-size="11.5" fill="#5b6b7c" text-anchor="start">plunger travel x</text><text x="549" y="59" font-size="11.5" fill="#5b6b7c" text-anchor="start">force F</text><path d="M 555 190 C 640 186, 720 140, 806 70" class="lnk" stroke-width="2"/><text x="700" y="100" font-size="10.5" fill="#0f5fa8" text-anchor="start">force is large when the</text><text x="700" y="116" font-size="10.5" fill="#0f5fa8" text-anchor="start">air gap is small</text><text x="680" y="245" font-size="12" fill="#12283d" text-anchor="middle" font-weight="600">F &#8733; (N I)&#178; / g&#178;  &mdash; N = turns, I = current, g = air gap length</text></svg></div><figcaption><b>Fig. 1:</b> Solenoid construction and its force-displacement characteristic. The force is greatest when the plunger is nearly fully pulled in, that is, when the air gap is smallest.</figcaption></figure><h4>Working principle</h4><p>When a current flows through the coil, a magnetic field is set up along its axis, and the coil behaves like a bar magnet. The soft iron plunger inside the field becomes magnetised by induction and experiences a force that pulls it towards the centre of the coil, where the flux density is greatest. A spring usually returns the plunger when the current is switched off. The force on the plunger is approximately</p><span class="eq">F = (B&#178; A) / (2 &#956;<sub>0</sub>)      and since B &#8733; (N I)/g ,    F &#8733; (N I)&#178; / g&#178;</span><p>where B is the flux density in the air gap, A is the area of the pole face, &#956;<sub>0</sub> = 4&#960; &times; 10<sup>&minus;7</sup> H/m, N is the number of turns, I the current and g the length of the air gap. The important conclusion is that <b>the force increases rapidly as the air gap closes</b>, so a solenoid gives its maximum force at the end of its stroke, not at the beginning.</p><h4>Types of solenoid</h4><ul><li><b>Linear (pull type) solenoid</b> &mdash; the plunger is pulled into the coil; the most common type.</li><li><b>Push type solenoid</b> &mdash; the plunger is pushed out, using a reversed magnetic arrangement.</li><li><b>Rotary solenoid</b> &mdash; a disc with inclined grooves and balls converts the linear pull into a rotation of about 25&deg; to 45&deg;.</li><li><b>Latching (bi-stable) solenoid</b> &mdash; a permanent magnet holds the plunger in position, so current is needed only to change the state. Saves power and heat.</li><li><b>Proportional solenoid</b> &mdash; the force is proportional to the current over a useful part of the stroke, allowing proportional control of a valve.</li><li><b>Tubular, U-frame and E-frame</b> &mdash; different mechanical constructions giving different stroke and force combinations.</li><li><b>Voice coil actuator</b> &mdash; a permanent magnet and a moving coil; gives smooth, fast, precisely controllable motion over a short stroke, as in a hard disc drive or a loudspeaker.</li></ul><h4>Specifications</h4><div class="tbl-scroll"><table><caption>Table 10.1 &mdash; Typical solenoid specifications</caption><thead><tr><th>Specification</th><th>Typical value</th><th>Comment</th></tr></thead><tbody><tr><td>Supply voltage</td><td>3 V, 5 V, 6 V, 12 V, 24 V DC; 110 V, 230 V AC</td><td>Must match the control supply</td></tr><tr><td>Stroke</td><td>2 mm to 50 mm</td><td>Force falls off rapidly with stroke</td></tr><tr><td>Force</td><td>0.1 N to 100 N or more</td><td>Specified at a given stroke</td></tr><tr><td>Duty cycle</td><td>Continuous (100 %), 50 %, 25 %, intermittent</td><td>A 25 % duty solenoid burns out if left energised</td></tr><tr><td>Current</td><td>100 mA to several amperes</td><td>Determines the driver rating</td></tr><tr><td>Coil resistance</td><td>A few ohms to a few hundred ohms</td><td>Sets the current at a given voltage</td></tr><tr><td>Operating time</td><td>5 ms to 50 ms</td><td>Including mechanical travel</td></tr><tr><td>Life</td><td>10<sup>6</sup> operations or more</td><td>Depends on the duty and the load</td></tr></tbody></table></div><h4>Applications</h4><ul><li>Solenoid valves controlling water, air, oil, gas and steam &mdash; in washing machines, dishwashers, irrigation, pneumatic systems and process plant.</li><li>Relays, contactors and circuit breakers (the operating mechanism is a solenoid).</li><li>Door locks in automobiles and in electronic access control systems.</li><li>Starters of automobile engines (the starter solenoid engages the pinion with the flywheel).</li><li>Pinball flippers, coin mechanisms, vending machines, ticket barriers and sorting gates.</li><li>Printers and dot-matrix print heads; fuel injectors in diesel and petrol engines; shifters in automatic gearboxes.</li><li>Vibration feeders and small actuators in robots.</li></ul><div class="warn"><span class="tag">Important</span><p>A solenoid coil is highly inductive, so a <b>freewheeling diode</b> must be connected across it when it is driven from a transistor. Also, a solenoid rated for intermittent duty will overheat and burn out if it is left energised; the driver software must limit the ON time.</p></div><h3 id="sec2"><span class="sec-no">2.</span>Brushed DC Motor</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>brushed DC motor</b> converts direct current electrical energy into mechanical rotation. It works on the principle that a current-carrying conductor placed in a magnetic field experiences a force (Fleming's left-hand rule), F = B I l.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Brushed DC motor &mdash; construction</text><path d="M 130 60 A 130 130 0 0 0 130 240 L 165 215 A 92 92 0 0 1 165 85 Z" class="mech"/><path d="M 390 60 A 130 130 0 0 1 390 240 L 355 215 A 92 92 0 0 0 355 85 Z" class="mech"/><text x="120" y="155" font-size="16" fill="#a8232a" text-anchor="middle" font-weight="700">N</text><text x="398" y="155" font-size="16" fill="#0f5fa8" text-anchor="middle" font-weight="700">S</text><circle cx="260" cy="150" r="72" class="mech2"/><line x1="285.4318376190789" y1="155.40570396126174" x2="324.55774164843115" y2="163.72217159397212" class="cmp" stroke-width="2"/><line x1="274.1606149103907" y1="171.80543476658102" x2="295.9461763109918" y2="205.352257484398" class="cmp" stroke-width="2"/><line x1="254.59429603873826" y1="175.43183761907895" x2="246.27782840602788" y2="214.55774164843118" class="cmp" stroke-width="2"/><line x1="238.19456523341898" y1="164.1606149103907" x2="204.64774251560203" y2="185.9461763109918" class="cmp" stroke-width="2"/><line x1="234.56816238092105" y1="144.59429603873826" x2="195.44225835156885" y2="136.27782840602788" class="cmp" stroke-width="2"/><line x1="245.8393850896093" y1="128.19456523341898" x2="224.05382368900823" y2="94.647742515602" class="cmp" stroke-width="2"/><line x1="265.40570396126174" y1="124.56816238092105" x2="273.7221715939721" y2="85.44225835156884" class="cmp" stroke-width="2"/><line x1="281.805434766581" y1="135.8393850896093" x2="315.35225748439797" y2="114.05382368900823" class="cmp" stroke-width="2"/><circle cx="260" cy="150" r="16" class="cmp-f"/><text x="260" y="154" font-size="9" fill="#12283d" text-anchor="middle" font-weight="600">shaft</text><path d="M 260 168 A 20 20 0 0 1 240 178 L 236 200 A 42 42 0 0 0 284 200 L 280 178 A 20 20 0 0 1 260 168" class="mech3"/><rect x="228" y="200" width="20" height="26" rx="8" class="mech"/><rect x="272" y="200" width="20" height="26" rx="8" class="mech"/><text x="260" y="246" font-size="10.5" fill="#5b6b7c" text-anchor="middle">commutator + carbon brushes</text><line x1="238" y1="226" x2="190" y2="226" class="wire"/><line x1="282" y1="226" x2="330" y2="226" class="wire"/><text x="182" y="230" font-size="11" fill="#a8232a" text-anchor="end" font-weight="700">A+</text><text x="338" y="230" font-size="11" fill="#0f5fa8" text-anchor="start" font-weight="700">A&#8722;</text><path d="M 300 96 A 84 84 0 0 1 332 138" class="lnk" marker-end="url(#ah)"/><text x="348" y="108" font-size="11" fill="#a8232a" text-anchor="start">rotation</text><rect x="480" y="60" width="370" height="190" rx="8" class="t-box2"/><text x="665" y="88" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">DC motor equations</text><text x="665" y="120" font-size="13" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">Back EMF   E<sub>b</sub> = V &minus; I<sub>a</sub> R<sub>a</sub></text><text x="665" y="148" font-size="13" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">E<sub>b</sub> = (P &#934; Z N) / (60 A)</text><text x="665" y="176" font-size="13" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">Torque   T = (P &#934; Z I<sub>a</sub>) / (2&#960; A)  =  k &#934; I<sub>a</sub></text><text x="665" y="204" font-size="13" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">Power   P<sub>m</sub> = E<sub>b</sub> I<sub>a</sub> = T &#969;</text><text x="665" y="232" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">N &#8733; (V &minus; I<sub>a</sub>R<sub>a</sub>) / &#934;</text></svg></div><figcaption><b>Fig. 2:</b> Construction of a brushed DC motor and its governing equations.</figcaption></figure><h4>Construction</h4><ul><li><b>Field system (stator)</b> &mdash; produces the main magnetic flux. It is either a <b>permanent magnet</b> (in small PMDC motors) or an <b>electromagnet</b> made of field poles with field windings. The stationary part carrying the poles is called the <b>yoke</b> or frame, made of cast steel.</li><li><b>Armature (rotor)</b> &mdash; a cylindrical laminated core of silicon steel stampings with axial slots, mounted on the shaft. Lamination reduces eddy current loss. The slots hold the <b>armature winding</b>, usually of enamelled copper.</li><li><b>Commutator</b> &mdash; a cylindrical assembly of hard-drawn copper segments insulated from each other by mica, mounted on but insulated from the shaft. It is the mechanical rectifier.</li><li><b>Brushes</b> &mdash; blocks of carbon or graphite held in brush holders and pressed against the commutator by springs. They carry the current from the stationary supply to the rotating armature.</li><li><b>Shaft, bearings and end shields</b> &mdash; support the rotor and transmit the torque to the load.</li><li><b>Interpoles</b> (in larger machines) &mdash; small poles between the main poles that improve commutation and reduce sparking.</li></ul><h4>Working principle</h4><p>When DC current enters the armature conductors through the brushes and commutator, each conductor lying in the field experiences a force F = B I l. The forces on the two sides of a coil form a couple that produces a torque and the armature begins to rotate. As the armature turns, the commutator reverses the direction of current in each coil exactly when that coil passes the magnetic neutral axis, so that the torque always acts in the same direction. The armature therefore continues to rotate.</p><p>While rotating, the armature conductors cut the main flux, so an EMF is induced in them by Faraday's law. By Lenz's law this EMF opposes the applied voltage and is therefore called the <b>back EMF</b> or counter EMF.</p><div class="formula"><span class="tag">Formula</span><p><b>DC motor equations</b><span class='eq'>E<sub>b</sub> = (P &#934; Z N) / (60 A)</span><span class='eq'>V = E<sub>b</sub> + I<sub>a</sub> R<sub>a</sub>       so       I<sub>a</sub> = (V &minus; E<sub>b</sub>) / R<sub>a</sub></span><span class='eq'>T = (P &#934; Z I<sub>a</sub>) / (2 &#960; A) = k &#934; I<sub>a</sub></span><span class='eq'>N &#8733; (V &minus; I<sub>a</sub> R<sub>a</sub>) / &#934;</span>where P = number of poles, &#934; = flux per pole in weber, Z = number of armature conductors, A = number of parallel paths (A = P for lap winding, A = 2 for wave winding), N = speed in rpm, V = supply voltage, I<sub>a</sub> = armature current, R<sub>a</sub> = armature resistance.</p></div><p>The back EMF is the key to understanding the motor. At the instant of starting, N = 0 so E<sub>b</sub> = 0, and the armature current would be V/R<sub>a</sub>, which is very large (R<sub>a</sub> is only a fraction of an ohm) &mdash; this is why a <b>starter</b> resistance is needed for large DC motors and why a small DC motor draws a large <b>stall current</b>. As the motor speeds up, E<sub>b</sub> rises and the current falls to the value needed to drive the load. The motor thus adjusts its current automatically to the load.</p><h4>Types of DC motor by excitation</h4><div class="tbl-scroll"><table><caption>Table 10.2 &mdash; Types of DC motor</caption><thead><tr><th>Type</th><th>Field connection</th><th>Speed characteristic</th><th>Starting torque</th><th>Application</th></tr></thead><tbody><tr><td>Separately excited</td><td>Field winding fed from a separate source</td><td>Nearly constant, easily controlled</td><td>High</td><td>Steel mills, precision drives, laboratory</td></tr><tr><td>Shunt (parallel)</td><td>Field in parallel with the armature</td><td>Nearly constant speed; falls slightly with load</td><td>Moderate</td><td>Machine tools, lathes, fans, blowers, centrifugal pumps</td></tr><tr><td>Series</td><td>Field in series with the armature</td><td>Very variable; dangerously high at no load</td><td>Very high</td><td>Traction (trains, trams), cranes, hoists, starters</td></tr><tr><td>Compound (cumulative)</td><td>Both shunt and series fields</td><td>Between shunt and series</td><td>High</td><td>Presses, shears, elevators, rolling mills</td></tr><tr><td>Permanent magnet (PMDC)</td><td>Flux from permanent magnets</td><td>Linear speed-torque; nearly constant speed</td><td>Moderate</td><td>Toys, wipers, small fans, robots, servos</td></tr></tbody></table></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Shunt / separately excited DC motor characteristics</text><rect x="70" y="45" width="330" height="175" rx="6" class="t-box"/><text x="235" y="36" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Speed vs armature current</text><line x1="105" y1="200" x2="105" y2="60" class="ax" marker-end="url(#ah)"/><line x1="105" y1="200" x2="375" y2="200" class="ax" marker-end="url(#ah)"/><text x="381" y="204" font-size="11.5" fill="#5b6b7c" text-anchor="start">I a</text><text x="99" y="54" font-size="11.5" fill="#5b6b7c" text-anchor="start">N</text><path d="M 105 90 L 370 150" class="lnk" stroke-width="2"/><text x="250" y="96" font-size="10.5" fill="#0f5fa8" text-anchor="start">nearly constant speed,</text><text x="250" y="112" font-size="10.5" fill="#0f5fa8" text-anchor="start">falls slightly with load</text><rect x="480" y="45" width="330" height="175" rx="6" class="t-box"/><text x="645" y="36" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Torque vs armature current</text><line x1="515" y1="200" x2="515" y2="60" class="ax" marker-end="url(#ah)"/><line x1="515" y1="200" x2="785" y2="200" class="ax" marker-end="url(#ah)"/><text x="791" y="204" font-size="11.5" fill="#5b6b7c" text-anchor="start">I a</text><text x="509" y="54" font-size="11.5" fill="#5b6b7c" text-anchor="start">T</text><path d="M 515 200 L 780 70" class="lnk" stroke-width="2"/><text x="650" y="100" font-size="11" fill="#a8232a" text-anchor="start">T &#8733; I a &mdash; a straight line</text><text x="650" y="118" font-size="10.5" fill="#5b6b7c" text-anchor="start">through the origin</text><text x="440" y="240" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Series motor: T &#8733; I a&#178; at low current, huge starting torque, and speed becomes dangerously high at no load.</text></svg></div><figcaption><b>Fig. 3:</b> Speed-armature current and torque-armature current characteristics of a shunt motor. Speed is nearly constant while torque is proportional to armature current.</figcaption></figure><div class="warn"><span class="tag">Important</span><p>A <b>DC series motor must never be started without a load</b>. At no load the armature current is small, so the field flux is small, and since N &#8733; 1/&#934; the speed rises to a dangerously high value that can destroy the rotor by centrifugal force.</p></div><h4>Speed control of a DC motor</h4><p>From N &#8733; (V &minus; I<sub>a</sub>R<sub>a</sub>)/&#934; there are three methods of speed control: <b>armature voltage control</b> (varying V, the most common and efficient method, giving constant torque below base speed), <b>field control</b> (varying &#934;, giving speeds above base speed at constant power but reduced torque), and <b>armature resistance control</b> (inserting resistance in series with the armature, which wastes power and is used only for starting).</p><p>In mechatronic systems, armature voltage control is implemented by <b>pulse width modulation (PWM)</b>. A power switch (MOSFET or IGBT) is turned on and off at a frequency of 1 kHz to 25 kHz, and the average voltage applied to the motor equals the duty cycle times the supply voltage: V<sub>avg</sub> = D &times; V<sub>CC</sub>. Because the switching frequency is well above the mechanical response of the motor, the armature inductance smooths the current and the motor behaves as if it were fed with a steady DC voltage. PWM control is very efficient because the switch is either fully on (low voltage drop) or fully off (no current).</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 315" width="880" height="315" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">H-bridge: two half-bridges and a motor connected between their midpoints</text><polyline points="150,60 730,60" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="150" y="48" font-size="12" fill="#a8232a" text-anchor="start" font-weight="700">+Vm</text><polyline points="150,255 730,255" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="440" y1="255" x2="440" y2="265" class="wire"/><line x1="427" y1="265" x2="453" y2="265" class="wire"/><line x1="432" y1="270" x2="448" y2="270" class="wire"/><line x1="436.5" y1="275" x2="443.5" y2="275" class="wire"/><text x="150" y="267" font-size="10.5" fill="#5b6b7c" text-anchor="start">0 V</text><rect x="213" y="92" width="64" height="42" rx="5" class="t-box2"/><text x="245" y="118" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">S1</text><rect x="213" y="190" width="64" height="42" rx="5" class="t-box2"/><text x="245" y="216" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">S2</text><polyline points="245,60 245,92" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="245,134 245,190" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="245,232 245,255" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="245" cy="160" r="3.3" class="dot" fill="#12283d"/><text x="245" y="178" font-size="10.5" fill="#5b6b7c" text-anchor="middle" font-weight="700">A</text><text x="200" y="83" font-size="9.5" fill="#5b6b7c" text-anchor="end">gate</text><rect x="603" y="92" width="64" height="42" rx="5" class="t-box2"/><text x="635" y="118" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">S3</text><rect x="603" y="190" width="64" height="42" rx="5" class="t-box2"/><text x="635" y="216" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">S4</text><polyline points="635,60 635,92" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="635,134 635,190" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="635,232 635,255" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="635" cy="160" r="3.3" class="dot" fill="#12283d"/><text x="635" y="178" font-size="10.5" fill="#5b6b7c" text-anchor="middle" font-weight="700">B</text><text x="590" y="83" font-size="9.5" fill="#5b6b7c" text-anchor="end">gate</text><polyline points="245,160 406,160" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="440" cy="160" r="34" class="cmp-f"/><text x="440" y="165" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">M</text><polyline points="474,160 635,160" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="245" cy="160" r="3.3" class="dot" fill="#12283d"/><circle cx="635" cy="160" r="3.3" class="dot" fill="#12283d"/><polyline points="270,145 385,145" class="lnk" marker-end="url(#ah)"/><polyline points="610,175 495,175" class="lnk-d" marker-end="url(#ah)"/><text x="440" y="88" font-size="10.8" fill="#a8232a" text-anchor="middle">S1 + S4 ON: current A → motor → B</text><text x="440" y="238" font-size="10.8" fill="#0f5fa8" text-anchor="middle">S2 + S3 ON: current B → motor → A</text><text x="440" y="295" font-size="11.2" fill="#a8232a" text-anchor="middle" font-weight="600">Never turn on S1 with S2, or S3 with S4: that creates shoot-through across the supply. Add dead time in real drivers.</text></svg></div><figcaption><b>Fig. 4:</b> H-bridge circuit used to reverse the direction of a DC motor and, with PWM, to control its speed.</figcaption></figure><p>To reverse the direction of rotation, either the armature connections or the field connections must be reversed (not both). An <b>H-bridge</b> of four switches does this electronically. Integrated H-bridge drivers such as the <b>L293D</b> (600 mA, two bridges), <b>L298N</b> (2 A, two bridges) and <b>TB6612FNG</b> (1.2 A, low loss) are used with microcontrollers.</p><h4>Advantages and disadvantages</h4><ul><li><b>Advantages:</b> simple and cheap; excellent speed control over a wide range; high starting torque; linear speed-torque characteristic; easy to reverse; control electronics is simple; available in very small sizes.</li><li><b>Disadvantages:</b> brushes and commutator wear out and need periodic replacement; sparking at the brushes generates radio interference and is a hazard in explosive atmospheres; limited maximum speed; not suitable for very high power without maintenance; brush friction reduces efficiency; cannot be used in a vacuum or in a sealed environment for very long life.</li></ul><p>Because of these disadvantages, brushed motors have been largely replaced by <b>brushless DC motors</b> in high-reliability and high-speed applications, although brushed motors are still widely used in toys, small appliances, automotive accessories and teaching laboratories because of their low cost and simple control.</p><h3 id="sec3"><span class="sec-no">3.</span>Stepper Motor</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>stepper motor</b> is a brushless DC motor that divides a complete revolution into a large number of equal <b>steps</b>. Each input pulse rotates the shaft by exactly one step angle, so the position is known simply by counting pulses and <b>no feedback encoder is needed</b>. It is therefore a natural actuator for digital control.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Variable reluctance stepper motor &mdash; cross section and step sequence</text><circle cx="200" cy="160" r="96" class="mech"/><g transform="translate(200.0,68.0) rotate(0)"><rect x="-17" y="-34" width="34" height="36" class="mech2"/></g><text x="200.0" y="104.0" font-size="11" fill="#0a4377" text-anchor="middle" font-weight="700">A</text><g transform="translate(279.6743371481684,114.0) rotate(60)"><rect x="-17" y="-34" width="34" height="36" class="mech2"/></g><text x="251.96152422706632" y="134.0" font-size="11" fill="#0a4377" text-anchor="middle" font-weight="700">C'</text><g transform="translate(279.6743371481684,206.0) rotate(120)"><rect x="-17" y="-34" width="34" height="36" class="mech2"/></g><text x="251.96152422706632" y="194.0" font-size="11" fill="#0a4377" text-anchor="middle" font-weight="700">B'</text><g transform="translate(200.0,252.0) rotate(180)"><rect x="-17" y="-34" width="34" height="36" class="mech2"/></g><text x="200.0" y="224.0" font-size="11" fill="#0a4377" text-anchor="middle" font-weight="700">A'</text><g transform="translate(120.32566285183164,206.0) rotate(240)"><rect x="-17" y="-34" width="34" height="36" class="mech2"/></g><text x="148.03847577293368" y="194.0" font-size="11" fill="#0a4377" text-anchor="middle" font-weight="700">C</text><g transform="translate(120.32566285183165,114.0) rotate(300)"><rect x="-17" y="-34" width="34" height="36" class="mech2"/></g><text x="148.03847577293368" y="134.0" font-size="11" fill="#0a4377" text-anchor="middle" font-weight="700">B</text><g transform="translate(200.0,120.0) rotate(0)"><polygon points="-13,10 0,-14 13,10" class="mech3"/></g><g transform="translate(240.0,160.0) rotate(90)"><polygon points="-13,10 0,-14 13,10" class="mech3"/></g><g transform="translate(200.0,200.0) rotate(180)"><polygon points="-13,10 0,-14 13,10" class="mech3"/></g><g transform="translate(160.0,160.0) rotate(270)"><polygon points="-13,10 0,-14 13,10" class="mech3"/></g><circle cx="200" cy="160" r="26" class="mech3"/><circle cx="200" cy="160" r="6" class="cmp-f"/><text x="200" y="286" font-size="11" fill="#5b6b7c" text-anchor="middle">4-tooth rotor, 6-pole stator &rarr; 3 phases</text><path d="M 280 90 A 90 90 0 0 1 300 140" class="lnk" marker-end="url(#ah)"/><text x="322" y="108" font-size="11" fill="#a8232a" text-anchor="start">step</text><rect x="400" y="60" width="440" height="190" rx="8" class="t-box2"/><text x="620" y="86" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Full-step (one-phase-on) sequence</text><text x="450" y="112" font-size="11.5" fill="#12283d" text-anchor="start" font-weight="600">Step 1</text><rect x="530" y="99" width="34" height="20" rx="4" class="t-box3"/><text x="547" y="113" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">A</text><text x="580" y="112" font-size="11" fill="#5b6b7c" text-anchor="start">rotor teeth align with A</text><text x="450" y="142" font-size="11.5" fill="#12283d" text-anchor="start" font-weight="600">Step 2</text><rect x="530" y="129" width="34" height="20" rx="4" class="t-box3"/><text x="547" y="143" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">B</text><text x="580" y="142" font-size="11" fill="#5b6b7c" text-anchor="start">rotor turns 30&#176; clockwise</text><text x="450" y="172" font-size="11.5" fill="#12283d" text-anchor="start" font-weight="600">Step 3</text><rect x="530" y="159" width="34" height="20" rx="4" class="t-box3"/><text x="547" y="173" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">C</text><text x="580" y="172" font-size="11" fill="#5b6b7c" text-anchor="start">rotor turns another 30&#176;</text><text x="450" y="202" font-size="11.5" fill="#12283d" text-anchor="start" font-weight="600">Step 4</text><rect x="530" y="189" width="34" height="20" rx="4" class="t-box3"/><text x="547" y="203" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">A'</text><text x="580" y="202" font-size="11" fill="#5b6b7c" text-anchor="start">rotor turns another 30&#176;</text><text x="620" y="236" font-size="12" fill="#12283d" text-anchor="middle" font-weight="600">Step angle &#952; = 360&#176; / (number of steps per revolution)</text></svg></div><figcaption><b>Fig. 5:</b> Cross section of a variable reluctance stepper motor with a 6-pole stator and a 4-tooth rotor, and the full-step excitation sequence.</figcaption></figure><h4>Working principle</h4><p>The stator has a number of salient poles carrying concentrated windings grouped into phases. The rotor carries teeth. When one phase is energised, its poles become electromagnets and the rotor teeth are attracted into alignment with them, because a magnetic circuit always tries to take up the position of <b>minimum reluctance</b> (maximum flux). When the next phase is energised and the first is switched off, the rotor moves to align with the new poles, advancing by one step angle. By energising the phases in a repeating sequence, continuous rotation is obtained. Reversing the order of the sequence reverses the direction of rotation.</p><div class="formula"><span class="tag">Formula</span><p><b>Step angle and resolution</b><span class='eq'>&#952;<sub>step</sub> = 360&#176; / (number of steps per revolution)</span><span class='eq'>For a motor with N<sub>s</sub> stator poles and N<sub>r</sub> rotor teeth:  &#952; = 360&#176; (N<sub>s</sub> &minus; N<sub>r</sub>) / (N<sub>s</sub> N<sub>r</sub>)</span><span class='eq'>Speed in rpm = (60 &times; f) / (steps per revolution), where f is the pulse frequency in Hz</span><span class='eq'>Linear travel per pulse = lead of the screw / steps per revolution</span></p></div><div class="example"><span class="tag">Example</span><p><b>Numerical 1.</b> A stepper motor has a step angle of 1.8&deg;. Steps per revolution = 360/1.8 = <b>200</b>. To turn the shaft through 45&deg; we need 45/1.8 = <b>25 pulses</b>. If pulses are supplied at 1000 Hz, speed = 60 &times; 1000/200 = <b>300 rpm</b>.<br><b>Numerical 2.</b> The motor of example 1 drives a lead screw of 5 mm lead. Each pulse moves the nut by 5/200 = <b>0.025 mm</b>, which is the resolution of the positioning system.<br><b>Numerical 3.</b> A VR stepper has 6 stator poles and 4 rotor teeth. Step angle = 360(6&minus;4)/(6&times;4) = 720/24 = <b>30&deg;</b>, so 12 steps per revolution.</p></div><h4>Types of stepper motor</h4><ul><li><b>Variable reluctance (VR)</b> &mdash; the rotor is a soft iron toothed cylinder with no magnets and no winding. It moves to the position of minimum reluctance. Step angles are typically 15&deg;, 30&deg; or 45&deg;. Cheap and simple, but low torque, no detent torque when unpowered, and prone to resonance.</li><li><b>Permanent magnet (PM)</b> &mdash; the rotor is a permanent magnet with alternate north and south poles. Step angles are larger, typically 45&deg; or 7.5&deg; per phase, but torque per volume is good and there is detent torque when unpowered. Used in low-cost applications such as printers and instrument drives.</li><li><b>Hybrid</b> &mdash; combines both ideas: a permanent magnet rotor with two toothed iron cups offset by half a tooth pitch. This gives small step angles of <b>1.8&deg; or 0.9&deg;</b>, high torque, high resolution and good damping. Almost all modern steppers used in CNC machines, 3D printers and robots are hybrid.</li><li><b>Unipolar versus bipolar winding</b> &mdash; a <b>unipolar</b> motor has a centre tap on each phase (5 or 6 wires) and current always flows in the same direction in each half winding; it is driven simply by a transistor array such as the ULN2003, but only half the winding is used at a time so torque is lower. A <b>bipolar</b> motor has 4 wires and needs an H-bridge per phase (L293D, A4988, DRV8825) but uses the whole winding and gives more torque.</li></ul><h4>Excitation modes</h4><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Drive waveforms: one-phase-on, two-phase-on and half stepping</text><text x="230" y="50" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Wave drive (one phase on)</text><text x="58" y="86" font-size="11" fill="#12283d" text-anchor="end" font-weight="600">A</text><path d="M 70 96 L 70 66 L 140 66 L 140 96" class="lnk" stroke-width="1.8" fill="none"/><path d="M 140 96 L 210 96" class="lnk" stroke-width="1.8" fill="none"/><path d="M 210 96 L 280 96" class="lnk" stroke-width="1.8" fill="none"/><path d="M 280 96 L 350 96" class="lnk" stroke-width="1.8" fill="none"/><path d="M 350 96 L 350 66 L 420 66 L 420 96" class="lnk" stroke-width="1.8" fill="none"/><path d="M 420 96 L 490 96" class="lnk" stroke-width="1.8" fill="none"/><path d="M 490 96 L 560 96" class="lnk" stroke-width="1.8" fill="none"/><path d="M 560 96 L 630 96" class="lnk" stroke-width="1.8" fill="none"/><text x="58" y="120" font-size="11" fill="#12283d" text-anchor="end" font-weight="600">B</text><path d="M 70 130 L 140 130" class="lnk" stroke-width="1.8" fill="none"/><path d="M 140 130 L 140 100 L 210 100 L 210 130" class="lnk" stroke-width="1.8" fill="none"/><path d="M 210 130 L 280 130" class="lnk" stroke-width="1.8" fill="none"/><path d="M 280 130 L 350 130" class="lnk" stroke-width="1.8" fill="none"/><path d="M 350 130 L 420 130" class="lnk" stroke-width="1.8" fill="none"/><path d="M 420 130 L 420 100 L 490 100 L 490 130" class="lnk" stroke-width="1.8" fill="none"/><path d="M 490 130 L 560 130" class="lnk" stroke-width="1.8" fill="none"/><path d="M 560 130 L 630 130" class="lnk" stroke-width="1.8" fill="none"/><text x="58" y="154" font-size="11" fill="#12283d" text-anchor="end" font-weight="600">C</text><path d="M 70 164 L 140 164" class="lnk" stroke-width="1.8" fill="none"/><path d="M 140 164 L 210 164" class="lnk" stroke-width="1.8" fill="none"/><path d="M 210 164 L 210 134 L 280 134 L 280 164" class="lnk" stroke-width="1.8" fill="none"/><path d="M 280 164 L 350 164" class="lnk" stroke-width="1.8" fill="none"/><path d="M 350 164 L 420 164" class="lnk" stroke-width="1.8" fill="none"/><path d="M 420 164 L 490 164" class="lnk" stroke-width="1.8" fill="none"/><path d="M 490 164 L 490 134 L 560 134 L 560 164" class="lnk" stroke-width="1.8" fill="none"/><path d="M 560 164 L 630 164" class="lnk" stroke-width="1.8" fill="none"/><text x="58" y="188" font-size="11" fill="#12283d" text-anchor="end" font-weight="600">A'</text><path d="M 70 198 L 140 198" class="lnk" stroke-width="1.8" fill="none"/><path d="M 140 198 L 210 198" class="lnk" stroke-width="1.8" fill="none"/><path d="M 210 198 L 280 198" class="lnk" stroke-width="1.8" fill="none"/><path d="M 280 198 L 280 168 L 350 168 L 350 198" class="lnk" stroke-width="1.8" fill="none"/><path d="M 350 198 L 420 198" class="lnk" stroke-width="1.8" fill="none"/><path d="M 420 198 L 490 198" class="lnk" stroke-width="1.8" fill="none"/><path d="M 490 198 L 560 198" class="lnk" stroke-width="1.8" fill="none"/><path d="M 560 198 L 560 168 L 630 168 L 630 198" class="lnk" stroke-width="1.8" fill="none"/><text x="690" y="50" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Half stepping (torque smoother, resolution doubled)</text><text x="508" y="86" font-size="11" fill="#12283d" text-anchor="end" font-weight="600">A</text><path d="M 530 96 L 530 66 L 570 66 L 570 96" class="lnk" stroke-width="1.6" fill="none"/><path d="M 570 96 L 570 66 L 610 66 L 610 96" class="lnk" stroke-width="1.6" fill="none"/><path d="M 610 96 L 650 96" class="lnk" stroke-width="1.6" fill="none"/><path d="M 650 96 L 690 96" class="lnk" stroke-width="1.6" fill="none"/><path d="M 690 96 L 730 96" class="lnk" stroke-width="1.6" fill="none"/><path d="M 730 96 L 770 96" class="lnk" stroke-width="1.6" fill="none"/><path d="M 770 96 L 810 96" class="lnk" stroke-width="1.6" fill="none"/><path d="M 810 96 L 810 66 L 850 66 L 850 96" class="lnk" stroke-width="1.6" fill="none"/><text x="508" y="120" font-size="11" fill="#12283d" text-anchor="end" font-weight="600">B</text><path d="M 530 130 L 570 130" class="lnk" stroke-width="1.6" fill="none"/><path d="M 570 130 L 570 100 L 610 100 L 610 130" class="lnk" stroke-width="1.6" fill="none"/><path d="M 610 130 L 610 100 L 650 100 L 650 130" class="lnk" stroke-width="1.6" fill="none"/><path d="M 650 130 L 650 100 L 690 100 L 690 130" class="lnk" stroke-width="1.6" fill="none"/><path d="M 690 130 L 730 130" class="lnk" stroke-width="1.6" fill="none"/><path d="M 730 130 L 770 130" class="lnk" stroke-width="1.6" fill="none"/><path d="M 770 130 L 810 130" class="lnk" stroke-width="1.6" fill="none"/><path d="M 810 130 L 850 130" class="lnk" stroke-width="1.6" fill="none"/><text x="508" y="154" font-size="11" fill="#12283d" text-anchor="end" font-weight="600">C</text><path d="M 530 164 L 570 164" class="lnk" stroke-width="1.6" fill="none"/><path d="M 570 164 L 610 164" class="lnk" stroke-width="1.6" fill="none"/><path d="M 610 164 L 650 164" class="lnk" stroke-width="1.6" fill="none"/><path d="M 650 164 L 650 134 L 690 134 L 690 164" class="lnk" stroke-width="1.6" fill="none"/><path d="M 690 164 L 690 134 L 730 134 L 730 164" class="lnk" stroke-width="1.6" fill="none"/><path d="M 730 164 L 730 134 L 770 134 L 770 164" class="lnk" stroke-width="1.6" fill="none"/><path d="M 770 164 L 810 164" class="lnk" stroke-width="1.6" fill="none"/><path d="M 810 164 L 850 164" class="lnk" stroke-width="1.6" fill="none"/><text x="508" y="188" font-size="11" fill="#12283d" text-anchor="end" font-weight="600">A'</text><path d="M 530 198 L 570 198" class="lnk" stroke-width="1.6" fill="none"/><path d="M 570 198 L 610 198" class="lnk" stroke-width="1.6" fill="none"/><path d="M 610 198 L 650 198" class="lnk" stroke-width="1.6" fill="none"/><path d="M 650 198 L 690 198" class="lnk" stroke-width="1.6" fill="none"/><path d="M 690 198 L 730 198" class="lnk" stroke-width="1.6" fill="none"/><path d="M 730 198 L 730 168 L 770 168 L 770 198" class="lnk" stroke-width="1.6" fill="none"/><path d="M 770 198 L 770 168 L 810 168 L 810 198" class="lnk" stroke-width="1.6" fill="none"/><path d="M 810 198 L 810 168 L 850 168 L 850 198" class="lnk" stroke-width="1.6" fill="none"/><text x="440" y="248" font-size="11.5" fill="#12283d" text-anchor="middle">Step angle halves from 30&#176; to 15&#176; in half stepping; torque ripple also becomes smaller.</text></svg></div><figcaption><b>Fig. 6:</b> Drive waveforms for one-phase-on (wave) drive and half stepping. Half stepping doubles the resolution and smooths the torque.</figcaption></figure><ul><li><b>One-phase-on (wave drive)</b> &mdash; only one phase is energised at a time. Lowest power consumption and lowest torque; the rotor tends to oscillate about the detent position.</li><li><b>Two-phase-on (full step)</b> &mdash; two adjacent phases are energised together, so the rotor settles midway between them. Torque is about 40 % higher than wave drive and the motion is smoother. Same step angle as wave drive.</li><li><b>Half stepping</b> &mdash; alternates between one-phase-on and two-phase-on in an 8-step sequence. The step angle is halved (1.8&deg; becomes 0.9&deg;), the resolution doubles, and the torque ripple is reduced.</li><li><b>Microstepping</b> &mdash; the currents in the two phases are varied sinusoidally in small increments, so the rotor can be positioned in fractions of a full step. Typical microstepping is 1/8, 1/16 or 1/32 of a step. This greatly reduces noise, vibration and resonance, but the holding torque per microstep is very small and positional accuracy does not improve proportionally.</li></ul><h4>Torque-speed characteristic and important terms</h4><p>The torque of a stepper motor is highest at standstill (<b>holding torque</b>) and falls rapidly as the stepping rate increases, because the winding inductance limits how quickly the current can build up in each phase. The <b>pull-in torque</b> is the maximum torque at which the motor can start and stop instantly with a load attached, without losing a step; the region below the pull-in curve is the <b>start/stop region</b>. Above this, the motor must be <b>ramped</b> up in speed gradually. The <b>pull-out torque</b> is the maximum torque the motor can develop at a given speed once it is already running and synchronised; the region between the pull-in and pull-out curves is the <b>slewing region</b>, where the motor can run but cannot start.</p><ul><li><b>Holding torque</b> &mdash; torque required to move the shaft one full step when the motor is energised but stationary.</li><li><b>Detent (residual) torque</b> &mdash; the torque present when the motor is unpowered, due to the permanent magnets.</li><li><b>Pull-in / pull-out torque</b> &mdash; as described above.</li><li><b>Step angle accuracy</b> &mdash; typically &plusmn;3 % to &plusmn;5 % of a step, and non-cumulative, so errors do not build up.</li><li><b>Resonance</b> &mdash; at certain step rates (usually 100 to 300 steps/s) the rotor oscillates and may lose synchronism. It is reduced by microstepping, by mechanical damping, by a smaller step angle, or by accelerating quickly through the resonant band.</li><li><b>Maximum start frequency and slew frequency</b> &mdash; the highest pulse rates at which the motor can start and run respectively.</li></ul><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 285" width="900" height="285" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="450" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Bipolar stepper driver: four logic inputs and two complete motor coils</text><rect x="45" y="75" width="180" height="150" rx="8" class="t-box3"/><text x="135" y="112" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">Microcontroller</text><text x="135" y="134" font-size="10.5" fill="#5b6b7c" text-anchor="middle">step sequence</text><text x="215" y="109" font-size="9.8" fill="#157a4b" text-anchor="end">IN1</text><polyline points="225,105 300,105" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="215" y="137" font-size="9.8" fill="#157a4b" text-anchor="end">IN2</text><polyline points="225,133 300,133" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="215" y="165" font-size="9.8" fill="#157a4b" text-anchor="end">IN3</text><polyline points="225,161 300,161" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="215" y="193" font-size="9.8" fill="#157a4b" text-anchor="end">IN4</text><polyline points="225,189 300,189" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="300" y="60" width="285" height="190" rx="8" class="t-box2"/><text x="442" y="88" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">L293D / H-bridge driver</text><text x="442" y="108" font-size="10.5" fill="#5b6b7c" text-anchor="middle">logic 5 V, motor 12 V</text><text x="315" y="109" font-size="9.5" fill="#5b6b7c" text-anchor="start">IN1</text><text x="315" y="137" font-size="9.5" fill="#5b6b7c" text-anchor="start">IN2</text><text x="315" y="165" font-size="9.5" fill="#5b6b7c" text-anchor="start">IN3</text><text x="315" y="193" font-size="9.5" fill="#5b6b7c" text-anchor="start">IN4</text><text x="570" y="109" font-size="9.5" fill="#0f5fa8" text-anchor="end">A1</text><polyline points="585,105 650,105" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="570" y="137" font-size="9.5" fill="#0f5fa8" text-anchor="end">A2</text><polyline points="585,133 650,133" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="570" y="165" font-size="9.5" fill="#0f5fa8" text-anchor="end">B1</text><polyline points="585,161 650,161" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="570" y="193" font-size="9.5" fill="#0f5fa8" text-anchor="end">B2</text><polyline points="585,189 650,189" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="442,60 442,40" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="454" y="43" font-size="9.8" fill="#a8232a" text-anchor="start">+5 V logic</text><polyline points="510,60 510,40" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="522" y="43" font-size="9.8" fill="#a8232a" text-anchor="start">+12 V motor</text><polyline points="442,250 442,265" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="442" y1="265" x2="442" y2="275" class="wire"/><line x1="429" y1="275" x2="455" y2="275" class="wire"/><line x1="434" y1="280" x2="450" y2="280" class="wire"/><line x1="438.5" y1="285" x2="445.5" y2="285" class="wire"/><rect x="650" y="70" width="200" height="155" rx="8" class="t-box4"/><text x="750" y="91" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">4-wire bipolar stepper</text><rect x="700" y="110" width="95" height="35" rx="4" class="mech2"/><text x="747" y="132" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">coil A</text><rect x="700" y="170" width="95" height="35" rx="4" class="mech2"/><text x="747" y="192" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">coil B</text><polyline points="650,105 680,105 680,127 700,127" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="650,133 670,133 670,95 815,95 815,127 795,127" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="650,161 680,161 680,187 700,187" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="650,189 660,189 660,215 815,215 815,187 795,187" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="825" y="127" font-size="9.5" fill="#5b6b7c" text-anchor="start">A+ / A−</text><text x="825" y="187" font-size="9.5" fill="#5b6b7c" text-anchor="start">B+ / B−</text><text x="450" y="278" font-size="11.2" fill="#12283d" text-anchor="middle">The driver reverses current in each coil; a ULN2003 is used instead for a 5-wire unipolar stepper motor.</text></svg></div><figcaption><b>Fig. 7:</b> A microcontroller drives a stepper motor through an L293D dual H-bridge (bipolar motor) or a ULN2003 (unipolar motor).</figcaption></figure><h4>Advantages, disadvantages and applications</h4><ul><li><b>Advantages:</b> open loop position control &mdash; no encoder or feedback needed, so the system is simple and cheap; precise and repeatable positioning, with non-cumulative error; excellent low-speed torque; holds position when energised; easy to interface to a microcontroller; very reliable with no brushes; fast response to start, stop and reverse; wide range of speed controlled simply by pulse frequency.</li><li><b>Disadvantages:</b> torque falls sharply with speed, so it is not suitable for high-speed drives; low efficiency &mdash; it draws full current even when stationary; can lose steps if overloaded, and because there is no feedback the controller does not know; resonance and vibration at certain speeds; noisy; low torque-to-inertia ratio; the motor and driver get warm; cannot correct for an externally applied disturbance.</li></ul><ul><li><b>Applications:</b> CNC machine tools, 3D printers, laser cutters and engravers; computer peripherals such as floppy drives, printers, plotters and scanners; robotics for joint positioning and gripper drives; textile machinery; medical equipment such as syringe pumps, analysers and scanning stages; camera lens focusing and shutter control; telescope and satellite antenna positioning; automated valves and dampers; pick-and-place machines; indexing tables and rotary conveyors; digital watches and instrument drives.</li></ul><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A solenoid converts electrical energy into a short linear stroke; the force is proportional to (NI)&#178;/g&#178;, so it is greatest at the end of the stroke when the air gap is smallest.</li><li>Solenoid types include linear pull, push, rotary, latching, proportional and voice-coil; duty cycle rating must be respected or the coil burns out.</li><li>A brushed DC motor consists of a field system, a laminated armature, a commutator and carbon brushes. Torque T = k&#934;I<sub>a</sub>, back EMF E<sub>b</sub> = V &minus; I<sub>a</sub>R<sub>a</sub>, and N &#8733; (V &minus; I<sub>a</sub>R<sub>a</sub>)/&#934;.</li><li>Back EMF limits the armature current; at standstill E<sub>b</sub> = 0 so the starting current is very high.</li><li>Shunt motors run at nearly constant speed, series motors have very high starting torque but must never run unloaded, and PMDC motors have a linear speed-torque characteristic.</li><li>Speed is controlled by armature voltage using PWM, where V<sub>avg</sub> = D &times; V<sub>CC</sub>; an H-bridge reverses the direction.</li><li>A stepper motor moves one exact step angle per input pulse, so position is obtained by counting pulses with no feedback. Step angle = 360&deg; / steps per revolution.</li><li>Types are variable reluctance, permanent magnet and hybrid; hybrid gives 1.8&deg; or 0.9&deg; steps with high torque and is the most common.</li><li>Excitation modes are wave (one phase on), full step (two phases on), half stepping and microstepping; microstepping reduces noise and resonance.</li><li>Stepper motors give simple, cheap, repeatable open loop positioning but lose torque rapidly with speed, are inefficient, may lose steps and can resonate.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Explain the construction and working of a solenoid. Derive an expression for the force on the plunger.</li><li>Why does a solenoid produce maximum force at the end of its stroke? What is meant by duty cycle rating?</li><li>List four applications of solenoids in mechatronic systems.</li><li>Draw the construction of a brushed DC motor and explain the function of the commutator and brushes.</li><li>Derive the back EMF equation and the torque equation of a DC motor.</li><li>What is back EMF and why is it important? Why does a DC motor draw a large current at starting?</li><li>Compare shunt, series and PMDC motors with respect to speed characteristic, starting torque and application.</li><li>Why must a DC series motor never be started at no load?</li><li>Explain PWM speed control of a DC motor and the working of an H-bridge for direction reversal.</li><li>Explain the working principle of a stepper motor. Why is it called a digital actuator?</li><li>A stepper motor has a step angle of 1.8&deg;. Find the number of steps per revolution, the pulses needed for 90&deg; of rotation, and the speed at 2000 pulses per second. (Answers: 200, 50, 600 rpm)</li><li>Compare variable reluctance, permanent magnet and hybrid stepper motors.</li><li>Explain wave drive, full step drive, half stepping and microstepping.</li><li>Define holding torque, detent torque, pull-in torque and pull-out torque. What is the slewing region?</li><li>State four advantages and four disadvantages of stepper motors and list four applications.</li></ol></div><div class="pager"><a class="prev" href="09-mechanical-switch-solid-state-switch.html"><span class="dir">&larr; Previous topic</span><span class="ttl">09. Electrical Actuation Systems &mdash; Mechanical and Solid State Switches</span></a><a class="next" href="11-ac-motor-bldc-motor-pmdc-motor.html"><span class="dir">Next topic &rarr;</span><span class="ttl">11. AC Motor, BLDC Motor and PMDC Motor</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

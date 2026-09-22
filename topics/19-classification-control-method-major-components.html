@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Classification by Control Method and Major Components of a Robot | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="How robots are classified by the way their motion is controlled, from simple manual handling to intelligent sensor-driven autonomy, and a detailed des">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit III &middot; Topic 19 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit III &rsaquo; Topic 19</nav><div class="unit-tag">Unit III</div><h2 class="page-title"><span class="topic-no">19</span>Classification by Control Method and Major Components of a Robot</h2><p class="lede">How robots are classified by the way their motion is controlled, from simple manual handling to intelligent sensor-driven autonomy, and a detailed description of every major component of a robot.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Classification of Robots by Control Method</a></li><li><a href="#sec2">Major Components of a Robot</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Classification of Robots by Control Method</h3><p>The control method describes how the robot's motion is commanded and how much information the controller has about the actual result. Six levels are recognised, in increasing order of sophistication.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" width="880" height="320" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Classification of robots by control method</text><rect x="60" y="50" width="760" height="46" rx="7" class="t-box2"/><text x="80" y="76" font-size="12" fill="#12283d" text-anchor="start" font-weight="700">Manual / limited sequence</text><text x="340" y="68" font-size="10.5" fill="#4a5b6d" text-anchor="start">Operator controls each motion;</text><text x="340" y="83" font-size="10.5" fill="#4a5b6d" text-anchor="start">sequence limited by mechanical stops</text><rect x="60" y="104" width="760" height="46" rx="7" class="t-box2"/><text x="80" y="130" font-size="12" fill="#12283d" text-anchor="start" font-weight="700">Point-to-point (PTP)</text><text x="340" y="122" font-size="10.5" fill="#4a5b6d" text-anchor="start">Only the end points are programmed;</text><text x="340" y="137" font-size="10.5" fill="#4a5b6d" text-anchor="start">the path between them is not controlled</text><rect x="60" y="158" width="760" height="46" rx="7" class="t-box2"/><text x="80" y="184" font-size="12" fill="#12283d" text-anchor="start" font-weight="700">Continuous path (CP)</text><text x="340" y="176" font-size="10.5" fill="#4a5b6d" text-anchor="start">The whole path is controlled;</text><text x="340" y="191" font-size="10.5" fill="#4a5b6d" text-anchor="start">used for welding, painting, grinding</text><rect x="60" y="212" width="760" height="46" rx="7" class="t-box2"/><text x="80" y="238" font-size="12" fill="#12283d" text-anchor="start" font-weight="700">Playback / teach-and-repeat</text><text x="340" y="230" font-size="10.5" fill="#4a5b6d" text-anchor="start">Positions are recorded by jogging</text><text x="340" y="245" font-size="10.5" fill="#4a5b6d" text-anchor="start">and replayed exactly</text><rect x="60" y="266" width="760" height="46" rx="7" class="t-box2"/><text x="80" y="292" font-size="12" fill="#12283d" text-anchor="start" font-weight="700">Numerical control (CNC)</text><text x="340" y="284" font-size="10.5" fill="#4a5b6d" text-anchor="start">Program written in a code (G-code)</text><text x="340" y="299" font-size="10.5" fill="#4a5b6d" text-anchor="start">and executed by interpolation</text><rect x="60" y="320" width="760" height="46" rx="7" class="t-box3"/><text x="80" y="346" font-size="12" fill="#12283d" text-anchor="start" font-weight="700">Intelligent / adaptive</text><text x="340" y="338" font-size="10.5" fill="#4a5b6d" text-anchor="start">Uses sensors, vision, AI to decide</text><text x="340" y="353" font-size="10.5" fill="#4a5b6d" text-anchor="start">actions in an unstructured environment</text></svg></div><figcaption><b>Fig. 1:</b> The six levels of robot control, from manual handling to intelligent autonomy.</figcaption></figure><h4>1. Manual control (limited sequence robot)</h4><p>The operator directly controls each motion using a joystick, pendant or buttons. There is no stored program; the robot does only what the operator commands at that instant. Motion may be limited by mechanical stops. This is used for simple handling tasks, for set-up and for teaching. Examples: a teleoperator handling radioactive material, a simple two-axis pick-and-place unit, a joystick-controlled wheelchair.</p><h4>2. Point-to-point (PTP) control</h4><p>Only the <b>end points</b> of a motion are programmed. The robot moves from point A to point B, and the controller ensures that it arrives at B, but <b>the path taken between A and B is not controlled</b>. Each joint moves at its own maximum speed, so the tool follows an unpredictable curved path. All the joints normally start and stop together.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="225" y="26" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(a) Point-to-point (PTP) control</text><rect x="50" y="45" width="350" height="165" rx="6" class="t-box"/><circle cx="95" cy="175" r="8" class="cmp-y"/><circle cx="95" cy="175" r="3.5" class="dot"/><circle cx="180" cy="95" r="8" class="cmp-y"/><circle cx="180" cy="95" r="3.5" class="dot"/><circle cx="275" cy="170" r="8" class="cmp-y"/><circle cx="275" cy="170" r="3.5" class="dot"/><circle cx="360" cy="80" r="8" class="cmp-y"/><circle cx="360" cy="80" r="3.5" class="dot"/><line x1="95" y1="175" x2="180" y2="95" class="lnk-d" stroke-width="1.4"/><line x1="180" y1="95" x2="275" y2="170" class="lnk-d" stroke-width="1.4"/><line x1="275" y1="170" x2="360" y2="80" class="lnk-d" stroke-width="1.4"/><text x="225" y="140" font-size="10.5" fill="#a8232a" text-anchor="middle">path is uncontrolled &mdash;</text><text x="225" y="156" font-size="10.5" fill="#a8232a" text-anchor="middle">joints move independently</text><text x="225" y="232" font-size="10.5" fill="#5b6b7c" text-anchor="middle">fastest point to point; used for spot welding,</text><text x="225" y="246" font-size="10.5" fill="#5b6b7c" text-anchor="middle">pick and place, drilling, assembly</text><text x="655" y="26" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">(b) Continuous path (CP) control</text><rect x="480" y="45" width="350" height="165" rx="6" class="t-box"/><path d="M 520 175 C 570 80, 640 190, 700 90 S 790 150, 800 100" class="lnk" stroke-width="2.4"/><circle cx="520" cy="175" r="7" class="cmp-y"/><circle cx="800" cy="100" r="7" class="cmp-y"/><text x="655" y="140" font-size="10.5" fill="#157a4b" text-anchor="middle">the exact path and the speed</text><text x="655" y="156" font-size="10.5" fill="#157a4b" text-anchor="middle">along it are both controlled</text><text x="655" y="232" font-size="10.5" fill="#5b6b7c" text-anchor="middle">used for arc welding, spray painting,</text><text x="655" y="246" font-size="10.5" fill="#5b6b7c" text-anchor="middle">grinding, polishing, cutting and gluing</text></svg></div><figcaption><b>Fig. 2:</b> Point-to-point control (left) does not control the path between programmed points; continuous path control (right) controls the exact path and the speed along it.</figcaption></figure><ul><li><b>Advantages:</b> simplest to program; fastest point-to-point motion because all joints move simultaneously at full speed; only a few points need to be stored.</li><li><b>Disadvantages:</b> the path is unknown, so the tool may collide with an obstacle; the speed along the path is not controlled; not suitable for any process where the trajectory matters.</li><li><b>Applications:</b> spot welding (the electrode must reach a point, and the path does not matter), pick and place, machine loading and unloading, drilling, riveting, component insertion, palletising.</li></ul><h4>3. Continuous path (CP) or controlled path control</h4><p>The entire <b>path</b> between points is controlled, and so is the speed along it. The controller continuously interpolates the position of the tool and corrects any deviation. To program such a path, either a very large number of closely spaced points must be taught, or a mathematical description of the path (a line, an arc, a circle) is given and the controller generates the intermediate points itself.</p><ul><li><b>Advantages:</b> the tool follows exactly the required trajectory at the required speed, which is essential for many processes; safe because the path is known and predictable.</li><li><b>Disadvantages:</b> more difficult to program; requires more memory and more computing power; motion is slower than PTP because the path must be followed exactly.</li><li><b>Applications:</b> arc welding, spray painting, adhesive sealing, gluing, grinding, polishing, deburring, flame cutting, laser cutting, waterjet cutting, milling and all tasks where the tool must follow a defined contour.</li></ul><h4>4. Playback (teach and repeat) control</h4><p>The operator moves the robot through the desired path by <b>jogging</b> it with a teach pendant, or by physically guiding the arm (this is called <b>lead-through</b> or <b>walk-through</b> programming). At each significant position the operator presses a button and the controller records the joint angles (and sometimes the speed) into memory. Afterwards the robot repeats the recorded sequence exactly, cycle after cycle.</p><p>Playback is the most common method of programming industrial robots because it needs no knowledge of mathematics or of programming languages. Modern controllers combine playback with the ability to edit the recorded points, to insert logic, to add conditional branches, and to modify positions arithmetically.</p><h4>5. Numerical control (CNC-type) control</h4><p>The robot is programmed by writing a <b>part program</b> in a text-based language, without touching the robot at all. The controller reads the program, performs interpolation, and drives the axes. Languages include the robot-specific ones such as <b>VAL</b> (Unimation), <b>KAREL</b> (FANUC), <b>RAPID</b> (ABB), <b>KRL</b> (KUKA), <b>INFORM</b> (Yaskawa), <b>MotoPlus</b>, and the general <b>G-code</b> used by CNC machines and 3D printers. Programming can be done <b>off-line</b> on a computer with a 3D simulation of the cell, which avoids stopping production.</p><ul><li><b>Advantages:</b> no need to have the robot available while programming; easy to store, copy, edit and version-control; can be generated automatically from a CAD model; simulation detects collisions before any hardware is at risk.</li><li><b>Disadvantages:</b> requires skilled programmers; the simulated positions may not exactly match the real machine, so a small amount of touch-up teaching is usually still needed.</li></ul><h4>6. Intelligent (adaptive / sensor-based) control</h4><p>The highest level. The robot is given a <b>task</b> rather than a motion, and it works out how to perform it using information from its own sensors. It can recognise objects with a camera, measure forces with a wrist sensor, avoid obstacles it has not been told about, adjust its grip, recover from errors and even learn from experience using machine learning. Examples: vision-guided picking of randomly oriented parts, autonomous mobile robots navigating a warehouse, surgical robots that compensate for a patient's breathing, robotic vacuum cleaners mapping a room, and agricultural robots identifying and picking ripe fruit.</p><div class="tbl-scroll"><table><caption>Table 19.1 &mdash; Control methods compared</caption><thead><tr><th>Control method</th><th>What is programmed</th><th>Path controlled?</th><th>Skill needed</th><th>Typical application</th></tr></thead><tbody><tr><td>Manual / limited sequence</td><td>Nothing &mdash; the operator drives each motion</td><td>No</td><td>Low</td><td>Teleoperation, set-up, teaching</td></tr><tr><td>Point-to-point</td><td>Discrete end points</td><td>No</td><td>Low to moderate</td><td>Spot welding, pick and place, drilling</td></tr><tr><td>Continuous path</td><td>The complete trajectory and speed</td><td>Yes</td><td>Moderate to high</td><td>Arc welding, painting, grinding, cutting</td></tr><tr><td>Playback (teach and repeat)</td><td>Recorded joint positions</td><td>Yes, along the taught points</td><td>Low</td><td>General industrial robots</td></tr><tr><td>Numerical / off-line</td><td>Text program or CAD path</td><td>Yes</td><td>High</td><td>Complex cells, high-mix production</td></tr><tr><td>Intelligent / adaptive</td><td>The task and the constraints</td><td>Decided by the robot</td><td>Very high</td><td>Vision-guided picking, AMRs, surgery</td></tr></tbody></table></div><h3 id="sec2"><span class="sec-no">2.</span>Major Components of a Robot</h3><p>A robot is a mechatronic system, and its components can be grouped exactly as in Topic 1: mechanical structure, actuators, sensors, controller, power supply and end effector.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 380" width="880" height="380" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Major components of an articulated robot</text><rect x="150" y="290" width="180" height="34" rx="4" class="mech"/><text x="240" y="311" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">BASE (fixed to the floor)</text><line x1="240" y1="290" x2="275.9121150491952" y2="191.33227481747963" class="cmp" stroke-width="9"/><line x1="275.9121150491952" y1="191.33227481747963" x2="365.18291402385654" y2="158.8403612015411" class="cmp" stroke-width="7"/><line x1="365.18291402385654" y1="158.8403612015411" x2="397.13246313057743" y2="147.21167632846837" class="cmp" stroke-width="4"/><circle cx="397.13246313057743" cy="147.21167632846837" r="8" class="t-box3"/><circle cx="240" cy="290" r="14" class="mech"/><circle cx="275.9121150491952" cy="191.33227481747963" r="10" class="cmp-f"/><circle cx="365.18291402385654" cy="158.8403612015411" r="8" class="cmp-f"/><text x="330" y="130" font-size="10.5" fill="#a8232a" text-anchor="start">wrist</text><rect x="352" y="120" width="34" height="20" rx="3" class="t-box3"/><text x="400" y="122" font-size="10.5" fill="#a8232a" text-anchor="start">END EFFECTOR (gripper / tool)</text><text x="196" y="352" font-size="10.5" fill="#5b6b7c" text-anchor="middle">Joint 1 &mdash; waist rotation</text><text x="300" y="176" font-size="10.5" fill="#5b6b7c" text-anchor="start">Joint 2 &mdash; shoulder</text><text x="378" y="232" font-size="10.5" fill="#5b6b7c" text-anchor="start">Joint 3 &mdash; elbow</text><text x="238" y="250" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">ARM (links 1, 2, 3)</text><rect x="520" y="60" width="320" height="130" rx="8" class="t-box2"/><text x="680" y="86" font-size="13" fill="#12283d" text-anchor="middle" font-weight="700">ROBOT CONTROLLER</text><text x="680" y="108" font-size="11" fill="#5b6b7c" text-anchor="middle">computer + servo drives + I/O</text><text x="540" y="132" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Motion planner &amp; trajectory generator</text><text x="540" y="148" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Kinematics and dynamics solver</text><text x="540" y="164" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Servo amplifiers for each joint</text><text x="540" y="180" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Program memory, teach pendant port, safety I/O</text><rect x="520" y="215" width="150" height="62" rx="8" class="t-box3"/><text x="595" y="240" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">TEACH</text><text x="595" y="258" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">PENDANT</text><rect x="690" y="215" width="150" height="62" rx="8" class="t-box4"/><text x="765" y="240" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">SENSORS</text><text x="765" y="258" font-size="10" fill="#5b6b7c" text-anchor="middle">encoders, vision, force</text><rect x="520" y="300" width="320" height="44" rx="8" class="t-box5"/><text x="680" y="320" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">POWER SUPPLY  (3-phase mains &rarr; drives)</text><text x="680" y="336" font-size="10" fill="#5b6b7c" text-anchor="middle">hydraulic / pneumatic supply if used</text><polyline points="520,125 420,125 420,200 350,200" class="lnk-d" marker-end="url(#ah)"/><text x="430" y="160" font-size="10" fill="#0f5fa8" text-anchor="start">drive signals</text><polyline points="300,250 470,250 470,190 518,190" class="lnk" marker-end="url(#ah)"/><text x="400" y="266" font-size="10" fill="#157a4b" text-anchor="middle">joint encoder feedback</text><line x1="670" y1="246" x2="690" y2="246" class="lnk"/><line x1="595" y1="215" x2="595" y2="190" class="lnk"/></svg></div><figcaption><b>Fig. 3:</b> An articulated robot showing the manipulator, the joints, the wrist, the end effector, the controller, the teach pendant and the sensors.</figcaption></figure><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Block diagram of a robot system</text><rect x="30" y="110" width="140" height="78" rx="8" class="t-box3"/><text x="100.0" y="132.0" class="t-lbl">Program /</text><text x="100.0" y="149.0" class="t-lbl">teach pendant</text><text x="100.0" y="166.0" class="t-lbl-s">the task to be done</text><rect x="215" y="110" width="150" height="78" rx="8" class="t-box2"/><text x="290.0" y="132.0" class="t-lbl">Controller</text><text x="290.0" y="149.0" class="t-lbl">(CPU + memory)</text><text x="290.0" y="166.0" class="t-lbl-s">kinematics, planner</text><rect x="410" y="110" width="140" height="78" rx="8" class="t-box2"/><text x="480.0" y="132.0" class="t-lbl">Servo drives</text><text x="480.0" y="149.0" class="t-lbl">(amplifiers)</text><text x="480.0" y="166.0" class="t-lbl-s">one per joint</text><rect x="595" y="110" width="130" height="78" rx="8" class="t-box4"/><text x="660.0" y="140.5" class="t-lbl">Actuators</text><text x="660.0" y="157.5" class="t-lbl-s">motors / cylinders</text><rect x="595" y="25" width="130" height="60" rx="8" class="t-box2"/><text x="660.0" y="38.0" class="t-lbl">Manipulator</text><text x="660.0" y="55.0" class="t-lbl">(arm + wrist)</text><text x="660.0" y="72.0" class="t-lbl-s">links and joints</text><rect x="770" y="25" width="95" height="60" rx="8" class="t-box4"/><text x="817.5" y="38.0" class="t-lbl">End</text><text x="817.5" y="55.0" class="t-lbl">effector</text><text x="817.5" y="72.0" class="t-lbl-s">gripper / tool</text><rect x="410" y="215" width="150" height="56" rx="8" class="t-box4"/><text x="485" y="237" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">Internal sensors</text><text x="485" y="254" font-size="10" fill="#5b6b7c" text-anchor="middle">encoders, resolvers</text><rect x="600" y="215" width="160" height="56" rx="8" class="t-box4"/><text x="680" y="237" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">External sensors</text><text x="680" y="254" font-size="10" fill="#5b6b7c" text-anchor="middle">vision, force, proximity</text><line x1="170" y1="149" x2="213" y2="149" class="lnk" marker-end="url(#ah)"/><line x1="365" y1="149" x2="408" y2="149" class="lnk" marker-end="url(#ah)"/><line x1="550" y1="149" x2="593" y2="149" class="lnk" marker-end="url(#ah)"/><polyline points="660,110 660,87" class="lnk" marker-end="url(#ah)"/><line x1="725" y1="55" x2="768" y2="55" class="lnk" marker-end="url(#ah)"/><polyline points="660,188 660,205 560,205 560,225" class="lnk" marker-end="url(#ah)"/><polyline points="600,243 562,243" class="lnk" marker-end="url(#ah)"/><polyline points="485,215 485,190" class="lnk-d" marker-end="url(#ah)"/><text x="485" y="205" font-size="10" fill="#0f5fa8" text-anchor="middle">position feedback</text><text x="770" y="250" font-size="10" fill="#5b6b7c" text-anchor="start">workpiece /</text><text x="770" y="264" font-size="10" fill="#5b6b7c" text-anchor="start">environment</text><text x="440" y="292" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Internal sensors close the joint position loops; external sensors close the task loops (vision-guided or force-controlled motion).</text></svg></div><figcaption><b>Fig. 4:</b> Block diagram of a robot system, showing internal sensors closing the joint loops and external sensors closing the task loops.</figcaption></figure><h4>1. The manipulator (arm and body)</h4><p>The <b>manipulator</b> is the mechanical arm itself. It consists of a series of rigid bodies called <b>links</b> connected by <b>joints</b>. The joints are driven by actuators. The link fixed to the floor is the <b>base</b>; the moving assembly attached to it is the <b>arm</b>; the assembly at the end of the arm that orients the tool is the <b>wrist</b>. The joint nearest the base is called the <b>waist</b> or <b>shoulder</b> and carries the largest load, so it is the strongest and largest. Each joint has mechanical limits (hard stops) and usually a brake to hold position when power is removed.</p><p>Links are made of cast or machined aluminium alloy for light weight and rigidity, or of steel where strength is needed, or of carbon fibre composite in high-speed robots to reduce inertia. The links are hollow wherever possible, so that cables and hoses can be routed inside them.</p><h4>2. Joints and actuators</h4><p>Each joint is driven by an <b>actuator</b>. The three types of actuator used in robots are:</p><ul><li><b>Electric</b> &mdash; by far the most common. Brushless DC (BLDC) or AC permanent magnet synchronous servo motors with harmonic or planetary gear reducers and absolute encoders. Clean, quiet, accurate, easy to control, and efficient. Used in almost all modern industrial and service robots.</li><li><b>Hydraulic</b> &mdash; a hydraulic cylinder or a hydraulic motor driven by a servo valve. Gives an extremely high force-to-weight ratio and is very stiff, so it is used for very heavy payloads (over 500 kg), for large foundry and forging robots, and historically for walking robots. It needs a hydraulic power pack, is noisy, can leak oil, and is less precise.</li><li><b>Pneumatic</b> &mdash; uses compressed air cylinders. Very cheap, fast, clean and safe in explosive atmospheres, but air is compressible so the position cannot be controlled precisely; only two positions (fully extended and fully retracted) are practical. Used for simple grippers and for low-cost pick-and-place robots.</li></ul><p>The <b>transmission</b> between the motor and the joint is usually a <b>harmonic drive</b> (strain wave gear) or a <b>cycloidal / RV reducer</b>, because these give very high reduction ratios with almost zero backlash in a compact package. This is discussed in detail in Topic 24.</p><h4>3. Sensors</h4><p>Robot sensors are divided into two groups.</p><ul><li><b>Internal (proprioceptive) sensors</b> &mdash; measure the internal state of the robot itself: joint position and velocity (encoders, resolvers, potentiometers), motor current and torque, brake status, and temperature. These close the servo position loops and are essential for the robot to work at all.</li><li><b>External (exteroceptive) sensors</b> &mdash; measure the robot's relationship with its environment: <b>vision</b> (2D and 3D cameras) to locate parts, <b>force and torque</b> sensors at the wrist to control contact force, <b>tactile</b> sensors on the gripper fingers to control grip and to detect slip, <b>proximity</b> sensors to detect the presence of a part, <b>range finders</b> (ultrasonic, laser, LiDAR) for mobile robot navigation, and <b>safety scanners</b> to detect people.</li></ul><h4>4. End effector</h4><p>The <b>end effector</b> is the device mounted on the wrist that actually performs the task. It is not part of the robot itself and is changed according to the job. There are two broad categories: <b>grippers</b>, which hold and move a workpiece, and <b>tools</b>, which perform an operation such as welding, painting, cutting or drilling. A <b>tool changer</b> allows one robot to switch automatically between several end effectors. End effectors are covered in detail in Topic 29.</p><h4>5. Controller</h4><p>The <b>controller</b> is a dedicated industrial computer that houses the processor, the memory, the servo drives, the input/output interfaces and the safety circuits. Its tasks are:</p><ul><li>to store the robot program and the taught positions;</li><li>to execute the program, including logic, branching, loops and calls to subroutines;</li><li>to perform the <b>kinematic calculations</b> &mdash; converting the desired tool position into the joint angles required (inverse kinematics) and the reverse (forward kinematics);</li><li>to generate the <b>trajectory</b>, interpolating between taught points at the commanded speed;</li><li>to run the <b>servo control loops</b> for each joint, typically at 1 kHz or higher, using PID or computed-torque control;</li><li>to handle communication with the teach pendant, with other machines, with vision systems and with the factory network;</li><li>to monitor all safety devices and to stop the robot safely in an emergency;</li><li>to log faults and to provide diagnostics.</li></ul><p>Modern controllers use a multi-processor or multi-core architecture, with one processor for the user program and trajectory planning and a separate digital signal processor for each joint's servo loop.</p><h4>6. Teach pendant and programming devices</h4><p>The <b>teach pendant</b> is a hand-held terminal, connected by a cable, with a display, a joystick or axis keys, an enabling (dead-man) switch and an emergency stop button. It is used to jog the robot, to record positions, to write and edit programs, and to set parameters. The <b>enabling switch</b> is a three-position device: the robot can move only when the switch is held in the middle position, so a startled operator who either lets go or squeezes hard will stop the machine. This is a legal safety requirement.</p><h4>7. Power supply</h4><p>Industrial robots are normally fed from a three-phase 400 V, 50 Hz supply, which is rectified to a DC bus (about 540 V to 650 V) and then inverted for each motor. A <b>braking resistor</b> absorbs the energy returned by the motors during deceleration, or a regenerative unit feeds it back to the mains. Small and mobile robots use 24 V DC or batteries. Hydraulic robots additionally need a hydraulic power pack with a pump, a reservoir, filters, a cooler and accumulators.</p><h4>8. Safety equipment</h4><ul><li>Emergency stop buttons at the pendant and on the cell.</li><li>Safety fences, interlocked gates and light curtains so that a person cannot enter the cell while the robot is moving.</li><li>Safety scanners and laser area monitors around the robot.</li><li>Safe speed and safe position monitoring in the controller.</li><li>Mechanical hard stops and brakes that hold the arm when power is lost.</li><li>Force and power limiting in collaborative robots, with rounded, padded surfaces.</li></ul><div class="tbl-scroll"><table><caption>Table 19.2 &mdash; Major components and their functions</caption><thead><tr><th>Component</th><th>Function</th><th>Typical devices</th></tr></thead><tbody><tr><td>Manipulator (links and joints)</td><td>Provide the mechanical structure and the degrees of freedom</td><td>Aluminium or steel links, revolute and prismatic joints, harmonic or RV reducers</td></tr><tr><td>Actuators</td><td>Move the joints</td><td>BLDC and AC servo motors, stepper motors, hydraulic cylinders, pneumatic cylinders</td></tr><tr><td>Internal sensors</td><td>Measure joint position, velocity and current</td><td>Absolute and incremental encoders, resolvers, tachogenerators, Hall sensors</td></tr><tr><td>External sensors</td><td>Measure the environment</td><td>2D and 3D cameras, force/torque sensor, tactile arrays, proximity, LiDAR, safety scanners</td></tr><tr><td>End effector</td><td>Perform the task</td><td>Grippers (parallel jaw, angular, vacuum, magnetic), tools (welding torch, paint gun, spindle, gripper), tool changer</td></tr><tr><td>Controller</td><td>Store and execute the program, compute kinematics, run the servo loops</td><td>Industrial computer, DSP servo amplifiers, PLC, safety controller</td></tr><tr><td>Teach pendant</td><td>Program and jog the robot</td><td>Hand terminal with display, joystick, enabling switch, E-stop</td></tr><tr><td>Power supply</td><td>Provide electrical (and hydraulic/pneumatic) power</td><td>3-phase rectifier and DC bus, braking resistor, 24 V supply, battery, hydraulic power pack</td></tr><tr><td>Safety equipment</td><td>Protect people and the machine</td><td>E-stops, fences, interlocks, light curtains, safety scanners, brakes</td></tr></tbody></table></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>Robots are classified by control method into manual, point-to-point, continuous path, playback, numerical control and intelligent control.</li><li>Point-to-point control programs only the end points; the path between them is uncontrolled. It is fastest and simplest, and suits spot welding and pick and place.</li><li>Continuous path control commands the whole trajectory and the speed along it, which is essential for arc welding, painting, grinding and cutting.</li><li>Playback programming records joint positions while the operator jogs or guides the robot; it needs no programming skill.</li><li>Numerical and off-line programming uses text languages such as RAPID, KAREL, KRL and VAL, and allows simulation before production.</li><li>Intelligent control uses sensors, vision and artificial intelligence to decide the actions needed to complete a task.</li><li>The major components of a robot are the manipulator (links and joints), the actuators, the transmission, internal and external sensors, the end effector, the controller, the teach pendant, the power supply and the safety equipment.</li><li>Electric actuators dominate; hydraulic ones give the highest force; pneumatic ones are cheapest but only give two positions.</li><li>Internal sensors close the joint servo loops; external sensors close the task loops.</li><li>The teach pendant has an enabling (dead-man) switch that must be held in the middle position for the robot to move.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Classify robots according to their control method and explain each class briefly.</li><li>Differentiate between point-to-point and continuous path control. Give two applications of each.</li><li>What is playback (teach and repeat) programming? Compare lead-through with walk-through programming.</li><li>Name any four robot programming languages. What is meant by off-line programming and what are its advantages?</li><li>What is an intelligent robot? Give three examples.</li><li>Draw a labelled sketch of an articulated robot and name its major components.</li><li>Draw the block diagram of a robot system and explain the function of each block.</li><li>Differentiate between internal and external sensors with two examples of each.</li><li>Compare electric, hydraulic and pneumatic actuators for robot joints.</li><li>What is an end effector and how does it differ from the manipulator?</li><li>Explain the function of the robot controller and list its main tasks.</li><li>What is the purpose of the enabling switch on a teach pendant?</li><li>List the safety equipment required around an industrial robot cell.</li></ol></div><div class="pager"><a class="prev" href="18-robotics-history-classification-coordinate-system.html"><span class="dir">&larr; Previous topic</span><span class="ttl">18. Introduction to Robotics &mdash; Brief History and Classification by Coordinate System</span></a><a class="next" href="20-fixed-versus-flexible-automation-applications.html"><span class="dir">Next topic &rarr;</span><span class="ttl">20. Fixed versus Flexible Automation; Robotics Applications, Current and Future</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

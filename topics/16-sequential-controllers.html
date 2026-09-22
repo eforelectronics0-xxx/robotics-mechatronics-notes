@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sequential Controllers | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="How machines that must perform a fixed series of operations in a fixed order are controlled: event-based and time-based sequencing, state diagrams, ti">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit II &middot; Topic 16 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit II &rsaquo; Topic 16</nav><div class="unit-tag">Unit II</div><h2 class="page-title"><span class="topic-no">16</span>Sequential Controllers</h2><p class="lede">How machines that must perform a fixed series of operations in a fixed order are controlled: event-based and time-based sequencing, state diagrams, timers, counters, cam shafts, PLCs and microcontroller state machines.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">What is Sequential Control?</a></li><li><a href="#sec2">Structure of a Sequential Controller</a></li><li><a href="#sec3">Types of Sequential Control</a></li><li><a href="#sec4">Devices Used as Sequential Controllers</a></li><li><a href="#sec5">Examples of Sequential Control</a></li><li><a href="#sec6">Advantages and Limitations</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>What is Sequential Control?</h3><div class="defbox"><span class="tag">Definition</span><p><b>Sequential control</b> is a form of control in which a series of operations is carried out in a <b>predetermined order</b>, each step starting only when the previous step has been completed and its transition condition has been satisfied. The controller moves from state to state, and the sequence of states is fixed in advance.</p></div><p>Many industrial and domestic machines are naturally sequential. A washing machine must fill, then heat, then wash, then drain, then spin. A bottle filling machine must position the bottle, then fill, then cap, then label, then eject. A lift must close its doors, then move, then stop, then open its doors. In each case the order is fixed and skipping a step would be dangerous or useless &mdash; you must not spin a washing machine while it is full of water.</p><p>Sequential control is quite different from the continuous <b>regulating</b> control discussed in Topics 13 to 15. Regulating control holds a variable at a set value continuously (like room temperature); sequential control moves a process from one discrete state to another. Real machines often combine both: a washing machine has a sequential controller for the cycle and a closed loop regulator for the water temperature.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 220" width="880" height="220" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Devices used as sequential controllers</text><rect x="28" y="65" width="144" height="74" rx="8" class="t-box2"/><text x="100.0" y="93.5" class="t-lbl" style="font-size:11.5px">Cam shaft</text><text x="100.0" y="110.5" class="t-lbl" style="font-size:11.5px">with lobes</text><rect x="208" y="65" width="144" height="74" rx="8" class="t-box2"/><text x="280.0" y="93.5" class="t-lbl" style="font-size:11.5px">Timer /</text><text x="280.0" y="110.5" class="t-lbl" style="font-size:11.5px">counter relay</text><rect x="388" y="65" width="144" height="74" rx="8" class="t-box2"/><text x="460.0" y="93.5" class="t-lbl" style="font-size:11.5px">Stepper motor</text><text x="460.0" y="110.5" class="t-lbl" style="font-size:11.5px">+ driver</text><rect x="568" y="65" width="144" height="74" rx="8" class="t-box2"/><text x="640.0" y="93.5" class="t-lbl" style="font-size:11.5px">PLC</text><text x="640.0" y="110.5" class="t-lbl" style="font-size:11.5px">(ladder logic)</text><rect x="728" y="65" width="144" height="74" rx="8" class="t-box2"/><text x="800.0" y="93.5" class="t-lbl" style="font-size:11.5px">Microcontroller</text><text x="800.0" y="110.5" class="t-lbl" style="font-size:11.5px">(state machine)</text><text x="440" y="170" font-size="12" fill="#12283d" text-anchor="middle" font-weight="600">A sequential controller moves the machine from one step to the next only when the transition condition of the present step is satisfied.</text><text x="440" y="194" font-size="11.5" fill="#5b6b7c" text-anchor="middle">Each step has an entry condition, an action and an exit condition.</text></svg></div><figcaption><b>Fig. 1:</b> Devices commonly used as sequential controllers, from purely mechanical to fully programmable.</figcaption></figure><h3 id="sec2"><span class="sec-no">2.</span>Structure of a Sequential Controller</h3><p>Every sequential controller has the same three ingredients.</p><ul><li><b>Steps (states)</b> &mdash; each step is a condition of the machine during which certain outputs are ON. The machine is always in exactly one step (in a simple sequence).</li><li><b>Transition conditions</b> &mdash; the logical condition that must become true before the machine may leave the present step and enter the next. This may be a <b>sensor signal</b> (a limit switch closed, a level reached, a temperature achieved), a <b>timer expiry</b> (5 seconds have elapsed), a <b>counter</b> value (20 parts counted), an <b>operator command</b> (start button pressed), or a combination.</li><li><b>Actions (outputs)</b> &mdash; what the machine does during each step: open a valve, start a motor, switch on a heater, sound a buzzer.</li></ul><p>The controller stores which step is currently active. When the transition condition of that step is satisfied, the controller deactivates the present step, activates the next one, and switches the outputs accordingly. This is exactly the behaviour of a <b>finite state machine</b> in computer science.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" width="880" height="320" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Sequential controller &mdash; state (step) diagram of a machine cycle</text><rect x="0" y="70" width="120" height="66" rx="8" class="t-box3"/><text x="60.0" y="94.5" class="t-lbl" style="font-size:11.5px">S0</text><text x="60.0" y="111.5" class="t-lbl" style="font-size:11.5px">idle / reset</text><rect x="170" y="70" width="120" height="66" rx="8" class="t-box2"/><text x="230.0" y="94.5" class="t-lbl" style="font-size:11.5px">S1</text><text x="230.0" y="111.5" class="t-lbl" style="font-size:11.5px">close door</text><rect x="340" y="70" width="120" height="66" rx="8" class="t-box2"/><text x="400.0" y="94.5" class="t-lbl" style="font-size:11.5px">S2</text><text x="400.0" y="111.5" class="t-lbl" style="font-size:11.5px">fill water</text><rect x="510" y="70" width="120" height="66" rx="8" class="t-box2"/><text x="570.0" y="94.5" class="t-lbl" style="font-size:11.5px">S3</text><text x="570.0" y="111.5" class="t-lbl" style="font-size:11.5px">heat &amp; wash</text><rect x="680" y="70" width="120" height="66" rx="8" class="t-box2"/><text x="740.0" y="94.5" class="t-lbl" style="font-size:11.5px">S4</text><text x="740.0" y="111.5" class="t-lbl" style="font-size:11.5px">drain &amp; spin</text><line x1="120" y1="103" x2="228" y2="103" class="lnk" marker-end="url(#ah)"/><line x1="290" y1="103" x2="398" y2="103" class="lnk" marker-end="url(#ah)"/><line x1="460" y1="103" x2="568" y2="103" class="lnk" marker-end="url(#ah)"/><line x1="630" y1="103" x2="738" y2="103" class="lnk" marker-end="url(#ah)"/><text x="174" y="82" font-size="10" fill="#157a4b" text-anchor="middle">start pressed</text><text x="344" y="82" font-size="10" fill="#157a4b" text-anchor="middle">door closed</text><text x="514" y="82" font-size="10" fill="#157a4b" text-anchor="middle">level = full</text><text x="684" y="82" font-size="10" fill="#157a4b" text-anchor="middle">temp reached</text><text x="684" y="96" font-size="10" fill="#157a4b" text-anchor="middle">&amp; timer done</text><text x="854" y="82" font-size="10" fill="#157a4b" text-anchor="middle">cycle end</text><text x="854" y="96" font-size="10" fill="#157a4b" text-anchor="middle">&rarr; S0</text><path d="M 740 136 L 740 175 L 60 175 L 60 138" class="lnk-d" marker-end="url(#ah)"/><text x="400" y="168" font-size="11" fill="#5b6b7c" text-anchor="middle">return to the initial state when the sequence is complete</text><rect x="60" y="200" width="760" height="100" rx="8" class="t-box"/><text x="440" y="192" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Equivalent ladder logic rung (PLC)</text><line x1="90" y1="225" x2="90" y2="285" class="cmp" stroke-width="3"/><line x1="790" y1="225" x2="790" y2="285" class="cmp" stroke-width="3"/><line x1="90" y1="250" x2="170" y2="250" class="wire"/><line x1="170" y1="236" x2="170" y2="264" class="cmp" stroke-width="2"/><line x1="204" y1="236" x2="204" y2="264" class="cmp" stroke-width="2"/><line x1="204" y1="250" x2="290" y2="250" class="wire"/><text x="187" y="226" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">START</text><line x1="290" y1="236" x2="290" y2="264" class="cmp" stroke-width="2"/><line x1="324" y1="236" x2="324" y2="264" class="cmp" stroke-width="2"/><line x1="324" y1="250" x2="440" y2="250" class="wire"/><text x="307" y="226" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">S0</text><line x1="440" y1="236" x2="440" y2="264" class="cmp" stroke-width="2"/><line x1="474" y1="236" x2="474" y2="264" class="cmp" stroke-width="2"/><line x1="410" y1="236" x2="410" y2="264" class="cmp" stroke-width="2"/><line x1="474" y1="250" x2="790" y2="250" class="wire"/><line x1="90" y1="250" x2="170" y2="250" class="wire"/><text x="427" y="226" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">NOT S1</text><text x="457" y="226" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">START/S0</text><rect x="640" y="232" width="54" height="36" fill="none" stroke="#12283d" stroke-width="2"/><rect x="648" y="240" width="54" height="36" fill="#e8f6ee" stroke="#12283d" stroke-width="2"/><text x="675" y="262" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">S1</text><text x="660" y="226" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">output coil (SET step 1)</text></svg></div><figcaption><b>Fig. 2:</b> A step (state) diagram of a machine cycle and the equivalent PLC ladder logic rung. Each step is entered only when the previous step's transition condition becomes true.</figcaption></figure><h3 id="sec3"><span class="sec-no">3.</span>Types of Sequential Control</h3><ul><li><b>Event-based (sensor-driven) sequencing</b> &mdash; the next step begins when a physical event occurs, such as a limit switch being operated, a part arriving at a station, or a level being reached. This is the safest and most accurate method because the machine only proceeds when the physical condition really exists.</li><li><b>Time-based sequencing</b> &mdash; the next step begins after a fixed time has elapsed, using a timer. Simple and cheap, but it assumes the operation always takes the same time. If it does not (for example a slow-filling valve), the sequence goes wrong.</li><li><b>Counter-based sequencing</b> &mdash; a step repeats until a count is reached, for example ten bottles filled or five holes drilled.</li><li><b>Combined (hybrid) sequencing</b> &mdash; most real machines use both time and sensor conditions, for example &ldquo;run the pump until the level switch operates OR until 60 seconds have elapsed, whichever comes first.&rdquo;</li><li><b>Interlocked sequencing</b> &mdash; additional safety conditions must also be true, for example the guard door must be closed and the emergency stop must be released.</li></ul><h4>Cam shaft sequencing</h4><p>The oldest form of sequential control is a rotating shaft carrying a number of <b>cams</b> or <b>dogs</b>. As the shaft turns at a constant speed, each cam operates a limit switch at the correct moment, and the switches in turn control valves, clutches and motors. This method is extremely fast, reliable and repeatable, and is still used in automatic screw machines, packaging machines and printing presses. Its disadvantage is that changing the sequence means physically changing or repositioning the cams, so it is inflexible. An electronic equivalent is a <b>cam timer</b> or a <b>drum sequencer</b>, in which a rotating drum with studs makes contact with a row of fingers.</p><h3 id="sec4"><span class="sec-no">4.</span>Devices Used as Sequential Controllers</h3><ol><li><b>Cam shaft and limit switches</b> &mdash; purely mechanical, very fast, fixed sequence.</li><li><b>Drum sequencer / cam timer</b> &mdash; a motor-driven drum or stepper-indexed disc with electrical contacts; the sequence is changed by moving the studs.</li><li><b>Electromechanical timers and counters</b> &mdash; on-delay and off-delay timers, star-delta timers, plug-in relays and mechanical counters wired together in a relay logic panel. Flexible to a limited extent but bulky and hard to modify.</li><li><b>Programmable Logic Controller (PLC)</b> &mdash; a rugged industrial computer programmed in <b>ladder logic</b>, <b>function block</b>, <b>structured text</b> or <b>sequential function chart (SFC)</b> language. The PLC scans its inputs, executes the program, updates its outputs and repeats, with a scan time of a few milliseconds. PLCs are the standard sequential controller in industry because the sequence can be changed by rewriting the program without touching the wiring.</li><li><b>Microcontroller</b> &mdash; a small, cheap programmable controller written in C or assembly, using a <code>switch-case</code> state machine. Used in domestic appliances, toys, automobiles and low-cost machines.</li><li><b>Personal computer or industrial PC</b> &mdash; used for complex sequences, data logging and operator interfaces.</li><li><b>Hardware state machine</b> &mdash; built from flip-flops and logic gates in a CPLD or FPGA, used where the sequence must be very fast or where the outputs must change simultaneously with no scan delay.</li></ol><h4>Sequential Function Chart and ladder logic</h4><p>Modern PLC programming for sequences usually follows the <b>Sequential Function Chart (SFC)</b> method defined in the IEC 61131-3 standard. The chart is drawn as a series of <b>steps</b> (squares) joined by <b>transitions</b> (short horizontal bars), with the transition condition written beside each bar. Each step has one or more <b>actions</b> associated with it. The chart maps directly onto ladder logic using SET and RESET coils, or onto a microcontroller using a state variable.</p><div class="note"><span class="tag">Note</span><p><b>Practical rule for writing a sequence.</b> Number the steps 0, 1, 2, 3 &hellip; Store the current step number in a register. The outputs are driven from the step number. A transition is tested only when its own step is active. Each transition SETs the next step and RESETs the current one in the same scan, so that two steps can never be active at once. Add an interlock so that the initial step can only be entered when the machine is safe (guards closed, emergency stop released).</p></div><h3 id="sec5"><span class="sec-no">5.</span>Examples of Sequential Control</h3><ul><li><b>Automatic washing machine</b> &mdash; fill &rarr; heat &rarr; wash &rarr; drain &rarr; rinse &rarr; spin &rarr; end. Transitions come from the level switch, the temperature sensor, timers and the door lock.</li><li><b>Traffic light controller</b> &mdash; main road green &rarr; main road amber &rarr; main road red &rarr; side road green &rarr; and so on, driven by timers, or by vehicle detectors in the more advanced version.</li><li><b>Bottle filling machine</b> &mdash; conveyor stops &rarr; nozzle lowers &rarr; fill valve opens until the level sensor operates &rarr; nozzle rises &rarr; conveyor runs to the next bottle.</li><li><b>Drilling machine</b> &mdash; clamp the work &rarr; spindle on &rarr; feed down until the depth limit switch operates &rarr; dwell &rarr; retract &rarr; spindle off &rarr; unclamp.</li><li><b>Lift (elevator)</b> &mdash; doors close &rarr; move to the floor &rarr; stop and level &rarr; doors open &rarr; wait for the door timer &rarr; doors close.</li><li><b>Pneumatic cylinder sequencing</b> &mdash; A+ B+ B&minus; A&minus;, where each movement is confirmed by a magnetic reed switch before the next is started.</li><li><b>Dishwasher, microwave oven, vending machine, car park barrier, automatic gate, chemical batch plant and assembly robot</b> &mdash; all sequential.</li></ul><div class="tbl-scroll"><table><caption>Table 16.1 &mdash; A pneumatic sequence expressed as steps</caption><thead><tr><th>Step</th><th>Action</th><th>Transition condition to the next step</th><th>Interlock</th></tr></thead><tbody><tr><td>0 Idle</td><td>All outputs off; clamp open</td><td>START button pressed AND guard closed</td><td>E-stop released</td></tr><tr><td>1 Clamp</td><td>Clamp cylinder extends (A+)</td><td>Clamp-extended limit switch a1 = 1</td><td>Air pressure OK</td></tr><tr><td>2 Drill</td><td>Spindle motor on; feed cylinder extends (B+)</td><td>Feed-extended switch b1 = 1</td><td>Spindle up to speed</td></tr><tr><td>3 Dwell</td><td>Spindle on; feed held</td><td>Dwell timer of 3 s expired</td><td>&mdash;</td></tr><tr><td>4 Retract</td><td>Feed cylinder retracts (B&minus;)</td><td>Feed-retracted switch b0 = 1</td><td>&mdash;</td></tr><tr><td>5 Unclamp</td><td>Spindle off; clamp retracts (A&minus;)</td><td>Clamp-retracted switch a0 = 1</td><td>&mdash;</td></tr><tr><td>6 End</td><td>Cycle complete lamp on</td><td>Return to step 0</td><td>&mdash;</td></tr></tbody></table></div><h3 id="sec6"><span class="sec-no">6.</span>Advantages and Limitations</h3><ul><li><b>Advantages:</b> the sequence is guaranteed and repeatable, so the machine always does the same thing; safety interlocks are built in, so a dangerous step cannot start unless the previous one has finished; easy to understand, to document and to troubleshoot because the state diagram shows exactly where the machine is; flexible to modify when a PLC or microcontroller is used; faults can be detected at each transition and an alarm raised if a step does not complete in time.</li><li><b>Limitations:</b> not suitable for continuous regulation of a variable, which needs a feedback controller instead; a purely mechanical or timer-based sequence cannot adapt to changing conditions; if a sensor fails, the sequence may stop or, worse, may skip a step unless a watchdog timer is provided; programming and debugging a long sequence takes skill; the scan time of a PLC limits how fast transitions can be detected.</li></ul><div class="warn"><span class="tag">Important</span><p><b>Fail-safe design.</b> Every transition that depends on a sensor should also have a maximum time limit, so that a stuck sensor does not stop the machine forever or let it proceed unsafely. For example: &ldquo;wait for the level switch, but if 60 s elapse, stop and raise an alarm.&rdquo; Emergency stop must be able to interrupt the sequence at any point and must return the machine to a safe state, not simply freeze it.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>Sequential control performs a fixed series of operations in a fixed order, each step starting only when the previous step's transition condition is satisfied.</li><li>The three ingredients of any sequential controller are steps (states), transition conditions and actions (outputs).</li><li>Sequencing may be event-based (sensor driven), time-based (timer driven), counter-based, combined or interlocked for safety.</li><li>Sequential control is different from regulating control; real machines often use both together.</li><li>Devices used as sequential controllers include cam shafts with limit switches, drum sequencers, electromechanical timer and relay panels, PLCs, microcontrollers, industrial PCs and hardware state machines.</li><li>A PLC programmed in ladder logic or Sequential Function Chart is the industrial standard because the sequence can be changed in software.</li><li>The Sequential Function Chart method uses numbered steps joined by transitions with conditions, and maps directly to SET/RESET ladder logic or to a switch-case state machine.</li><li>Every sensor-based transition should also have a time limit and an alarm, so that a failed sensor cannot cause an unsafe condition.</li><li>Typical examples are washing machines, traffic lights, filling machines, drilling machines, lifts and pneumatic cylinder sequences.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Define sequential control and explain how it differs from regulating (continuous) control.</li><li>What are the three essential ingredients of a sequential controller?</li><li>Explain event-based, time-based and counter-based sequencing with one example each.</li><li>Describe the cam shaft method of sequential control. What are its advantages and limitations?</li><li>List any six devices that can be used as a sequential controller and compare a PLC with a microcontroller.</li><li>Draw a state diagram for a washing machine cycle and specify the transition condition of each step.</li><li>Write the step table for the pneumatic sequence A+ B+ B&minus; A&minus; including interlocks.</li><li>Why should every sensor-based transition also have a time limit?</li><li>Give four advantages and four limitations of sequential control.</li><li>What is a Sequential Function Chart and which standard defines it?</li></ol></div><div class="pager"><a class="prev" href="15-basic-elements-of-closed-loop-system.html"><span class="dir">&larr; Previous topic</span><span class="ttl">15. Basic Elements of a Closed Loop System</span></a><a class="next" href="17-examples-room-heating-water-level-washing-machine.html"><span class="dir">Next topic &rarr;</span><span class="ttl">17. Examples of Mechatronic Systems &mdash; Room Heating, Water Level Control and Washing Machine</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

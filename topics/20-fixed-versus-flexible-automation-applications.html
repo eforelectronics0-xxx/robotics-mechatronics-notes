@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixed versus Flexible Automation; Robotics Applications, Current and Future | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="The three stages of automation, how flexible manufacturing systems use robots, and a survey of where robots are used today and where they are going.">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit III &middot; Topic 20 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit III &rsaquo; Topic 20</nav><div class="unit-tag">Unit III</div><h2 class="page-title"><span class="topic-no">20</span>Fixed versus Flexible Automation; Robotics Applications, Current and Future</h2><p class="lede">The three stages of automation, how flexible manufacturing systems use robots, and a survey of where robots are used today and where they are going.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Types of Automation</a></li><li><a href="#sec2">Why Robots Make Automation Flexible</a></li><li><a href="#sec3">Current Applications of Robots</a></li><li><a href="#sec4">Future Trends in Robotics</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Types of Automation</h3><p>Automation means using machines and control systems to perform work with minimum human intervention. It has developed in three stages, and the choice between them is an economic decision based on <b>production volume</b> and <b>product variety</b>.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Fixed (hard) automation versus flexible (soft) automation</text><rect x="50" y="55" width="370" height="200" rx="8" class="t-box"/><text x="235" y="78" font-size="13" fill="#a8232a" text-anchor="middle" font-weight="700">FIXED / HARD AUTOMATION</text><rect x="80" y="100" width="70" height="46" rx="4" class="mech"/><rect x="170" y="100" width="70" height="46" rx="4" class="mech"/><rect x="260" y="100" width="70" height="46" rx="4" class="mech"/><rect x="350" y="100" width="50" height="46" rx="4" class="mech"/><line x1="60" y1="123" x2="410" y2="123" class="cmp" stroke-width="3"/><text x="235" y="168" font-size="11" fill="#4a5b6d" text-anchor="middle">one dedicated machine per operation</text><text x="235" y="186" font-size="11" fill="#4a5b6d" text-anchor="middle">fixed sequence, cam and stop driven</text><text x="235" y="210" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">very high rate, very low unit cost,</text><text x="235" y="226" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">no changeover possible</text><text x="235" y="248" font-size="10.5" fill="#5b6b7c" text-anchor="middle">e.g. automobile engine machining transfer line</text><rect x="460" y="55" width="370" height="200" rx="8" class="t-box"/><text x="645" y="78" font-size="13" fill="#157a4b" text-anchor="middle" font-weight="700">FLEXIBLE / SOFT AUTOMATION</text><rect x="490" y="100" width="66" height="46" rx="4" class="mech2"/><rect x="576" y="100" width="66" height="46" rx="4" class="mech3"/><rect x="662" y="100" width="66" height="46" rx="4" class="mech2"/><rect x="748" y="100" width="66" height="46" rx="4" class="mech3"/><line x1="470" y1="123" x2="820" y2="123" class="cmp" stroke-width="3"/><path d="M 523 92 A 14 14 0 0 1 537 104" class="lnk" marker-end="url(#aho)" stroke-width="1.4"/><path d="M 609 92 A 14 14 0 0 1 623 104" class="lnk" marker-end="url(#aho)" stroke-width="1.4"/><path d="M 695 92 A 14 14 0 0 1 709 104" class="lnk" marker-end="url(#aho)" stroke-width="1.4"/><path d="M 781 92 A 14 14 0 0 1 795 104" class="lnk" marker-end="url(#aho)" stroke-width="1.4"/><text x="645" y="168" font-size="11" fill="#4a5b6d" text-anchor="middle">robots and CNC machines, reprogrammable</text><text x="645" y="186" font-size="11" fill="#4a5b6d" text-anchor="middle">AGVs route parts between stations</text><text x="645" y="210" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">changeover by software only,</text><text x="645" y="226" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">handles a family of products</text><text x="645" y="248" font-size="10.5" fill="#5b6b7c" text-anchor="middle">e.g. FMS, robotic assembly and welding cells</text><text x="440" y="286" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Programmable automation lies between the two: a batch is made, then the machine is reprogrammed for the next batch.</text></svg></div><figcaption><b>Fig. 1:</b> Fixed automation uses one dedicated machine per operation; flexible automation uses reprogrammable robots and CNC machines that can handle a whole family of products.</figcaption></figure><h4>1. Fixed (hard) automation</h4><p>The sequence of operations is fixed by the design of the equipment. The machines are specially built for one product and cannot be changed to make anything else. Typical equipment is a <b>transfer line</b>, in which the workpiece moves from one dedicated machine to the next, and each machine performs one operation using cams, stops and dedicated tooling.</p><ul><li><b>Features:</b> very high production rate; very low unit cost; high initial investment; long lead time to design and install; inflexible &mdash; a change of product means replacing the line; long economic life for one product.</li><li><b>Best when:</b> the product is standard, the demand is very high (millions of pieces) and the design will not change. Examples: automobile engine and gearbox machining lines, bottling and canning plants, paper mills, chemical process plants, electrical lamp manufacture, fastener manufacture.</li></ul><h4>2. Programmable automation</h4><p>The equipment can be changed from one product to another by <b>reprogramming</b> and by changing some hardware (tools, fixtures). Production is in <b>batches</b>: a batch of one product is made, then the machine is reconfigured (which takes time &mdash; the <b>changeover</b>), and then a batch of another product is made. Numerical control machine tools and industrial robots are programmable automation.</p><ul><li><b>Features:</b> suitable for medium volumes and medium variety; lower production rate than fixed automation because of changeover time; more general-purpose equipment; requires skilled programming.</li><li><b>Best when:</b> a range of similar products is made in batches. Examples: NC and CNC machine tools, industrial robots, printing presses.</li></ul><h4>3. Flexible (soft) automation</h4><p>This is an extension of programmable automation in which the <b>changeover is done automatically and almost instantly</b>, by software, with no lost production time. The system can therefore produce a <b>mixture of different products simultaneously</b> rather than in separate batches. A <b>Flexible Manufacturing System (FMS)</b> is the classic example: a group of CNC machining centres served by an automatic material handling system (conveyors, automated guided vehicles) and controlled by a central computer.</p><ul><li><b>Features:</b> high variety with medium volume; very expensive equipment; continuous production of a part family; requires a great deal of planning, computer control and integration.</li><li><b>Best when:</b> product demand changes frequently and many variants exist. Examples: FMS, robotic assembly cells with vision, semiconductor fabrication, 3D printing farms.</li></ul><div class="tbl-scroll"><table><caption>Table 20.1 &mdash; Comparison of the three types of automation</caption><thead><tr><th>Feature</th><th>Fixed automation</th><th>Programmable automation</th><th>Flexible automation</th></tr></thead><tbody><tr><td>Product variety</td><td>None (single product)</td><td>Moderate (batches)</td><td>High (mixed at once)</td></tr><tr><td>Production volume</td><td>Very high</td><td>Medium</td><td>Medium to high</td></tr><tr><td>Production rate</td><td>Very high</td><td>Moderate</td><td>Moderate to high</td></tr><tr><td>Initial investment</td><td>Very high</td><td>High</td><td>Very high</td></tr><tr><td>Unit cost</td><td>Lowest</td><td>Medium</td><td>Medium</td></tr><tr><td>Changeover time</td><td>Not possible economically</td><td>Hours to days</td><td>Seconds to minutes, automatic</td></tr><tr><td>Equipment</td><td>Special purpose, dedicated</td><td>General purpose, reprogrammable</td><td>General purpose, integrated and computer controlled</td></tr><tr><td>Skill needed to operate</td><td>Low</td><td>High (programming)</td><td>High (systems engineering)</td></tr><tr><td>Examples</td><td>Transfer lines, bottling plants</td><td>CNC machines, industrial robots</td><td>FMS, robotic welding cells with vision</td></tr></tbody></table></div><div class="note"><span class="tag">Note</span><p>The relationship between variety and volume is often drawn as a diagram in which fixed automation occupies the high-volume / low-variety corner, manual production occupies the low-volume / high-variety corner, and flexible automation fills the middle. Robots have moved steadily towards the manual corner as they have become cheaper, easier to program and able to use sensors.</p></div><h3 id="sec2"><span class="sec-no">2.</span>Why Robots Make Automation Flexible</h3><ul><li>The <b>same hardware</b> performs many different tasks; only the program and the end effector change.</li><li>The <b>work cell layout can be changed</b> by re-teaching positions, without rebuilding machines.</li><li>Robots can be <b>visually guided</b>, so parts do not have to be presented in an exactly fixed position.</li><li>A robot can handle a <b>family of parts</b> by selecting the appropriate program from a list, often triggered automatically by a barcode or RFID tag.</li><li>Robots can be <b>moved</b> to a new production line when a product is discontinued, protecting the capital investment.</li><li><b>Collaborative robots</b> can be redeployed by production staff themselves, without a specialist programmer.</li></ul><div class="example"><span class="tag">Example</span><p><b>Economic example.</b> A dedicated machine for inserting a particular clip costs 20 lakh rupees and can make 40 parts per minute. If the product is discontinued after two years, the machine is scrap. A robot cell costing 15 lakh rupees makes 20 parts per minute, but after two years the robot is simply reprogrammed and re-tooled for the next product at a cost of about 1 lakh rupees. Over ten years and five products, the robot is far cheaper even though its rate is lower. This is the essence of flexible automation.</p></div><h3 id="sec3"><span class="sec-no">3.</span>Current Applications of Robots</h3><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 330" width="880" height="330" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Application areas of robots</text><rect x="30" y="55" width="158" height="240" rx="10" class="t-box"/><rect x="30" y="55" width="158" height="40" rx="10" fill="#e7f1fb" stroke="#0f5fa8" stroke-width="1.6"/><rect x="30" y="80" width="158" height="15" fill="#e7f1fb" stroke="none"/><text x="109" y="80" font-size="11.5" fill="#0f5fa8" text-anchor="middle" font-weight="700">Manufacturing</text><text x="44" y="118" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Arc &amp; spot welding</text><text x="44" y="146" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Spray painting</text><text x="44" y="174" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Machine loading</text><text x="44" y="202" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Assembly</text><text x="44" y="230" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Deburring, grinding</text><rect x="198" y="55" width="158" height="240" rx="10" class="t-box"/><rect x="198" y="55" width="158" height="40" rx="10" fill="#fff4e5" stroke="#e07b00" stroke-width="1.6"/><rect x="198" y="80" width="158" height="15" fill="#fff4e5" stroke="none"/><text x="277" y="80" font-size="11.5" fill="#e07b00" text-anchor="middle" font-weight="700">Material handling</text><text x="212" y="118" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Pick and place</text><text x="212" y="146" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Palletising</text><text x="212" y="174" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; AGVs and AMRs</text><text x="212" y="202" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Sorting</text><text x="212" y="230" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Injection mould unloading</text><rect x="366" y="55" width="158" height="240" rx="10" class="t-box"/><rect x="366" y="55" width="158" height="40" rx="10" fill="#e8f6ee" stroke="#157a4b" stroke-width="1.6"/><rect x="366" y="80" width="158" height="15" fill="#e8f6ee" stroke="none"/><text x="445" y="80" font-size="11.5" fill="#157a4b" text-anchor="middle" font-weight="700">Medical</text><text x="380" y="118" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Surgical (da Vinci)</text><text x="380" y="146" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Rehabilitation</text><text x="380" y="174" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Prosthetics</text><text x="380" y="202" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Pharmacy dispensing</text><text x="380" y="230" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Disinfection</text><rect x="534" y="55" width="158" height="240" rx="10" class="t-box"/><rect x="534" y="55" width="158" height="40" rx="10" fill="#fdecec" stroke="#a8232a" stroke-width="1.6"/><rect x="534" y="80" width="158" height="15" fill="#fdecec" stroke="none"/><text x="613" y="80" font-size="11.5" fill="#a8232a" text-anchor="middle" font-weight="700">Field &amp; service</text><text x="548" y="118" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Agriculture</text><text x="548" y="146" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Underwater (ROV)</text><text x="548" y="174" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Space</text><text x="548" y="202" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Mining, inspection</text><text x="548" y="230" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Defence / bomb disposal</text><rect x="702" y="55" width="158" height="240" rx="10" class="t-box"/><rect x="702" y="55" width="158" height="40" rx="10" fill="#f1ecfb" stroke="#5b3a9e" stroke-width="1.6"/><rect x="702" y="80" width="158" height="15" fill="#f1ecfb" stroke="none"/><text x="781" y="80" font-size="11.5" fill="#5b3a9e" text-anchor="middle" font-weight="700">Domestic &amp; personal</text><text x="716" y="118" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Vacuum cleaning</text><text x="716" y="146" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Lawn mowing</text><text x="716" y="174" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Companion / social</text><text x="716" y="202" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Education and research</text><text x="716" y="230" font-size="10.5" fill="#12283d" text-anchor="start">&#8226; Assistive care</text><text x="440" y="318" font-size="11.5" fill="#5b6b7c" text-anchor="middle">About 70 % of all industrial robots are used in the automobile and electrical/electronics industries.</text></svg></div><figcaption><b>Fig. 2:</b> The main application areas of robots: manufacturing, material handling, medical, field and service, and domestic and personal.</figcaption></figure><h4>Manufacturing (industrial robots)</h4><ul><li><b>Welding</b> &mdash; the largest single application. <b>Spot welding</b> of car bodies uses point-to-point control with heavy guns weighing 50 kg to 100 kg. <b>Arc welding</b> (MIG, TIG) uses continuous path control with a wire feed and shielding gas, giving consistent quality far better than manual welding and keeping the operator away from fumes and radiation.</li><li><b>Material removal</b> &mdash; grinding, deburring, polishing, buffing, routing, trimming of plastic mouldings, waterjet and laser cutting. The robot applies a constant force and a constant speed, so the finish is uniform.</li><li><b>Coating and painting</b> &mdash; spray painting of cars, appliances and furniture. The robot gives uniform film thickness, saves paint, and removes the operator from a toxic and explosive environment. The robot must be intrinsically safe (pressurised or explosion-proof) because of the solvent vapour.</li><li><b>Assembly</b> &mdash; insertion of components, screwdriving, riveting, snap-fitting, and the assembly of electronic devices, automotive components and medical devices. SCARA and small articulated robots dominate here.</li><li><b>Machine loading and unloading</b> &mdash; serving CNC lathes, machining centres, presses, injection moulding machines and die casting machines. This is one of the fastest-growing applications because it allows lights-out (unmanned) manufacturing.</li><li><b>Dispensing</b> &mdash; applying adhesive, sealant, gasket material, solder paste and encapsulant along a precise path.</li><li><b>Inspection and testing</b> &mdash; carrying a camera or a probe to measure dimensions, to detect defects and to test the function of a product.</li></ul><h4>Material handling and logistics</h4><ul><li><b>Pick and place</b> &mdash; transferring parts from one location to another at high speed; Delta and SCARA robots excel here.</li><li><b>Palletising and depalletising</b> &mdash; stacking bags, boxes and crates onto pallets; heavy payload robots with special grippers.</li><li><b>Automated Guided Vehicles (AGV) and Autonomous Mobile Robots (AMR)</b> &mdash; transporting materials around a factory or warehouse. AGVs follow wires, magnets, tape or a fixed map; AMRs navigate dynamically using LiDAR and cameras. Warehouse robots such as those used by large e-commerce companies move entire shelves to the picker.</li><li><b>Sorting</b> &mdash; parcel and baggage handling in airports and courier depots.</li><li><b>Injection moulding and die casting extraction</b> &mdash; removing hot mouldings quickly and consistently, which also improves part quality.</li></ul><h4>Medical and healthcare</h4><ul><li><b>Surgical robots</b> &mdash; the da Vinci system allows a surgeon to operate through tiny incisions with 3D magnified vision and instrument wrists that have seven degrees of freedom, far more than the human hand. Robotic systems are used in urology, gynaecology, cardiac and general surgery, and in orthopaedic joint replacement, where the robot mills the bone to a plan computed from a CT scan.</li><li><b>Rehabilitation and therapy</b> &mdash; exoskeletons and robotic arms that move a patient's limbs to aid recovery after a stroke or a spinal injury.</li><li><b>Prosthetics and orthotics</b> &mdash; myoelectric arms controlled by the electrical signals from the remaining muscles.</li><li><b>Hospital logistics</b> &mdash; robots that deliver medicines, meals and linen, and that disinfect rooms using ultraviolet light.</li><li><b>Pharmacy automation</b> &mdash; dispensing and packaging of tablets.</li><li><b>Capsule endoscopy and nanorobotics</b> &mdash; miniature devices that travel inside the body.</li></ul><h4>Field, extreme and service environments</h4><ul><li><b>Agriculture</b> &mdash; autonomous tractors, drone spraying, robotic harvesting of fruit and vegetables using vision, weeding robots that reduce herbicide use, milking robots, and poultry and greenhouse automation.</li><li><b>Underwater</b> &mdash; Remotely Operated Vehicles (ROVs) and Autonomous Underwater Vehicles (AUVs) for offshore oil and gas inspection, pipeline and cable laying, ship hull cleaning, archaeology and deep-sea research.</li><li><b>Space</b> &mdash; the Canadarm on the Space Shuttle and the ISS, the Mars rovers Sojourner, Spirit, Opportunity, Curiosity and Perseverance, satellite servicing and repair robots, and the humanoid Vyommitra developed by ISRO.</li><li><b>Mining, construction and civil engineering</b> &mdash; autonomous haul trucks and drills, bricklaying robots, concrete printing, demolition and tunnel boring.</li><li><b>Defence and security</b> &mdash; bomb disposal robots, reconnaissance drones, unmanned ground vehicles, and logistics mules.</li><li><b>Inspection and maintenance</b> &mdash; crawling inside boilers, pipes, nuclear reactors and aircraft fuel tanks; climbing wind turbine blades; inspecting bridges and power lines using drones.</li><li><b>Disaster response</b> &mdash; searching collapsed buildings, firefighting, and handling hazardous material.</li></ul><h4>Domestic, consumer and personal robots</h4><ul><li><b>Robotic vacuum cleaners and lawn mowers</b> &mdash; the most commercially successful consumer robots.</li><li><b>Social and companion robots</b> &mdash; for entertainment, for elder care and for children with autism.</li><li><b>Educational and research robots</b> &mdash; kits and platforms used in schools and universities.</li><li><b>Humanoids</b> &mdash; ASIMO, Atlas, Pepper, Sophia and newer general-purpose humanoids designed to work in human-built environments.</li><li><b>Personal mobility</b> &mdash; robotic wheelchairs and walking aids.</li><li><b>Hospitality</b> &mdash; reception, delivery and cleaning robots in hotels and restaurants.</li></ul><h3 id="sec4"><span class="sec-no">4.</span>Future Trends in Robotics</h3><ul><li><b>Collaborative robots (cobots)</b> &mdash; robots that work safely alongside humans without a safety fence, thanks to force and power limiting, rounded padded surfaces, and speed and separation monitoring. They are easy to program by hand-guiding, which brings automation to small and medium enterprises.</li><li><b>Artificial intelligence and machine learning</b> &mdash; robots that learn a task by demonstration, that recognise unsorted and unfamiliar objects, that plan their own motions, and that improve from experience. Deep learning vision has transformed bin picking, which was once considered impossible.</li><li><b>Large language models and natural language programming</b> &mdash; giving a robot a task in plain speech rather than writing code.</li><li><b>Mobile manipulation</b> &mdash; combining a mobile base with an arm so that a robot can move to a workstation and then manipulate. This greatly increases the area one robot can serve.</li><li><b>Swarm robotics</b> &mdash; many simple robots cooperating through local communication, inspired by ants and bees; used in warehouses, agriculture and search and rescue.</li><li><b>Soft robotics</b> &mdash; grippers and bodies made of elastomers and actuated by air, fluids or shape-memory alloys. Soft grippers can handle delicate and irregular items such as fruit, eggs and fabric, which rigid grippers cannot.</li><li><b>Humanoid and general-purpose robots</b> &mdash; designed to work in environments built for people, using the same tools, stairs and vehicles.</li><li><b>Cloud robotics and 5G</b> &mdash; offloading heavy computation such as vision and planning to the cloud, and sharing learned skills between robots.</li><li><b>Digital twins</b> &mdash; a live virtual model of the robot cell that runs alongside the real one, allowing prediction, optimisation and virtual commissioning.</li><li><b>Better sensors</b> &mdash; cheap 3D vision, force sensing in every joint, and tactile skins covering the whole robot body.</li><li><b>New actuators</b> &mdash; series elastic actuators, quasi-direct drives, and variable-stiffness joints that store energy and are safer on contact.</li><li><b>Energy and autonomy</b> &mdash; better batteries, wireless charging, and energy harvesting for long-duration field operation.</li><li><b>Nanorobotics and micro-robotics</b> &mdash; devices at the millimetre and micrometre scale for medicine and micro-assembly.</li><li><b>Standardisation and safety</b> &mdash; ISO 10218 for industrial robots and ISO/TS 15066 for collaborative robots continue to evolve; ethics and regulation of autonomous systems are becoming a formal engineering discipline.</li></ul><div class="note"><span class="tag">Note</span><p>The general direction of robotics is away from <b>caged, blindly repeating machines</b> towards <b>open, sensing, adaptive machines that work with people</b>. This is what makes robotics a genuinely mechatronic discipline: it needs mechanics, electronics, sensing, computing and control working together.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>Automation is of three types: fixed (hard), programmable and flexible (soft).</li><li>Fixed automation uses dedicated equipment for one product at very high volume and very low unit cost, but it cannot be changed.</li><li>Programmable automation uses reprogrammable equipment such as CNC machines and robots; production is in batches and changeover takes time.</li><li>Flexible automation performs changeover automatically, so a mixture of products can be made simultaneously; the FMS is the classic example.</li><li>Robots make automation flexible because the same hardware performs many tasks, the cell layout can be re-taught, and vision allows parts to be presented in random positions.</li><li>Current industrial applications are welding, material removal, painting, assembly, machine loading, dispensing, inspection, pick and place, and palletising.</li><li>Beyond industry, robots are used in logistics (AGV/AMR), surgery and rehabilitation, agriculture, underwater and space work, defence, inspection, and domestic cleaning.</li><li>Future trends include cobots, AI and machine learning, natural language programming, mobile manipulation, swarm and soft robotics, humanoids, cloud robotics, digital twins and improved sensors and actuators.</li><li>The overall direction is from caged repeating machines towards open, sensing, adaptive machines that work with people.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Define automation. Explain the three types of automation with one example of each.</li><li>Compare fixed, programmable and flexible automation on any six points.</li><li>What is a Flexible Manufacturing System? Which type of automation does it represent?</li><li>Explain why robots make automation flexible. Give any five reasons.</li><li>List the major industrial applications of robots and explain welding and painting in detail.</li><li>What are AGVs and AMRs? How do they differ?</li><li>Describe any four medical applications of robots.</li><li>Describe the use of robots in agriculture, underwater work and space exploration.</li><li>What is a collaborative robot (cobot) and what makes it safe to work beside a human?</li><li>Explain any six future trends in robotics.</li><li>Why is bin picking considered a difficult problem and how has deep learning vision changed this?</li></ol></div><div class="pager"><a class="prev" href="19-classification-control-method-major-components.html"><span class="dir">&larr; Previous topic</span><span class="ttl">19. Classification by Control Method and Major Components of a Robot</span></a><a class="next" href="21-sociological-consequences-of-robots-application-areas.html"><span class="dir">Next topic &rarr;</span><span class="ttl">21. Sociological Consequences of Robots and Application Areas</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

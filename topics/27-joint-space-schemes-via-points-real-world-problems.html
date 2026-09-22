@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Joint Space Schemes, Via Points and Problems with Real-World Components | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="Planning a joint-space motion through several intermediate points, and an honest look at the imperfections of real hardware &mdash; backlash, friction">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit IV &middot; Topic 27 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit IV &rsaquo; Topic 27</nav><div class="unit-tag">Unit IV</div><h2 class="page-title"><span class="topic-no">27</span>Joint Space Schemes, Via Points and Problems with Real-World Components</h2><p class="lede">Planning a joint-space motion through several intermediate points, and an honest look at the imperfections of real hardware &mdash; backlash, friction, compliance, resonance, thermal drift and wear.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Joint Space Schemes</a></li><li><a href="#sec2">Motion Through Via Points</a></li><li><a href="#sec3">Some Problems with Real-World Components</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Joint Space Schemes</h3><p>In a <b>joint space scheme</b> the motion of every joint is planned independently as a function of time. The controller stores, for each taught point, the complete set of joint angles (&#952;<sub>1</sub>, &#952;<sub>2</sub>, &hellip;, &#952;<sub>6</sub>). Between two consecutive points it generates a smooth function for each joint. This is the scheme used for point-to-point motion, and it is the simplest, fastest and most robust way to move a robot.</p><h4>Requirements of a good joint space scheme</h4><ul><li>The position must be <b>continuous</b> &mdash; no jumps.</li><li>The <b>velocity</b> must be continuous, ideally everywhere including at the via points, so that there is no infinite acceleration.</li><li>The <b>acceleration</b> should be continuous too, and bounded, so that the required torque stays within the motor's capability.</li><li>The motion should be <b>as fast as possible</b> without exceeding any limit.</li><li>The scheme should be <b>simple to compute</b>, because it must run in real time.</li><li>It should not produce <b>unnecessary motion</b> in joints that do not need to move.</li></ul><h4>Common joint space schemes</h4><ol><li><b>Two-point move with a single polynomial</b> &mdash; a cubic or a quintic polynomial takes each joint from its start angle to its end angle. Every joint is given the same total time so that they all arrive together.</li><li><b>Two-point move with a trapezoidal velocity profile</b> &mdash; the standard industrial method: constant acceleration, constant velocity, constant deceleration, with a parabolic position blend. Simple, predictable and fast.</li><li><b>Multi-point move through via points with blended polynomials</b> &mdash; a separate polynomial for each segment, joined so that the velocity is continuous at every via point.</li><li><b>Spline interpolation</b> &mdash; a single cubic spline is fitted through all the via points, giving continuous position, velocity and acceleration everywhere.</li><li><b>Higher-order and time-optimal schemes</b> &mdash; used where the motion must be as fast as the torque limits allow.</li></ol><h3 id="sec2"><span class="sec-no">2.</span>Motion Through Via Points</h3><p>A <b>via point</b> (also called a <b>way point</b>, <b>pass point</b> or <b>intermediate point</b>) is a point that the robot must pass through on its way from the start to the goal. Via points are needed to avoid obstacles, to approach a workpiece from a safe direction, to follow a required path approximately, or to break a long move into safe pieces.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 290" width="880" height="290" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Joint space motion through via points</text><rect x="50" y="60" width="780" height="160" rx="6" class="t-box"/><line x1="88" y1="196" x2="88" y2="78" class="ax" marker-end="url(#ah)"/><line x1="88" y1="196" x2="804" y2="196" class="ax" marker-end="url(#ah)"/><text x="810" y="200" font-size="11.5" fill="#5b6b7c" text-anchor="start">time</text><text x="82" y="72" font-size="11.5" fill="#5b6b7c" text-anchor="start">joint variable &#952;</text><path d="M 88 190 C 159.0 190, 159.0 120, 230 120" class="lnk" stroke-width="2.2"/><path d="M 230 120 C 315.0 120, 315.0 165, 400 165" class="lnk" stroke-width="2.2"/><path d="M 400 165 C 480.0 165, 480.0 88, 560 88" class="lnk" stroke-width="2.2"/><path d="M 560 88 C 645.0 88, 645.0 150, 730 150" class="lnk" stroke-width="2.2"/><circle cx="88" cy="190" r="5" class="dot"/><text x="88" y="174" font-size="10.5" fill="#0a4377" text-anchor="middle" font-weight="700">Start</text><line x1="88" y1="190" x2="88" y2="200" class="ax" stroke-dasharray="6 4"/><circle cx="230" cy="120" r="5" class="dot"/><text x="230" y="104" font-size="10.5" fill="#0a4377" text-anchor="middle" font-weight="700">Via 1</text><line x1="230" y1="120" x2="230" y2="200" class="ax" stroke-dasharray="6 4"/><circle cx="400" cy="165" r="5" class="dot"/><text x="400" y="149" font-size="10.5" fill="#0a4377" text-anchor="middle" font-weight="700">Via 2</text><line x1="400" y1="165" x2="400" y2="200" class="ax" stroke-dasharray="6 4"/><circle cx="560" cy="88" r="5" class="dot"/><text x="560" y="72" font-size="10.5" fill="#0a4377" text-anchor="middle" font-weight="700">Via 3</text><line x1="560" y1="88" x2="560" y2="200" class="ax" stroke-dasharray="6 4"/><circle cx="730" cy="150" r="5" class="dot"/><text x="730" y="134" font-size="10.5" fill="#0a4377" text-anchor="middle" font-weight="700">End</text><line x1="730" y1="150" x2="730" y2="200" class="ax" stroke-dasharray="6 4"/><text x="88" y="214" font-size="11" fill="#5b6b7c" text-anchor="middle">t0</text><text x="230" y="214" font-size="11" fill="#5b6b7c" text-anchor="middle">t1</text><text x="400" y="214" font-size="11" fill="#5b6b7c" text-anchor="middle">t2</text><text x="560" y="214" font-size="11" fill="#5b6b7c" text-anchor="middle">t3</text><text x="730" y="214" font-size="11" fill="#5b6b7c" text-anchor="middle">tf</text><text x="440" y="246" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Each segment is a separate polynomial blend. Velocity must be continuous at every via point; acceleration may or may not be.</text><text x="440" y="268" font-size="11.5" fill="#a8232a" text-anchor="middle">The path in space is not controlled &mdash; only the joint values at the via points are guaranteed.</text></svg></div><figcaption><b>Fig. 1:</b> Joint space motion through via points. Each segment has its own polynomial, and the velocity is made continuous at every via point by a blend.</figcaption></figure><h4>Two ways of treating a via point</h4><ul><li><b>Exact stop at the via point</b> &mdash; the velocity is brought to zero at the via point and the next segment then accelerates from rest. This guarantees that the robot passes exactly through the point, but it wastes a great deal of time because the robot accelerates and decelerates at every point.</li><li><b>Blend (continuous) through the via point</b> &mdash; the robot does not stop; the two polynomials are joined so that the position and the velocity are continuous, and the path is allowed to deviate from the exact via point by a specified tolerance. This is much faster and is the normal industrial practice. The tolerance is called the <b>blend zone</b>, <b>corner distance</b> or <b>approximation zone</b>.</li></ul><h4>Constructing a blended joint space trajectory</h4><p>A standard method uses a cubic polynomial for each segment and imposes continuity of position and velocity at each via point.</p><ol><li>Let the via points be at times t<sub>0</sub>, t<sub>1</sub>, &hellip;, t<sub>n</sub> with joint values &#952;<sub>0</sub>, &#952;<sub>1</sub>, &hellip;, &#952;<sub>n</sub>.</li><li>For each segment k, write &#952;<sub>k</sub>(t) = a<sub>k0</sub> + a<sub>k1</sub>t + a<sub>k2</sub>t&#178; + a<sub>k3</sub>t&#179;.</li><li>Impose &#952;<sub>k</sub>(t<sub>k</sub>) = &#952;<sub>k</sub> and &#952;<sub>k</sub>(t<sub>k+1</sub>) = &#952;<sub>k+1</sub> (position continuity at both ends).</li><li>Impose &#952;&#775;<sub>k</sub>(t<sub>k+1</sub>) = &#952;&#775;<sub>k+1</sub>(t<sub>k+1</sub>) (velocity continuity at the via point).</li><li>Specify the velocity at each via point, either as zero (exact stop) or by a chosen rule, such as a fixed fraction of the maximum speed, or the value that makes the acceleration continuous as well.</li><li>Solve the resulting set of linear equations for the coefficients.</li><li>Check that the maximum velocity and acceleration in every segment are within the motor's limits; if not, increase the segment time and repeat.</li></ol><p>If the acceleration must also be continuous at the via points, a <b>quintic</b> polynomial or a <b>cubic spline</b> is needed. A cubic spline through n+1 points requires solving a tridiagonal system of n&minus;1 equations, which is very fast and is done once, off-line, when the program is prepared.</p><h4>Timing of the segments</h4><p>The time allotted to each segment is usually chosen in proportion to the largest joint movement in that segment, so that all joints finish at the same time and the motion looks coordinated:</p><span class="eq">t<sub>k+1</sub> &minus; t<sub>k</sub>  &#8733;  max<sub>i</sub> | &#952;<sub>i,k+1</sub> &minus; &#952;<sub>i,k</sub> | / &#969;<sub>i,max</sub></span><p>The controller then checks that no joint exceeds its acceleration or torque limit, and lengthens the segment time if necessary. This process is called <b>time scaling</b>.</p><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> A joint must pass through the angles 0&deg; at t = 0, 40&deg; at t = 2 s and 90&deg; at t = 5 s, with zero velocity at the start and at the end, and with the velocity at the via point chosen as 20 &deg;/s. For the first segment, &#952;(t) = a<sub>0</sub> + a<sub>1</sub>t + a<sub>2</sub>t&#178; + a<sub>3</sub>t&#179; with &#952;(0) = 0, &#952;&#775;(0) = 0, &#952;(2) = 40, &#952;&#775;(2) = 20. From the first two conditions a<sub>0</sub> = 0 and a<sub>1</sub> = 0. Then 4a<sub>2</sub> + 8a<sub>3</sub> = 40 and 4a<sub>2</sub> + 12a<sub>3</sub> = 20, giving a<sub>3</sub> = &minus;5 and a<sub>2</sub> = 20. So &#952;(t) = 20t&#178; &minus; 5t&#179;, whose maximum velocity in the segment is 20 &deg;/s at t = 1.33 s and whose acceleration at t = 0 is 40 &deg;/s&#178; and at t = 2 s is 0 &deg;/s&#178;.</p></div><div class="note"><span class="tag">Note</span><p><b>Practical point.</b> The path taken between via points in joint space is <b>not</b> the straight line between them in the workspace. If the tool must actually follow a straight line, the points must be closely spaced (a few millimetres apart) or Cartesian interpolation must be used instead. This is why a long joint move can look alarmingly like a wild swing to a person standing near the robot.</p></div><h3 id="sec3"><span class="sec-no">3.</span>Some Problems with Real-World Components</h3><p>All the theory above assumes an ideal robot: perfectly rigid links, frictionless joints, gears with no clearance, motors with unlimited torque and sensors with infinite resolution. Real robots have none of these properties. The differences between the ideal model and the real machine are the reason why robots must be taught on the actual workpiece, why calibration is needed for absolute accuracy, and why servo tuning is a skilled task.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 330" width="880" height="330" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Problems with real-world components</text><rect x="42" y="60" width="176" height="112" rx="8" class="t-box5"/><text x="130" y="88" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Backlash</text><text x="130" y="114" font-size="10" fill="#4a5b6d" text-anchor="middle">clearance in gears causes lost motion</text><text x="130" y="132" font-size="10" fill="#4a5b6d" text-anchor="middle">on reversal &rarr; positioning error</text><rect x="232" y="60" width="176" height="112" rx="8" class="t-box5"/><text x="320" y="88" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Friction &amp; stiction</text><text x="320" y="114" font-size="10" fill="#4a5b6d" text-anchor="middle">Coulomb + viscous friction cause</text><text x="320" y="132" font-size="10" fill="#4a5b6d" text-anchor="middle">following error and limit cycling</text><rect x="422" y="60" width="176" height="112" rx="8" class="t-box5"/><text x="510" y="88" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Compliance</text><text x="510" y="114" font-size="10" fill="#4a5b6d" text-anchor="middle">links, gears and bearings deflect</text><text x="510" y="132" font-size="10" fill="#4a5b6d" text-anchor="middle">under load &rarr; tip position error</text><rect x="612" y="60" width="176" height="112" rx="8" class="t-box5"/><text x="700" y="88" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Resonance</text><text x="700" y="114" font-size="10" fill="#4a5b6d" text-anchor="middle">structural natural frequencies are</text><text x="700" y="132" font-size="10" fill="#4a5b6d" text-anchor="middle">excited &rarr; vibration and ringing</text><rect x="142" y="195" width="176" height="112" rx="8" class="t-box3"/><text x="230" y="223" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Thermal effects</text><text x="230" y="249" font-size="10" fill="#4a5b6d" text-anchor="middle">heating changes dimensions and</text><text x="230" y="267" font-size="10" fill="#4a5b6d" text-anchor="middle">lubricant viscosity &rarr; drift</text><rect x="352" y="195" width="176" height="112" rx="8" class="t-box3"/><text x="440" y="223" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Wear &amp; ageing</text><text x="440" y="249" font-size="10" fill="#4a5b6d" text-anchor="middle">clearances grow, lubricant degrades,</text><text x="440" y="267" font-size="10" fill="#4a5b6d" text-anchor="middle">accuracy falls over time</text><rect x="562" y="195" width="176" height="112" rx="8" class="t-box3"/><text x="650" y="223" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Sensor quantisation</text><text x="650" y="249" font-size="10" fill="#4a5b6d" text-anchor="middle">finite encoder counts and ADC</text><text x="650" y="267" font-size="10" fill="#4a5b6d" text-anchor="middle">resolution limit accuracy</text><text x="440" y="322" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">All of these make the real robot differ from the ideal mathematical model, which is why positions are taught on the machine and why calibration is needed for absolute accuracy.</text></svg></div><figcaption><b>Fig. 2:</b> The main imperfections of real robot components.</figcaption></figure><h4>1. Backlash</h4><p>Backlash is the clearance between mating gear teeth, between a nut and a screw, or in a bearing. When the direction of motion reverses, the input must travel a small distance before the output begins to move. This produces a <b>positioning error that depends on the direction from which the point was approached</b>, and it shows up as a hysteresis loop in the accuracy test.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 230" width="880" height="230" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Backlash &mdash; lost motion at direction reversal</text><rect x="120" y="50" width="340" height="150" rx="6" class="t-box"/><line x1="155" y1="178" x2="155" y2="68" class="ax" marker-end="url(#ah)"/><line x1="155" y1="178" x2="435" y2="178" class="ax" marker-end="url(#ah)"/><text x="441" y="182" font-size="11.5" fill="#5b6b7c" text-anchor="start">input rotation</text><text x="149" y="62" font-size="11.5" fill="#5b6b7c" text-anchor="start">output rotation</text><path d="M 155 178 L 250 92" class="lnk" stroke-width="2.2"/><path d="M 250 92 L 268 92 L 176 178" class="lnk" stroke-width="2.2"/><path d="M 176 178 L 200 178" class="lnk" stroke-width="2.2"/><line x1="250" y1="92" x2="268" y2="92" class="lnk" stroke-width="1.2" stroke-dasharray="6 4"/><text x="268" y="78" font-size="10.5" fill="#a8232a" text-anchor="start">dead band</text><text x="295" y="130" font-size="11" fill="#a8232a" text-anchor="start" font-weight="600">backlash loop</text><circle cx="620" cy="120" r="52" class="mech2"/><circle cx="740" cy="120" r="36" class="mech2"/><path d="M 668 96 a 8 8 0 0 1 8 14" fill="none" stroke="#a8232a" stroke-width="2"/><text x="700" y="76" font-size="10.5" fill="#a8232a" text-anchor="middle">clearance between</text><text x="700" y="92" font-size="10.5" fill="#a8232a" text-anchor="middle">mating tooth flanks</text><text x="680" y="200" font-size="10.5" fill="#5b6b7c" text-anchor="middle">reduced by preloaded bearings, split nuts,</text><text x="680" y="216" font-size="10.5" fill="#5b6b7c" text-anchor="middle">harmonic drives and anti-backlash gears</text></svg></div><figcaption><b>Fig. 3:</b> Backlash produces a dead band in the input-output relationship at every direction reversal.</figcaption></figure><ul><li><b>Effect:</b> lost motion of a few arc-minutes, which at the end of a 1.5 m arm becomes a tool error of tenths of a millimetre; the servo loop may oscillate (limit cycling) as it hunts across the dead band.</li><li><b>Reduction:</b> use harmonic drives or cycloidal reducers (near-zero backlash); preload planetary gears; use a preloaded double ball nut; use anti-backlash split gears with a spring; always approach a taught point from the same direction (the controller can be told to do this); preloaded bearings.</li></ul><h4>2. Friction and stiction</h4><p>Friction in the gears, bearings and seals opposes motion. It has three components: <b>stiction</b> (static friction, higher than the others, which must be overcome before motion begins), <b>Coulomb</b> (dry) friction, which is roughly constant, and <b>viscous</b> friction, which is proportional to velocity.</p><ul><li><b>Effect:</b> a steady-state <b>following error</b> when the robot is moving; <b>stick-slip</b> motion at low speed, where the joint sticks and then jumps forward, giving a jerky crawl; contour errors when following a path; extra heat; difficulty in tuning the servo loop; limit cycling around the target.</li><li><b>Reduction:</b> good lubrication; low-friction seals; harmonic drives instead of sliding contacts; <b>friction compensation</b> in the controller, which adds a torque command in the direction of motion; dither (a small high-frequency signal) to break stiction; higher servo gains; ball screws instead of plain screws.</li></ul><h4>3. Compliance (elastic deflection)</h4><p>No component is perfectly rigid. Links bend, gear teeth deflect, shafts twist and bearings shift under load. This compliance means that when a force is applied at the tool, the actual tool position differs from the position calculated from the motor encoders, <b>and the controller cannot see the error</b> because the encoders are on the motor side of the gearbox.</p><ul><li><b>Effect:</b> positioning error proportional to the applied force; vibration and poor surface finish in machining; a limit to the force that can be applied in grinding or assembly; reduced bandwidth of the servo loop.</li><li><b>Reduction:</b> stiffer structures and materials; higher-ratio gearboxes (which reflect the motor's stiffness up by the square of the ratio); a <b>force/torque sensor at the wrist</b>, which measures what is actually happening at the tool; direct-drive motors, which have no gearbox compliance at all; keeping the payload within the rating; mounting the tool close to the flange.</li></ul><h4>4. Resonance and vibration</h4><p>Every robot structure has natural frequencies. If the motion excites one of them &mdash; at a sudden start or stop, at a particular speed, or through a repeating process force &mdash; the arm vibrates. Because a robot arm is a long, light, cantilever structure, its natural frequencies are low (a few hertz to a few tens of hertz), which is exactly the range of typical robot motion.</p><ul><li><b>Effect:</b> ringing after a move, which lengthens the settling time; poor surface finish; noise; increased wear; possible loss of accuracy or even damage.</li><li><b>Reduction:</b> smooth acceleration profiles (S-curve instead of trapezoidal); jerk limiting; increasing the structural stiffness and moving the natural frequencies higher; <b>input shaping</b>, which adds a cancelling vibration to the command; notch filters in the servo loop tuned to the resonant frequency; damping material in the links; reducing the payload and the reach.</li></ul><h4>5. Thermal effects</h4><p>Motors, gearboxes and brakes generate heat. Different materials expand at different rates, so the geometry of the arm changes as it warms up, and the position drifts. This is the main cause of the accuracy change between a cold machine and one that has been running for two hours. Lubricant viscosity also changes with temperature, altering the friction.</p><ul><li><b>Reduction:</b> thermal modelling and compensation in the controller; temperature sensors at critical points; a warm-up cycle before precision work; keeping the ambient temperature stable; using materials with a low coefficient of expansion for precision structures; allowing heat to escape from the motors.</li></ul><h4>6. Wear, ageing and clearance growth</h4><p>Gear teeth wear, belts stretch, cables fray, lubricant degrades, bearings develop play, and seals harden. All of these increase backlash and reduce accuracy over the life of the machine. A robot that was accurate when new may be well outside its specification after ten years unless it is maintained.</p><ul><li><b>Reduction:</b> regular preventive maintenance &mdash; greasing, belt tension checks, cable inspection and backlash measurement; periodic recalibration; monitoring the motor current signature, which changes as the gearbox wears; keeping the machine clean and at the correct temperature.</li></ul><h4>7. Sensor quantisation, noise and delay</h4><p>Encoders have a finite number of counts, so the measured position is quantised; the signal is noisy; and there is a delay in reading and processing it. After reduction through a high-ratio gearbox, the encoder resolution at the joint is excellent, but at very low speeds the quantisation still limits the smoothness of the velocity estimate.</p><ul><li><b>Reduction:</b> high-resolution absolute encoders (17-bit to 23-bit); velocity estimation by a filter rather than by simple differentiation; a higher servo update rate; resolver-to-digital conversion with good filtering; shielding of the encoder cables from electrical noise.</li></ul><h4>8. Actuator and drive limitations</h4><p>Motors have a limited peak torque (available only for a few seconds before overheating) and a limited continuous torque. Power electronics have switching losses and a limited current. As a result, the robot cannot follow an arbitrarily fast trajectory, and the practical limit is set by torque, not by speed.</p><ul><li><b>Reduction:</b> correct motor and gearbox sizing using the RMS and peak torque calculations; reducing the inertia of the links; regenerative braking units so that energy recovered during deceleration is not wasted as heat in a braking resistor; gravity compensation so that holding torque does not consume the motor's rating.</li></ul><h4>9. Kinematic model errors</h4><p>The Denavit-Hartenberg parameters used by the controller are the <b>nominal</b> dimensions from the drawing. The real robot differs because of manufacturing tolerances, assembly errors and deflection. These errors cause the calculated tool position to be wrong by a millimetre or more, even when every joint angle is perfect. This is why <b>absolute accuracy</b> is much worse than <b>repeatability</b>.</p><ul><li><b>Reduction:</b> <b>kinematic calibration</b>, in which a laser tracker or a ball-bar measures the actual tool position at many configurations, the DH parameters are identified by least-squares fitting, and a compensation table is downloaded to the controller. This can improve absolute accuracy from about 1 mm to better than 0.2 mm, which makes robots usable for machining and drilling.</li></ul><div class="tbl-scroll"><table><caption>Table 27.1 &mdash; Real-world imperfections, their effects and remedies</caption><thead><tr><th>Imperfection</th><th>Main effect on the robot</th><th>Principal remedies</th></tr></thead><tbody><tr><td>Backlash</td><td>Lost motion at reversal; hysteresis error; limit cycling</td><td>Harmonic or cycloidal drives; preloaded nuts and gears; approach from one direction</td></tr><tr><td>Friction and stiction</td><td>Following error; stick-slip at low speed; contour error</td><td>Lubrication; friction compensation in the controller; dither; higher servo gain</td></tr><tr><td>Compliance</td><td>Tool position error under load, invisible to the joint encoders</td><td>Stiffer structure; higher gear ratio; wrist force sensor; direct drive</td></tr><tr><td>Resonance</td><td>Vibration, ringing, noise, poor surface finish</td><td>S-curve profiles; jerk limiting; input shaping; notch filters; structural stiffening</td></tr><tr><td>Thermal effects</td><td>Drift of accuracy as the machine warms up</td><td>Thermal compensation; temperature sensors; warm-up cycle; stable ambient</td></tr><tr><td>Wear and ageing</td><td>Gradual loss of accuracy and increase of backlash</td><td>Preventive maintenance; periodic recalibration; condition monitoring</td></tr><tr><td>Sensor quantisation and noise</td><td>Limited resolution and rough velocity estimate</td><td>High-resolution absolute encoders; filtering; faster servo rate</td></tr><tr><td>Actuator torque limits</td><td>Trajectory cannot be executed at the planned speed</td><td>Correct sizing; inertia reduction; gravity compensation; regeneration</td></tr><tr><td>Kinematic model errors</td><td>Poor absolute accuracy despite good repeatability</td><td>Kinematic calibration with a laser tracker and a compensation table</td></tr><tr><td>Cable and hose drag</td><td>Extra friction, hysteresis and unpredictable forces</td><td>Internal routing; dress packs; tension management</td></tr></tbody></table></div><div class="note"><span class="tag">Note</span><p>The overall lesson is that a robot is a <b>feedback system built on imperfect components</b>. Feedback corrects errors at the joint, but it cannot see errors between the joint encoder and the tool. That is why high-precision work needs either a sensor at the tool (vision or force) or a carefully calibrated machine.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A joint space scheme plans each joint angle independently as a function of time; it must give continuous position and velocity, bounded acceleration, and maximum speed within the limits.</li><li>Common schemes are the single cubic or quintic polynomial, the trapezoidal velocity profile with parabolic blends, blended polynomials through via points, and cubic splines.</li><li>A via point may be an exact stop or a blend; blending is much faster and allows a specified path deviation.</li><li>Segment times are chosen in proportion to the largest joint movement so that all joints arrive together; time scaling then ensures the limits are met.</li><li>The path between via points in joint space is not a straight line in the workspace.</li><li>Real components introduce backlash, friction and stiction, compliance, resonance, thermal drift, wear, sensor quantisation, torque limits and kinematic model errors.</li><li>Backlash is reduced by harmonic and cycloidal drives, preloading and by always approaching from the same direction.</li><li>Friction is reduced by lubrication, friction compensation, dither and higher servo gains.</li><li>Compliance causes a tool error that the joint encoders cannot see; a wrist force/torque sensor or a direct drive is the remedy.</li><li>Resonance is reduced by S-curve profiles, jerk limiting, input shaping and notch filters.</li><li>Absolute accuracy is much worse than repeatability because of kinematic model errors; calibration with a laser tracker corrects this.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>What is a joint space scheme? List the requirements of a good one.</li><li>Define a via point. Why are via points used?</li><li>Compare an exact stop at a via point with a blend. Which is used in industry and why?</li><li>Describe the procedure for constructing a blended joint space trajectory through three via points.</li><li>How is the time allotted to each segment decided?</li><li>A joint moves through 0&deg; at t = 0, 30&deg; at t = 2 s and 80&deg; at t = 5 s with zero velocity at both ends. Set up the equations for the first segment using a cubic polynomial.</li><li>Why is the path between two via points in joint space not a straight line in the workspace?</li><li>List any six problems caused by real-world components and explain the effect of each on robot performance.</li><li>Explain backlash and state four ways of reducing it.</li><li>Why is friction compensation needed in a robot servo loop? What is stick-slip motion?</li><li>Why can joint encoders not detect the error caused by arm compliance?</li><li>Explain resonance in a robot arm and describe three methods of reducing it.</li><li>Why is the absolute accuracy of a robot much worse than its repeatability, and how is it improved?</li></ol></div><div class="pager"><a class="prev" href="26-trajectory-planning-and-generation.html"><span class="dir">&larr; Previous topic</span><span class="ttl">26. Trajectory Planning and Generation</span></a><a class="next" href="28-kinematic-chains-the-manipulator.html"><span class="dir">Next topic &rarr;</span><span class="ttl">28. Kinematic Chains &mdash; The Manipulator</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

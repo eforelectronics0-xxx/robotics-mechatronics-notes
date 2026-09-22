@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mechanical Actuation Systems &mdash; Types of Motion and Degrees of Freedom | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="Why mechanisms are needed in a mechatronic system, the three basic types of motion, how joints and constraints limit movement, and how to count the de">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit II &middot; Topic 7 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit II &rsaquo; Topic 7</nav><div class="unit-tag">Unit II</div><h2 class="page-title"><span class="topic-no">07</span>Mechanical Actuation Systems &mdash; Types of Motion and Degrees of Freedom</h2><p class="lede">Why mechanisms are needed in a mechatronic system, the three basic types of motion, how joints and constraints limit movement, and how to count the degrees of freedom of a mechanism.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">Why Mechanical Actuation is Needed</a></li><li><a href="#sec2">Types of Motion</a></li><li><a href="#sec3">Freedom of Constraints and Degrees of Freedom</a></li><li><a href="#sec4">Transmission of Motion &mdash; Overview</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>Why Mechanical Actuation is Needed</h3><p>Most actuators &mdash; electric motors, solenoids and cylinders &mdash; produce a simple form of motion: continuous rotation or a straight-line stroke. The real machine, however, usually needs something different: a slower speed with a larger torque, a rotation converted into linear travel, an oscillation, an intermittent motion, or a precisely shaped movement such as the dwell-and-rise of a cam. <b>Mechanical actuation systems</b>, also called <b>mechanisms</b>, are the links, gears, belts, cams and screws that stand between the actuator and the load and transform the motion into the required form.</p><div class="defbox"><span class="tag">Definition</span><p>A <b>mechanism</b> is a combination of rigid or resistant bodies, connected by joints, arranged so that the motion of one member causes predictable motion in the other members. A <b>machine</b> is a mechanism that also transmits or modifies force and does useful work.</p></div><p>The elements of a mechanism are described with a few standard words. A <b>link</b> (or element) is a rigid body that has at least two joints. A <b>joint</b> or <b>pair</b> is the connection between two links that permits a particular relative motion. A <b>kinematic chain</b> is an assembly of links and joints in which the motion of each link is definite with respect to the others. When one link of a kinematic chain is fixed to the frame, the chain becomes a <b>mechanism</b>. If no relative motion is possible at all, the chain is a <b>structure</b>.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Kinematic chain, mechanism and structure</text><text x="160" y="62" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(a) Four-bar kinematic chain</text><polygon points="90,190 140,100 240,120 230,200" fill="#e7f1fb" stroke="#0f5fa8" stroke-width="2.4"/><circle cx="90" cy="190" r="8" class="cmp-f"/><text x="90" y="174" font-size="10.5" fill="#0f5fa8" text-anchor="middle">L1</text><circle cx="140" cy="100" r="8" class="cmp-f"/><text x="140" y="84" font-size="10.5" fill="#0f5fa8" text-anchor="middle">L2</text><circle cx="240" cy="120" r="8" class="cmp-f"/><text x="240" y="104" font-size="10.5" fill="#0f5fa8" text-anchor="middle">L3</text><circle cx="230" cy="200" r="8" class="cmp-f"/><text x="230" y="184" font-size="10.5" fill="#0f5fa8" text-anchor="middle">L4</text><text x="90" y="214" font-size="10.5" fill="#a8232a" text-anchor="middle">fixed link</text><rect x="70" y="200" width="40" height="8" rx="8" class="hatch"/><text x="160" y="258" font-size="11" fill="#5b6b7c" text-anchor="middle">4 links, 4 turning pairs,</text><text x="160" y="274" font-size="11" fill="#5b6b7c" text-anchor="middle">1 DOF &mdash; closed chain</text><text x="450" y="62" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(b) Slider-crank mechanism</text><circle cx="420" cy="160" r="6" class="cmp-f"/><circle cx="420" cy="110" r="6" class="cmp-f"/><line x1="420" y1="160" x2="420" y2="110" class="cmp" stroke-width="3"/><line x1="420" y1="110" x2="530" y2="150" class="cmp" stroke-width="3"/><circle cx="530" cy="150" r="6" class="cmp-f"/><rect x="516" y="138" width="56" height="30" rx="8" class="mech2"/><rect x="500" y="172" width="100" height="10" rx="8" class="mech"/><polyline points="585,153 620,153" class="lnk" marker-end="url(#ah)"/><text x="600" y="140" font-size="10.5" fill="#5b6b7c" text-anchor="middle">output</text><path d="M 442 160 A 22 22 0 0 0 424 138" class="lnk" marker-end="url(#ah)"/><text x="470" y="186" font-size="10.5" fill="#0f5fa8" text-anchor="middle">crank</text><text x="482" y="122" font-size="10.5" fill="#0f5fa8" text-anchor="middle">connecting rod</text><text x="560" y="128" font-size="10.5" fill="#0f5fa8" text-anchor="middle">slider (piston)</text><text x="450" y="258" font-size="11" fill="#5b6b7c" text-anchor="middle">rotary motion of the crank is</text><text x="450" y="274" font-size="11" fill="#5b6b7c" text-anchor="middle">converted into linear motion</text><text x="745" y="62" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(c) Structure</text><polygon points="700,200 790,200 745,105" fill="#fdecec" stroke="#a8232a" stroke-width="2.4"/><circle cx="700" cy="200" r="7" class="cmp-f"/><circle cx="790" cy="200" r="7" class="cmp-f"/><circle cx="745" cy="105" r="7" class="cmp-f"/><rect x="680" y="204" width="130" height="8" rx="8" class="hatch"/><text x="745" y="250" font-size="11" fill="#5b6b7c" text-anchor="middle">all members are fixed &mdash;</text><text x="745" y="266" font-size="11" fill="#5b6b7c" text-anchor="middle">0 DOF, no relative motion</text></svg></div><figcaption><b>Fig. 1:</b> A four-bar kinematic chain, a slider-crank mechanism and a structure. Fixing one link of the chain converts it into a mechanism; if no relative motion is possible it is a structure.</figcaption></figure><h3 id="sec2"><span class="sec-no">2.</span>Types of Motion</h3><p>Motion in machines is classified into three basic types, and every mechanism is really a device for converting one type into another.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Types of motion produced by actuators</text><text x="150" y="62" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(a) Linear / translatory</text><rect x="50" y="130" width="200" height="16" rx="8" class="mech"/><rect x="110" y="100" width="70" height="30" rx="8" class="mech2"/><polyline points="95,115 55,115" class="lnk" marker-end="url(#ah)"/><polyline points="195,115 235,115" class="lnk" marker-end="url(#ah)"/><text x="150" y="178" font-size="11" fill="#5b6b7c" text-anchor="middle">motion in a straight line</text><text x="150" y="195" font-size="10.5" fill="#5b6b7c" text-anchor="middle">piston, solenoid plunger, slide</text><text x="440" y="62" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(b) Rotary</text><circle cx="440" cy="128" r="46" class="mech"/><circle cx="440" cy="128" r="7" class="cmp-f"/><line x1="440" y1="128" x2="476" y2="100" class="cmp" stroke-width="2"/><path d="M 470 88 A 52 52 0 0 1 492 122" class="lnk" marker-end="url(#ah)"/><text x="440" y="200" font-size="11" fill="#5b6b7c" text-anchor="middle">continuous rotation about an axis</text><text x="440" y="217" font-size="10.5" fill="#5b6b7c" text-anchor="middle">motor shaft, wheel, spindle</text><text x="730" y="62" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(c) Oscillatory</text><circle cx="730" cy="90" r="7" class="cmp-f"/><line x1="730" y1="90" x2="730" y2="165" class="cmp" stroke-width="2.4"/><path d="M 690 150 A 60 60 0 0 0 770 150" class="lnk-d" marker-end="url(#ah)"/><g transform="translate(730,90) rotate(28)"><line x1="0" y1="0" x2="0" y2="75" class="lnk-d" stroke-width="1.4"/></g><g transform="translate(730,90) rotate(-28)"><line x1="0" y1="0" x2="0" y2="75" class="lnk-d" stroke-width="1.4"/></g><text x="730" y="200" font-size="11" fill="#5b6b7c" text-anchor="middle">to-and-fro rotation through an angle</text><text x="730" y="217" font-size="10.5" fill="#5b6b7c" text-anchor="middle">pendulum, wiper motor, rocker arm</text></svg></div><figcaption><b>Fig. 2:</b> The three basic types of motion: linear (translatory), rotary and oscillatory.</figcaption></figure><ul><li><b>Linear or translatory motion</b> &mdash; every point of the body moves along a straight line and travels the same distance. Examples: the piston of a cylinder, the plunger of a solenoid, the table of a shaping machine, the carriage of a 3D printer.</li><li><b>Rotary motion</b> &mdash; the body turns about a fixed axis and every point describes a circle about that axis. Examples: a motor shaft, a road wheel, a lathe spindle, a fan blade. Rotary motion is the natural output of almost all electric motors and is the easiest to transmit over a distance.</li><li><b>Oscillatory (or reciprocating angular) motion</b> &mdash; the body swings to and fro about a fixed axis through a limited angle. Examples: a pendulum, the wiper arm of a car, the rocker of a four-bar linkage, the needle bar of a sewing machine.</li><li><b>Reciprocating motion</b> is the special name used when the to-and-fro motion is along a straight line, as in the piston of an engine.</li><li><b>Intermittent motion</b> is motion that alternates between movement and rest, as produced by a Geneva mechanism or a ratchet.</li></ul><div class="note"><span class="tag">Note</span><p>The three important conversions performed by mechanisms are: <b>rotary to rotary</b> (gears, belts, chains), <b>rotary to linear</b> (rack and pinion, lead screw, slider-crank, cam) and <b>linear to rotary</b> (the reverse of the above, as in an engine).</p></div><p>Motion is also described by the way it varies with time. <b>Uniform motion</b> means constant velocity. <b>Uniformly accelerated motion</b> means constant acceleration, which is what a stepper motor gives when it starts. In practice, mechanisms are designed to avoid sudden changes of velocity or acceleration because these produce shock, noise, vibration and wear.</p><div class="tbl-scroll"><table><caption>Table 7.1 &mdash; Linear and angular quantities compared</caption><thead><tr><th>Linear (translatory)</th><th>Symbol</th><th>Angular (rotational)</th><th>Symbol</th><th>Connecting relation</th></tr></thead><tbody><tr><td>Displacement</td><td>s (m)</td><td>Angular displacement</td><td>&#952; (rad)</td><td>s = r &#952;</td></tr><tr><td>Velocity</td><td>v (m/s)</td><td>Angular velocity</td><td>&#969; (rad/s)</td><td>v = r &#969;</td></tr><tr><td>Acceleration</td><td>a (m/s&#178;)</td><td>Angular acceleration</td><td>&#945; (rad/s&#178;)</td><td>a = r &#945;</td></tr><tr><td>Mass</td><td>m (kg)</td><td>Moment of inertia</td><td>I (kg m&#178;)</td><td>I = &#931; m r&#178;</td></tr><tr><td>Force</td><td>F (N)</td><td>Torque</td><td>T (N m)</td><td>T = F r</td></tr><tr><td>Momentum</td><td>m v</td><td>Angular momentum</td><td>I &#969;</td><td>&mdash;</td></tr><tr><td>Kinetic energy</td><td>&#189; m v&#178;</td><td>Rotational kinetic energy</td><td>&#189; I &#969;&#178;</td><td>&mdash;</td></tr><tr><td>Work</td><td>F s</td><td>Work</td><td>T &#952;</td><td>&mdash;</td></tr><tr><td>Power</td><td>F v (W)</td><td>Power</td><td>T &#969; (W)</td><td>P = 2&#960; N T / 60</td></tr></tbody></table></div><div class="example"><span class="tag">Example</span><p>A motor runs at 1500 rpm and drives a pulley of radius 0.05 m. Angular velocity &#969; = 2&#960;N/60 = 2&#960; &times; 1500/60 = <b>157.1 rad/s</b>. Belt speed v = r&#969; = 0.05 &times; 157.1 = <b>7.85 m/s</b>.</p></div><h3 id="sec3"><span class="sec-no">3.</span>Freedom of Constraints and Degrees of Freedom</h3><div class="defbox"><span class="tag">Definition</span><p>The <b>degree of freedom (DOF)</b> of a body is the number of independent directions in which it can move. The <b>freedom of constraint</b> describes how much a joint restricts that movement.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Six degrees of freedom of a rigid body in space</text><line x1="440" y1="165" x2="590" y2="165" class="lnk" marker-end="url(#ah)"/><line x1="440" y1="165" x2="320" y2="220" class="lnk" marker-end="url(#ah)"/><line x1="440" y1="165" x2="440" y2="60" class="lnk" marker-end="url(#ah)"/><text x="598" y="169" font-size="12.5" fill="#12283d" text-anchor="start" font-weight="700">X</text><text x="308" y="227" font-size="12.5" fill="#12283d" text-anchor="start" font-weight="700">Y</text><text x="448" y="55" font-size="12.5" fill="#12283d" text-anchor="start" font-weight="700">Z</text><circle cx="440" cy="165" r="5" class="cmp-f"/><rect x="40" y="60" width="200" height="84" rx="8" class="t-box2"/><text x="140" y="82" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Translation (3)</text><text x="140" y="102" font-size="11.5" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">T x , T y , T z</text><text x="140" y="122" font-size="10.5" fill="#5b6b7c" text-anchor="middle">linear movement along</text><text x="140" y="136" font-size="10.5" fill="#5b6b7c" text-anchor="middle">each of the three axes</text><rect x="640" y="60" width="200" height="84" rx="8" class="t-box3"/><text x="740" y="82" font-size="12" fill="#12283d" text-anchor="middle" font-weight="700">Rotation (3)</text><text x="740" y="102" font-size="11.5" fill="#12283d" text-anchor="middle" font-family="Consolas,Menlo,monospace">R x , R y , R z</text><text x="740" y="122" font-size="10.5" fill="#5b6b7c" text-anchor="middle">rotation about each of</text><text x="740" y="136" font-size="10.5" fill="#5b6b7c" text-anchor="middle">the three axes</text><text x="440" y="226" font-size="12" fill="#12283d" text-anchor="middle" font-weight="600">A completely free rigid body has 6 DOF. A joint removes (constrains) some of them.</text></svg></div><figcaption><b>Fig. 3:</b> A rigid body free in space has six degrees of freedom: three translations and three rotations.</figcaption></figure><p>A rigid body floating freely in space can move in six independent ways: it can translate along the X, Y and Z axes and it can rotate about the X, Y and Z axes. Therefore a free body in space has <b>6 degrees of freedom</b>. A body confined to a plane (planar motion) can translate in two directions and rotate about one axis, so it has <b>3 degrees of freedom</b>.</p><p>Every joint removes some of these freedoms. A revolute (turning) joint allows only rotation about one axis, so it removes five freedoms and leaves one. A prismatic (sliding) joint allows only translation along one axis and also leaves one. A cylindrical joint allows both rotation about and sliding along the same axis, so it leaves two. A spherical (ball and socket) joint allows rotation about three axes and leaves three.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Types of kinematic pairs (joints)</text><rect x="28" y="70" width="124" height="108" rx="8" class="t-box"/><text x="90" y="152" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">Turning pair</text><text x="90" y="168" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">(revolute)</text><rect x="203" y="70" width="124" height="108" rx="8" class="t-box"/><text x="265" y="152" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">Sliding pair</text><text x="265" y="168" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">(prismatic)</text><rect x="378" y="70" width="124" height="108" rx="8" class="t-box"/><text x="440" y="152" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">Rolling pair</text><rect x="538" y="70" width="124" height="108" rx="8" class="t-box"/><text x="600" y="152" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">Screw pair</text><rect x="693" y="70" width="124" height="108" rx="8" class="t-box"/><text x="755" y="152" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">Spherical pair</text><circle cx="90" cy="112" r="26" class="mech"/><circle cx="90" cy="112" r="9" class="cmp-f"/><path d="M 106 92 A 30 30 0 0 1 116 116" class="lnk" marker-end="url(#ah)"/><rect x="203" y="100" width="124" height="12" rx="8" class="mech"/><rect x="245" y="78" width="46" height="22" rx="8" class="mech2"/><polyline points="300,89 322,89" class="lnk" marker-end="url(#ah)"/><circle cx="440" cy="108" r="24" class="mech2"/><rect x="400" y="132" width="84" height="10" rx="8" class="mech"/><path d="M 458 88 A 30 30 0 0 1 470 110" class="lnk" marker-end="url(#ah)"/><line x1="600" y1="78" x2="600" y2="140" class="cmp" stroke-width="4"/><path d="M 588 84 L 612 90" class="cmp" stroke-width="1.8"/><path d="M 588 96 L 612 102" class="cmp" stroke-width="1.8"/><path d="M 588 108 L 612 114" class="cmp" stroke-width="1.8"/><path d="M 588 120 L 612 126" class="cmp" stroke-width="1.8"/><path d="M 588 132 L 612 138" class="cmp" stroke-width="1.8"/><path d="M 622 96 A 24 24 0 0 1 626 122" class="lnk" marker-end="url(#ah)"/><circle cx="755" cy="108" r="24" class="mech2"/><path d="M 727 118 A 30 30 0 0 0 783 118" class="mech" fill="none"/><path d="M 745 82 A 26 26 0 0 1 772 92" class="lnk" marker-end="url(#ah)"/><text x="440" y="210" font-size="11.5" fill="#5b6b7c" text-anchor="middle">Each joint removes some degrees of freedom: a revolute or prismatic joint leaves 1 DOF,</text><text x="440" y="226" font-size="11.5" fill="#5b6b7c" text-anchor="middle">a cylindrical joint leaves 2, and a spherical joint leaves 3.</text></svg></div><figcaption><b>Fig. 4:</b> The common kinematic pairs. A lower pair has surface contact (revolute, prismatic, cylindrical, spherical); a higher pair has line or point contact (gear teeth, cam and follower, rolling wheel).</figcaption></figure><h4>Types of constrained motion</h4><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 290" width="880" height="290" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Degrees of freedom and types of constrained motion</text><text x="160" y="62" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(a) Completely constrained</text><rect x="60" y="100" width="200" height="14" rx="8" class="mech"/><rect x="60" y="176" width="200" height="14" rx="8" class="mech"/><rect x="120" y="114" width="80" height="62" rx="8" class="mech2"/><text x="160" y="148" font-size="11" fill="#12283d" text-anchor="middle" font-weight="600">block</text><polyline points="110,145 75,145" class="lnk" marker-end="url(#ah)"/><polyline points="210,145 245,145" class="lnk" marker-end="url(#ah)"/><text x="160" y="220" font-size="11" fill="#5b6b7c" text-anchor="middle">square bar in a square hole:</text><text x="160" y="236" font-size="11" fill="#5b6b7c" text-anchor="middle">only sliding is possible</text><text x="440" y="62" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(b) Incompletely constrained</text><rect x="350" y="130" width="190" height="14" rx="8" class="mech"/><circle cx="445" cy="118" r="16" class="mech2"/><polyline points="445,92 445,66" class="lnk" marker-end="url(#ah)"/><path d="M 470 105 A 40 40 0 0 1 486 132" class="lnk" marker-end="url(#ah)"/><text x="440" y="190" font-size="11" fill="#5b6b7c" text-anchor="middle">circular shaft in a circular hole:</text><text x="440" y="206" font-size="11" fill="#5b6b7c" text-anchor="middle">it can rotate OR slide &mdash; two motions</text><text x="440" y="236" font-size="10.5" fill="#a8232a" text-anchor="middle">direction is not fixed by geometry alone</text><text x="730" y="62" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(c) Successfully constrained</text><rect x="640" y="130" width="180" height="14" rx="8" class="mech"/><circle cx="720" cy="118" r="16" class="mech2"/><path d="M 760 96 a 14 14 0 0 1 26 0" class="cmp"/><line x1="773" y1="96" x2="773" y2="130" class="cmp" stroke-width="1.6" stroke-dasharray="6 4"/><polyline points="720,92 720,70" class="lnk" marker-end="url(#ah)"/><text x="730" y="190" font-size="11" fill="#5b6b7c" text-anchor="middle">shaft in a hole plus a spring / collar:</text><text x="730" y="206" font-size="11" fill="#5b6b7c" text-anchor="middle">an external force removes one motion,</text><text x="730" y="222" font-size="11" fill="#5b6b7c" text-anchor="middle">leaving only rotation</text></svg></div><figcaption><b>Fig. 5:</b> Completely constrained motion, incompletely constrained motion and successfully constrained motion.</figcaption></figure><ul><li><b>Completely constrained motion</b> &mdash; the motion is limited to a definite direction by the geometry of the pairing alone, no matter what the direction of the applied force is. Example: a square bar in a square hole can only slide; it cannot rotate. Another example: a shaft with a collar between two bearings can only rotate.</li><li><b>Incompletely constrained motion</b> &mdash; the pair permits motion in more than one direction, and the actual direction depends on the direction of the applied force. Example: a circular shaft in a circular hole can either rotate or slide. Both motions are possible and neither is prevented by geometry.</li><li><b>Successfully constrained motion</b> &mdash; the pair is incompletely constrained by geometry, but an external agency such as a spring, gravity or a load removes one of the possible motions, leaving only one. Example: a shaft in a footstep bearing can rotate or lift up; the weight of the shaft (or a spring) keeps it down, so only rotation remains. Another example: the piston in an engine cylinder, held in place by the connecting rod.</li></ul><h4>Counting the degrees of freedom &mdash; Gruebler's criterion</h4><p>For a planar chain made of rigid links connected by lower pairs, the mobility M (number of independent inputs required) is given by Gruebler's equation, also called the Kutzbach criterion.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 210" width="880" height="210" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Gruebler / Kutzbach criterion for mobility</text><rect x="120" y="55" width="640" height="62" rx="8" class="t-box2"/><text x="440" y="82" font-size="19" fill="#12283d" text-anchor="middle" font-weight="700">M = 3 ( n &minus; 1 ) &minus; 2 j<sub>1</sub> &minus; j<sub>2</sub></text><text x="440" y="104" font-size="11.5" fill="#5b6b7c" text-anchor="middle">planar chains:  n = number of links,  j1 = lower pairs,  j2 = higher pairs</text><text x="440" y="148" font-size="12" fill="#12283d" text-anchor="middle" font-weight="600">M = 0 &rarr; structure        M = 1 &rarr; mechanism (one input needed)        M = 2 &rarr; two inputs needed</text><text x="440" y="176" font-size="12" fill="#0f5fa8" text-anchor="middle">Four-bar chain:  n = 4,  j1 = 4  &rarr;  M = 3(4&minus;1) &minus; 2(4) = 1  &rarr; a mechanism</text></svg></div><figcaption><b>Fig. 6:</b> Gruebler's equation for planar mechanisms and how to interpret the result.</figcaption></figure><span class="eq">M = 3 (n &minus; 1) &minus; 2 j<sub>1</sub> &minus; j<sub>2</sub></span><p>where n is the total number of links including the fixed link, j<sub>1</sub> is the number of lower pairs (joints with one degree of freedom such as turning and sliding pairs), and j<sub>2</sub> is the number of higher pairs (joints with two degrees of freedom such as a cam and follower or two gear teeth in contact).</p><ul><li>If <b>M = 0</b>, the chain is a <b>structure</b> &mdash; no relative motion is possible.</li><li>If <b>M = 1</b>, the chain is a <b>mechanism</b> needing one input; most machines are of this type.</li><li>If <b>M = 2</b>, two independent inputs are required, as in a differential gear.</li><li>If <b>M is negative</b>, the chain is a statically indeterminate structure with redundant constraints.</li></ul><div class="example"><span class="tag">Example</span><p><b>Example 1 &mdash; four-bar chain.</b> n = 4 links, j<sub>1</sub> = 4 turning pairs, j<sub>2</sub> = 0. M = 3(4 &minus; 1) &minus; 2(4) &minus; 0 = 9 &minus; 8 = <b>1</b>. So one input (say the crank) is enough to determine the motion of all other links &mdash; it is a mechanism.<br><b>Example 2 &mdash; slider-crank.</b> n = 4 (crank, connecting rod, slider, frame), j<sub>1</sub> = 3 turning pairs + 1 sliding pair = 4. M = 3(3) &minus; 8 = <b>1</b>.<br><b>Example 3 &mdash; triangular frame.</b> n = 3, j<sub>1</sub> = 3. M = 3(2) &minus; 6 = <b>0</b>, so it is a structure.<br><b>Example 4 &mdash; cam and follower.</b> n = 3 (cam, follower, frame), j<sub>1</sub> = 2 turning/sliding pairs, j<sub>2</sub> = 1 higher pair at the cam contact. M = 3(2) &minus; 2(2) &minus; 1 = <b>1</b>.</p></div><div class="note"><span class="tag">Note</span><p><b>Inversions.</b> If different links of the same kinematic chain are fixed one by one, different mechanisms are obtained. These are called <b>inversions</b> of the chain. The slider-crank chain gives the reciprocating engine (crank fixed as driver), the Whitworth quick-return mechanism and the oscillating cylinder engine. The four-bar chain gives the crank-rocker, the double-crank (drag link) and the double-rocker mechanisms depending on which link is fixed and on the relative lengths (Grashof's law).</p></div><h3 id="sec4"><span class="sec-no">4.</span>Transmission of Motion &mdash; Overview</h3><p>The mechanisms used to transmit motion from an actuator to a load fall into a few families, each with its own advantages.</p><div class="tbl-scroll"><table><caption>Table 7.2 &mdash; Motion transmission methods compared</caption><thead><tr><th>Method</th><th>Motion conversion</th><th>Centre distance</th><th>Slip</th><th>Efficiency</th><th>Typical use</th></tr></thead><tbody><tr><td>Gear drive</td><td>Rotary to rotary</td><td>Short</td><td>None (positive)</td><td>95 to 99 %</td><td>Gearboxes, machine tools, clocks</td></tr><tr><td>Belt drive</td><td>Rotary to rotary</td><td>Long</td><td>Some (except toothed belt)</td><td>90 to 98 %</td><td>Conveyors, fans, lathes, alternators</td></tr><tr><td>Chain drive</td><td>Rotary to rotary</td><td>Medium to long</td><td>None (positive)</td><td>97 to 98 %</td><td>Bicycles, motorcycles, conveyors</td></tr><tr><td>Rack and pinion</td><td>Rotary to linear</td><td>Short</td><td>None</td><td>90 to 95 %</td><td>Car steering, lathe traverse, robot joints</td></tr><tr><td>Lead / ball screw</td><td>Rotary to linear</td><td>Short</td><td>None</td><td>30 to 90 %</td><td>CNC axes, vices, 3D printers</td></tr><tr><td>Cam and follower</td><td>Rotary to programmed linear or oscillating</td><td>Short</td><td>None</td><td>High</td><td>Engines, automatic machines, textile machines</td></tr><tr><td>Linkage</td><td>Rotary to complex planar motion</td><td>Short</td><td>None</td><td>High</td><td>Wipers, excavators, folding mechanisms</td></tr><tr><td>Solenoid</td><td>Electrical to short linear</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>Valves, relays, locks, latches</td></tr></tbody></table></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>Mechanical actuation systems convert the simple motion of an actuator into the motion actually required by the load.</li><li>A link is a rigid body with two or more joints; a kinematic chain is an assembly of links with definite relative motion; fixing one link makes it a mechanism.</li><li>The three basic types of motion are linear (translatory), rotary and oscillatory, plus reciprocating and intermittent motion.</li><li>Linear and angular quantities are related by s = r&#952;, v = r&#969;, a = r&#945;, T = F r and P = T&#969;.</li><li>A free rigid body in space has 6 degrees of freedom; a body in a plane has 3.</li><li>Completely constrained motion is limited by geometry alone; incompletely constrained motion depends on the direction of the force; successfully constrained motion is limited by an external agency such as gravity or a spring.</li><li>Gruebler's equation M = 3(n &minus; 1) &minus; 2j<sub>1</sub> &minus; j<sub>2</sub> gives the mobility of a planar chain; M = 0 is a structure and M = 1 is a mechanism.</li><li>Fixing different links of the same chain gives different inversions of that chain.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Define link, joint, kinematic chain, mechanism and machine.</li><li>Explain the three basic types of motion with one example each.</li><li>Write the relations connecting linear and angular displacement, velocity, acceleration, force and power.</li><li>What is meant by degree of freedom? How many degrees of freedom does a rigid body have in space and in a plane?</li><li>Distinguish between completely, incompletely and successfully constrained motion with examples.</li><li>Classify kinematic pairs into lower pairs and higher pairs with a neat sketch of each.</li><li>State and explain Gruebler's criterion for mobility.</li><li>Find the degrees of freedom of a four-bar chain and of a slider-crank mechanism.</li><li>What is an inversion of a kinematic chain? Give two examples.</li><li>Compare gear, belt and chain drives on the basis of slip, centre distance and efficiency.</li></ol></div><div class="pager"><a class="prev" href="06-ultrasonic-touch-pir-sensor.html"><span class="dir">&larr; Previous topic</span><span class="ttl">06. Ultrasonic Sensor, Touch Sensor and PIR Sensor</span></a><a class="next" href="08-cams-gears-ratchet-belts-bearings.html"><span class="dir">Next topic &rarr;</span><span class="ttl">08. Kinematic Chains, Cams, Gears, Ratchet and Pawl, Belt and Chain Drives, Bearings</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

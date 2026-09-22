@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Servo Motor &mdash; Construction, Working Principle and Specifications | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="What makes a servo motor different from an ordinary motor: it is a motor plus a position sensor plus a controller in one closed loop package, able to ">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit II &middot; Topic 12 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit II &rsaquo; Topic 12</nav><div class="unit-tag">Unit II</div><h2 class="page-title"><span class="topic-no">12</span>Servo Motor &mdash; Construction, Working Principle and Specifications</h2><p class="lede">What makes a servo motor different from an ordinary motor: it is a motor plus a position sensor plus a controller in one closed loop package, able to go to an exact angle and hold it there.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">What is a Servo Motor?</a></li><li><a href="#sec2">Construction</a></li><li><a href="#sec3">Working Principle</a></li><li><a href="#sec4">Specifications of Servo Motors</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>What is a Servo Motor?</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>servo motor</b> is a rotary actuator that allows <b>precise control of angular position, velocity and torque</b>. It is not a single device but a <b>system</b> consisting of a motor, a position feedback device, a reduction gearbox and a control circuit, all combined so that the shaft always moves to the commanded position and holds it there against any disturbing force. The word <i>servo</i> comes from the Latin <i>servus</i>, meaning servant &mdash; the motor faithfully obeys the command signal.</p></div><p>An ordinary DC motor keeps rotating as long as power is applied; you cannot tell from the motor itself how far it has turned. A servo motor rotates to a specified angle, typically between 0&deg; and 180&deg; for a hobby servo, and stops. If an external force tries to move the shaft away, the servo senses the change and drives the motor to bring it back. This ability to hold a position is what makes servos indispensable in robotics, RC models, CNC machines and industrial automation.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 330" width="900" height="330" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="450" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">Servo motor: mechanical reduction and internal closed-loop position control</text><text x="235" y="55" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(a) Inside a hobby servo</text><rect x="35" y="70" width="400" height="205" rx="10" class="t-box"/><circle cx="95" cy="145" r="30" class="cmp-f"/><text x="95" y="150" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">M</text><text x="95" y="190" font-size="10.5" fill="#5b6b7c" text-anchor="middle">DC motor</text><line x1="130" y1="145" x2="163" y2="145" class="lnk" marker-end="url(#ah)"/><rect x="165" y="112" width="100" height="66" rx="5" class="mech2"/><text x="215" y="137" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">gear</text><text x="215" y="155" font-size="10.5" fill="#5b6b7c" text-anchor="middle">reduction</text><line x1="265" y1="145" x2="320" y2="145" class="lnk" marker-end="url(#ah)"/><line x1="320" y1="145" x2="410" y2="145" class="cmp" stroke-width="4"/><text x="365" y="132" font-size="10.5" fill="#5b6b7c" text-anchor="middle">output shaft</text><rect x="290" y="85" width="110" height="42" rx="5" class="t-box3"/><text x="345" y="104" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="700">control board</text><rect x="280" y="205" width="130" height="40" rx="5" class="t-box2"/><text x="345" y="229" font-size="9.8" fill="#12283d" text-anchor="middle" font-weight="700">feedback potentiometer</text><polyline points="320,145 320,205" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="327" y="180" font-size="9.2" fill="#5b6b7c" text-anchor="start">shaft link</text><polyline points="290,106 260,106 260,90 110,90" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="205" y="84" font-size="9.8" fill="#157a4b" text-anchor="middle">PWM command</text><polyline points="280,225 250,225 250,260 110,260" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="190" y="255" font-size="9.8" fill="#0f5fa8" text-anchor="middle">position feedback</text><text x="235" y="294" font-size="10.5" fill="#12283d" text-anchor="middle">The motor and gears move the shaft; the board compares commanded and measured angle.</text><text x="690" y="55" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">(b) Closed-loop control</text><rect x="480" y="80" width="105" height="55" rx="8" class="t-box3"/><text x="532.5" y="99.0" class="t-lbl" style="font-size:11px">Desired</text><text x="532.5" y="116.0" class="t-lbl" style="font-size:11px">angle</text><circle cx="620" cy="107" r="16" class="cmp-f"/><text x="612" y="97" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">+</text><text x="612" y="121" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">−</text><rect x="655" y="80" width="105" height="55" rx="8" class="t-box2"/><text x="707.5" y="99.0" class="t-lbl" style="font-size:11px">Controller</text><text x="707.5" y="116.0" class="t-lbl" style="font-size:11px">(PID)</text><rect x="790" y="80" width="85" height="55" rx="8" class="t-box4"/><text x="832.5" y="99.0" class="t-lbl" style="font-size:10.5px">Motor +</text><text x="832.5" y="116.0" class="t-lbl" style="font-size:10.5px">gearbox</text><line x1="585" y1="107" x2="603" y2="107" class="lnk" marker-end="url(#ah)"/><line x1="637" y1="107" x2="653" y2="107" class="lnk" marker-end="url(#ah)"/><line x1="760" y1="107" x2="788" y2="107" class="lnk" marker-end="url(#ah)"/><polyline points="875,107 885,107" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="885" y="111" font-size="9.8" fill="#157a4b" text-anchor="end">shaft angle</text><rect x="710" y="190" width="125" height="50" rx="8" class="t-box2"/><text x="772.5" y="215.0" class="t-lbl" style="font-size:10.5px">Position sensor</text><polyline points="875,135 875,215 837,215" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="837" y1="215" x2="829" y2="215" class="lnk-d" marker-end="url(#ah)"/><polyline points="710,215 620,215 620,123" class="lnk-d" marker-end="url(#ah)"/><text x="665" y="207" font-size="9.8" fill="#0f5fa8" text-anchor="middle">measured angle</text><text x="690" y="274" font-size="10.8" fill="#12283d" text-anchor="middle" font-weight="600">error = desired angle − measured angle; feedback drives the error toward zero.</text><text x="450" y="318" font-size="11" fill="#12283d" text-anchor="middle">Three external wires on a hobby servo are typically +5 V, ground and the PWM command signal.</text></svg></div><figcaption><b>Fig. 1:</b> Inside a hobby servo motor: a DC motor, a reduction gearbox, a potentiometer that senses the output shaft angle, and a control board that compares the commanded and actual positions. The block diagram below shows the closed loop.</figcaption></figure><h3 id="sec2"><span class="sec-no">2.</span>Construction</h3><p>A servo motor unit contains four main parts inside a small rectangular case.</p><h4>1. The motor</h4><p>The motor itself is usually a small <b>PMDC motor</b> in hobby servos and low-power industrial servos. It runs at a high speed (several thousand rpm) with low torque. In larger industrial servo motors, a <b>brushless DC (BLDC)</b> or an <b>AC synchronous motor</b> with permanent magnets on the rotor is used, giving higher efficiency, better heat dissipation and longer life. Some special servos use a <b>stepper motor</b> as the base machine, and there are also <b>linear servos</b> in which the rotor is unrolled into a straight moving part.</p><h4>2. The reduction gearbox</h4><p>A set of spur gears (plastic in cheap servos, metal in high-torque ones) reduces the motor speed by a ratio of about 30:1 to 300:1 and multiplies the torque by the same factor. This gives the output shaft a useful speed of about 50 to 200 rpm with a torque of a few kg-cm. Planetary or harmonic gearboxes are used in high-precision industrial servos because they have almost zero backlash.</p><h4>3. The position feedback device</h4><p>This is what makes the motor a <i>servo</i>. In a hobby servo it is a small <b>potentiometer</b> whose shaft is coupled to the output shaft. As the output rotates, the wiper moves and produces a voltage proportional to the angle. In industrial servos, much more accurate devices are used:</p><ul><li><b>Incremental optical encoder</b> &mdash; a slotted disc and a photointerrupter produce pulses; position is found by counting pulses from a reference index. Typical resolution 1000 to 10 000 pulses per revolution, multiplied four times by edge decoding.</li><li><b>Absolute optical encoder</b> &mdash; a coded disc gives a unique digital word for every shaft position, so the position is known immediately at switch-on without any homing. Single-turn and multi-turn versions exist.</li><li><b>Resolver</b> &mdash; a rugged rotary transformer that gives absolute position and works at high temperature and under vibration; used in aerospace and military applications.</li><li><b>Hall sensor array</b> &mdash; used in BLDC servos for commutation and coarse position.</li><li><b>Potentiometer</b> &mdash; cheap and absolute but with limited resolution, wear and noise.</li></ul><h4>4. The control electronics</h4><p>A small printed circuit board carries a comparator or, in modern servos, a microcontroller running a <b>PID algorithm</b>. It compares the commanded position with the actual position from the feedback device, computes the error, and drives the motor through an H-bridge in the direction that reduces the error. It also provides PWM speed control, current limiting, soft starting, end-stop protection and sometimes a serial communication interface.</p><h4>5. The output shaft and case</h4><p>The output shaft projects from the case with a splined or serrated end to which a <b>servo horn</b> (arm) is screwed. Hobby servos have three wires: red for +5 V supply, black or brown for ground, and orange, yellow or white for the control signal. Industrial servos use connectors for power, encoder feedback and communication.</p><h3 id="sec3"><span class="sec-no">3.</span>Working Principle</h3><p>The servo works as a <b>closed loop position control system</b>. The sequence of events is as follows.</p><ol><li>A command signal, usually a PWM pulse of width between 1 ms and 2 ms repeated every 20 ms, arrives at the control input. The width represents the desired angle: 1 ms for 0&deg;, 1.5 ms for 90&deg; and 2 ms for 180&deg;.</li><li>The control circuit converts this pulse width into a reference voltage V<sub>ref</sub> proportional to the desired angle.</li><li>The potentiometer (or encoder) produces a feedback voltage V<sub>fb</sub> proportional to the actual shaft angle.</li><li>The error voltage e = V<sub>ref</sub> &minus; V<sub>fb</sub> is computed and amplified by the controller.</li><li>If the error is positive, the H-bridge drives the motor in one direction; if negative, in the other direction. The speed of the motor is proportional to the magnitude of the error, so the servo slows down as it approaches the target &mdash; this is natural proportional control.</li><li>As the shaft turns, the feedback voltage changes, and the error reduces. When the error becomes zero (or falls within the dead band), the motor stops.</li><li>If an external force moves the shaft, the feedback voltage changes, an error appears, and the motor drives the shaft back to the commanded position. This is the <b>holding action</b>.</li></ol><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="24" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">PWM control signal for a hobby servo motor</text><text x="70" y="66" font-size="12" fill="#12283d" text-anchor="end" font-weight="700">0&#176;</text><line x1="90" y1="82" x2="830" y2="82" class="ax"/><path d="M 90 82 L 120 82 L 120 54 L 175 54 L 175 82 L 250 82 L 250 82 L 830 82" class="lnk" stroke-width="2" fill="none"/><line x1="120" y1="92" x2="175.0" y2="92" class="lnk" stroke-width="1.2"/><text x="147.5" y="106" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">1.0 ms</text><text x="70" y="124" font-size="12" fill="#12283d" text-anchor="end" font-weight="700">90&#176;</text><line x1="90" y1="140" x2="830" y2="140" class="ax"/><path d="M 90 140 L 120 140 L 120 112 L 202 112 L 202 140 L 250 140 L 250 140 L 830 140" class="lnk" stroke-width="2" fill="none"/><line x1="120" y1="150" x2="202.5" y2="150" class="lnk" stroke-width="1.2"/><text x="161.25" y="164" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">1.5 ms</text><text x="70" y="182" font-size="12" fill="#12283d" text-anchor="end" font-weight="700">180&#176;</text><line x1="90" y1="198" x2="830" y2="198" class="ax"/><path d="M 90 198 L 120 198 L 120 170 L 230 170 L 230 198 L 250 198 L 250 198 L 830 198" class="lnk" stroke-width="2" fill="none"/><line x1="120" y1="208" x2="230.0" y2="208" class="lnk" stroke-width="1.2"/><text x="175.0" y="222" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="600">2.0 ms</text><text x="700" y="52" font-size="11" fill="#5b6b7c" text-anchor="middle">period = 20 ms (50 Hz)</text><text x="440" y="240" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Pulse width 1.0 ms &rarr; 0&#176;,  1.5 ms &rarr; 90&#176;,  2.0 ms &rarr; 180&#176;. A continuous-rotation servo uses pulse width to set speed and direction instead.</text></svg></div><figcaption><b>Fig. 2:</b> The PWM control signal of a hobby servo. Pulse width sets the angle; the period is always 20 ms (50 Hz).</figcaption></figure><div class="formula"><span class="tag">Formula</span><p><b>Servo control law</b><span class='eq'>error  e(t) = &#952;<sub>desired</sub> &minus; &#952;<sub>actual</sub></span><span class='eq'>motor voltage  V<sub>m</sub> = K<sub>p</sub> e(t) + K<sub>i</sub> &#8747; e dt + K<sub>d</sub> (de/dt)</span>A pure proportional servo stops when the error falls below its dead band, which is why hobby servos have an accuracy of about &plusmn;1&deg;. Industrial servos use full PID control with high-resolution encoders to achieve accuracies of a few arc-seconds.</p></div><h4>Types of servo motor</h4><ul><li><b>Positional rotation servo</b> &mdash; the standard hobby servo, limited to about 180&deg; by mechanical end stops. Most common.</li><li><b>Continuous rotation servo</b> &mdash; the end stops are removed and the potentiometer is fixed at mid-position; the pulse width then controls speed and direction instead of position. 1.5 ms is stop, 1 ms is full speed one way, 2 ms is full speed the other way.</li><li><b>Linear servo</b> &mdash; the output is a linear push-pull motion, obtained either by unrolling the motor or by a screw mechanism.</li><li><b>Industrial AC servo</b> &mdash; a permanent magnet synchronous motor with an absolute encoder and a dedicated servo amplifier, controlled by position, velocity or torque loop. Used in CNC machines, robots and pick-and-place machines.</li><li><b>Digital servo</b> &mdash; uses a microcontroller running at several hundred Hz instead of an analogue comparator, giving faster response, tighter holding and smoother motion, but drawing more current.</li><li><b>Analog servo</b> &mdash; the traditional type, with a response rate of 50 Hz.</li></ul><div class="note"><span class="tag">Note</span><p><b>Servo versus stepper.</b> A stepper motor moves in fixed steps and, in open loop, assumes that it has arrived; it can lose steps under overload and has poor torque at high speed. A servo motor uses feedback, so it always knows where it is, can correct an error, gives full torque at high speed and runs smoothly and quietly. Servos are used where high speed, high accuracy or high dynamic response is needed; steppers are used where cost matters and the speed is low.</p></div><h3 id="sec4"><span class="sec-no">4.</span>Specifications of Servo Motors</h3><div class="tbl-scroll"><table><caption>Table 12.1 &mdash; Servo motor specifications and their meaning</caption><thead><tr><th>Specification</th><th>Typical hobby value</th><th>Typical industrial value</th><th>Meaning</th></tr></thead><tbody><tr><td>Supply voltage</td><td>4.8 V to 7.4 V DC</td><td>24 V to 400 V AC/DC</td><td>Operating supply</td></tr><tr><td>Position range</td><td>0&deg; to 180&deg; (or 0&deg; to 360&deg;)</td><td>Unlimited (continuous rotation)</td><td>Usable travel</td></tr><tr><td>Torque (stall)</td><td>1 kg-cm to 60 kg-cm</td><td>0.1 N m to 200 N m or more</td><td>Maximum holding torque at rated voltage; usually quoted at 4.8 V and 6.0 V</td></tr><tr><td>Speed</td><td>0.1 s to 0.25 s per 60&deg;</td><td>1000 rpm to 6000 rpm</td><td>How fast the shaft moves, usually quoted at no load</td></tr><tr><td>Resolution / encoder</td><td>Potentiometer, about 1&deg;</td><td>17-bit to 23-bit encoder (131 072 to 8 388 608 counts/rev)</td><td>Smallest detectable position change</td></tr><tr><td>Position accuracy</td><td>&plusmn;1&deg; to &plusmn;2&deg;</td><td>&plusmn;10 arc-seconds</td><td>Closeness to the commanded position</td></tr><tr><td>Repeatability</td><td>&plusmn;0.5&deg;</td><td>Very high, sub-arc-second</td><td>Ability to return to the same position</td></tr><tr><td>Dead band width</td><td>1 &#181;s to 10 &#181;s</td><td>Adjustable</td><td>The error below which the servo does not respond</td></tr><tr><td>Control signal</td><td>PWM 50 Hz, 1 ms to 2 ms</td><td>Analogue &plusmn;10 V, pulse train, or fieldbus (EtherCAT, CANopen, ProfiNet)</td><td>How the command is given</td></tr><tr><td>Current drain</td><td>100 mA idle, 1 A to 3 A stall</td><td>Depends on rating</td><td>Determines the supply and wiring</td></tr><tr><td>Gear type</td><td>Plastic or metal spur, some planetary</td><td>Planetary or harmonic (near zero backlash)</td><td>Backlash affects accuracy</td></tr><tr><td>Bearings</td><td>Bush or single ball bearing</td><td>Two ball bearings</td><td>Life and radial load capacity</td></tr><tr><td>Operating temperature</td><td>0 &deg;C to 50 &deg;C</td><td>&minus;10 &deg;C to 40 &deg;C (with derating)</td><td>Ambient limits</td></tr><tr><td>Weight and size</td><td>9 g micro to 80 g standard to 300 g large</td><td>Flange sizes 40 mm to 200 mm</td><td>Physical envelope</td></tr><tr><td>Duty</td><td>Intermittent (not for continuous stall)</td><td>Continuous at rated torque</td><td>Thermal capability</td></tr></tbody></table></div><h4>Standard servo sizes</h4><ul><li><b>Micro servo (9 g)</b> &mdash; about 23 &times; 12 &times; 25 mm, torque 1.5 to 2.5 kg-cm. Used in small RC models, pan-tilt camera mounts and lightweight robot arms.</li><li><b>Standard servo (40 g to 60 g)</b> &mdash; about 40 &times; 20 &times; 38 mm, torque 3 to 10 kg-cm. The most common size in hobby robotics.</li><li><b>Large / winch servo</b> &mdash; torque 15 to 60 kg-cm, metal gears, used in steering of large models and in robot joints.</li><li><b>Industrial servo</b> &mdash; rated in watts and newton metres, with a matching amplifier and encoder, used in CNC machines and robots.</li></ul><h4>Selecting a servo</h4><p>The engineer must first calculate the <b>load torque</b> (friction plus gravity plus acceleration torque) and the <b>required speed</b>, then add a safety margin of 50 % to 100 % on torque. The load inertia reflected to the motor shaft should be matched to the motor inertia, usually keeping the ratio below 10:1 for good response. Other factors are the required accuracy and repeatability, the duty cycle, the supply available, the mounting space, the environmental conditions and the cost.</p><div class="example"><span class="tag">Example</span><p><b>Torque calculation example.</b> A robot arm link of weight 5 N has its centre of gravity 0.15 m from the servo shaft. The static torque required to hold the arm horizontal is T = W &times; r = 5 &times; 0.15 = <b>0.75 N m</b> = 7.65 kg-cm. Allowing a safety factor of 1.5 for acceleration and friction, a servo of at least <b>11.5 kg-cm</b> is required.</p></div><h4>Applications of servo motors</h4><ul><li><b>Robotics</b> &mdash; joint actuators of educational, hobby and light industrial robots; gripper drives; mobile robot steering.</li><li><b>CNC machines and machine tools</b> &mdash; axis drives for milling, turning, grinding and EDM machines, where position accuracy of a few micrometres is required.</li><li><b>Radio-controlled models</b> &mdash; control surfaces of aircraft, steering and throttle of cars, and sail winches of boats. This was the original application.</li><li><b>Industrial automation</b> &mdash; pick-and-place machines, packaging machinery, assembly robots, conveyors with precise indexing, welding robots and painting robots.</li><li><b>Aerospace and defence</b> &mdash; flight control surface actuators (fly-by-wire), antenna and radar positioning, missile fin control, turret drives.</li><li><b>Automotive</b> &mdash; electronic power steering, throttle control, active suspension, headlight levelling, seat and mirror adjustment.</li><li><b>Medical</b> &mdash; surgical robots, infusion pumps, imaging equipment positioning, prosthetic limbs and exoskeletons.</li><li><b>Consumer electronics</b> &mdash; camera autofocus and zoom, disc drive positioning, DVD tray, hard disc head positioning (voice coil servo), smart locks and valve actuators.</li><li><b>Textile, printing and paper industries</b> &mdash; precise tension and register control.</li></ul><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>A servo motor is a complete closed loop positioning system: motor, reduction gearbox, position feedback device and control electronics in one package.</li><li>The feedback device may be a potentiometer (hobby servos), an incremental or absolute optical encoder, or a resolver (industrial servos).</li><li>Working: the command pulse width is converted to a reference, compared with the feedback, and the error drives the motor through an H-bridge until the error is zero. If the shaft is disturbed, the servo corrects it.</li><li>A hobby servo uses a 20 ms period PWM signal: 1 ms = 0&deg;, 1.5 ms = 90&deg;, 2 ms = 180&deg;. A continuous-rotation servo uses the same signal for speed and direction.</li><li>Industrial servos use PID control with high-resolution encoders and are commanded by analogue voltage, pulse trains or an industrial fieldbus.</li><li>Key specifications are torque (in kg-cm or N m), speed, resolution, accuracy, repeatability, dead band, gear type, current drain and duty.</li><li>Servos differ from stepper motors in that they use feedback, so they never lose position, they run smoothly at high speed and they can correct an error.</li><li>Applications include robot joints, CNC axes, RC models, industrial automation, aerospace actuators, automotive steering, medical devices and camera drives.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Define a servo motor. Why is it described as a system rather than a single device?</li><li>Describe the construction of a servo motor, explaining the function of each of its four main parts.</li><li>Explain the working principle of a servo motor with a block diagram. Why is it called a closed loop system?</li><li>Draw the PWM control signal of a hobby servo and state the pulse widths for 0&deg;, 90&deg; and 180&deg;.</li><li>Compare a positional rotation servo with a continuous rotation servo.</li><li>Differentiate between a servo motor and a stepper motor.</li><li>List the feedback devices used in servo motors and compare a potentiometer with an optical encoder.</li><li>What is meant by dead band, resolution, repeatability and holding torque of a servo?</li><li>A robot arm link weighs 8 N with its centre of gravity 0.2 m from the servo shaft. Find the static holding torque and suggest a suitable servo rating with a factor of safety of 2. (Answers: 1.6 N m = 16.3 kg-cm; select 33 kg-cm or more)</li><li>List any eight applications of servo motors.</li></ol></div><div class="pager"><a class="prev" href="11-ac-motor-bldc-motor-pmdc-motor.html"><span class="dir">&larr; Previous topic</span><span class="ttl">11. AC Motor, BLDC Motor and PMDC Motor</span></a><a class="next" href="13-control-systems-feedback-open-closed-loop.html"><span class="dir">Next topic &rarr;</span><span class="ttl">13. Control Systems &mdash; Feedback, Open Loop and Closed Loop Systems</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>

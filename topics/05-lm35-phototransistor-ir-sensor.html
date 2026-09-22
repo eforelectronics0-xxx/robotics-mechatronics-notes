@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LM35 Temperature Sensor, Phototransistor and IR Sensor | Robotics &amp; Mechatronics Notes</title>
+<meta name="description" content="Three easy-to-use sensors for the laboratory and for projects: the LM35 analogue temperature sensor with its 10 mV per degree output, the phototransis">
+<style>
+/* ==========================================================================
+   Robotics & Mechatronics Notes - shared stylesheet
+   ========================================================================== */
+
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --ink:#1c2733;
+  --ink-soft:#4a5b6d;
+  --line:#dbe4ee;
+  --brand:#0f5fa8;
+  --brand-dark:#0a4377;
+  --brand-soft:#e7f1fb;
+  --accent:#e07b00;
+  --accent-soft:#fff4e5;
+  --good:#157a4b;
+  --good-soft:#e8f6ee;
+  --warn:#a8232a;
+  --warn-soft:#fdecec;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 6px 18px rgba(16,42,67,.06);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:16.5px;
+  line-height:1.78;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--brand-dark),var(--brand) 60%,#1878c9);
+  color:#fff;
+  padding:14px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(10,40,70,.25);
+}
+.topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brandmark{
+  width:38px;height:38px;flex:0 0 38px;border-radius:10px;
+  background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+}
+.brandmark svg{display:block}
+.topbar h1{font-size:17px;margin:0;letter-spacing:.2px;font-weight:650}
+.topbar .sub{font-size:12.5px;opacity:.86;margin:1px 0 0}
+.topbar .spacer{flex:1 1 auto}
+.topnav{display:flex;gap:8px;flex-wrap:wrap}
+.topnav a{
+  color:#fff;text-decoration:none;font-size:13.5px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:background .18s;
+}
+.topnav a:hover{background:rgba(255,255,255,.3)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 28px;margin-bottom:22px;
+}
+
+/* ---------- breadcrumb + heading ---------- */
+.crumbs{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+.crumbs a{color:var(--brand);text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.unit-tag{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--brand-dark);background:var(--brand-soft);
+  border:1px solid #cfe2f5;padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+h2.page-title{
+  font-size:30px;line-height:1.28;margin:0 0 8px;color:#12283d;font-weight:700;
+  letter-spacing:-.2px;
+}
+.topic-no{color:var(--accent);font-weight:700;margin-right:8px}
+.lede{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:78ch}
+
+h3{
+  font-size:21px;margin:34px 0 12px;color:#123252;font-weight:680;
+  padding-bottom:7px;border-bottom:2px solid var(--line);
+  scroll-margin-top:88px;
+}
+h3 .sec-no{color:var(--brand);margin-right:9px;font-family:var(--mono);font-size:17px}
+h4{font-size:17px;margin:22px 0 8px;color:#173a5c;font-weight:660}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:24px}
+li{margin-bottom:7px}
+li::marker{color:var(--brand)}
+strong{color:#12283d;font-weight:660}
+a{color:var(--brand)}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef3f9;
+  border:1px solid #dfe8f2;padding:1px 5px;border-radius:5px;color:#0d3f6d;
+}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--brand-soft);border:1px solid #cfe2f5;border-radius:10px;
+  padding:16px 20px;margin:0 0 26px;
+}
+.toc h4{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--brand-dark)}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+.toc li{font-size:14.5px;margin-bottom:4px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- callouts ---------- */
+.note,.formula,.example,.warn,.defbox{
+  border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid;font-size:15.5px;
+}
+.note{background:var(--brand-soft);border-color:#cfe2f5}
+.example{background:var(--good-soft);border-color:#cde9d9}
+.warn{background:var(--warn-soft);border-color:#f4d3d5}
+.formula{background:#fbf8f1;border-color:#ece0c6}
+.defbox{background:#f6f7f9;border-color:var(--line)}
+.note b,.example b,.warn b,.formula b,.defbox b{display:inline-block;margin-bottom:3px}
+.note .tag,.example .tag,.warn .tag,.formula .tag{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:2px 9px;border-radius:5px;margin-bottom:7px;
+}
+.note .tag{background:var(--brand);color:#fff}
+.example .tag{background:var(--good);color:#fff}
+.warn .tag{background:var(--warn);color:#fff}
+.formula .tag{background:var(--accent);color:#fff}
+.formula p:last-child{margin-bottom:0}
+.eq{
+  font-family:var(--mono);font-size:16px;background:#fff;border:1px dashed #dccfae;
+  border-radius:7px;padding:9px 14px;margin:9px 0;display:block;overflow-x:auto;
+}
+.note ul,.example ul,.warn ul,.defbox ul{margin-bottom:6px}
+.note p:last-child,.example p:last-child,.warn p:last-child{margin-bottom:0}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+caption{
+  caption-side:top;text-align:left;font-size:13.5px;font-weight:700;color:var(--brand-dark);
+  padding:10px 14px;background:var(--brand-soft);border-bottom:1px solid var(--line);
+}
+th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+thead th{background:#eef4fa;color:#12324f;font-weight:680;white-space:nowrap}
+tbody tr:nth-child(even){background:#fafcfe}
+tbody tr:hover{background:var(--brand-soft)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- figures ---------- */
+figure.fig{
+  margin:22px 0;padding:18px 16px 12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;text-align:center;
+}
+figure.fig .svgbox{width:100%;overflow-x:auto}
+figure.fig svg{max-width:100%;height:auto;display:inline-block}
+figcaption{
+  font-size:13.8px;color:var(--ink-soft);margin-top:12px;padding-top:10px;
+  border-top:1px solid var(--line);text-align:left;
+}
+figcaption b{color:var(--brand-dark)}
+
+/* ---------- key points / summary ---------- */
+.summary{background:linear-gradient(180deg,#f7fbff,#eef5fc);border:1px solid #cfe2f5}
+.summary h3{border-bottom-color:#cfe2f5;margin-top:6px}
+.kp{list-style:none;padding:0;margin:0}
+.kp li{
+  position:relative;padding:6px 0 6px 26px;margin:0;border-bottom:1px dashed #d6e4f1;
+}
+.kp li:last-child{border-bottom:0}
+.kp li::before{
+  content:"\2713";position:absolute;left:0;top:6px;color:var(--good);
+  font-weight:700;font-size:15px;
+}
+.qa{counter-reset:q;list-style:none;padding:0;margin:0}
+.qa li{
+  counter-increment:q;position:relative;padding:8px 0 8px 32px;margin:0;
+  border-bottom:1px dashed var(--line);
+}
+.qa li:last-child{border-bottom:0}
+.qa li::before{
+  content:"Q" counter(q);position:absolute;left:0;top:9px;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;
+  background:var(--brand);border-radius:5px;padding:1px 5px;
+}
+
+/* ---------- pager ---------- */
+.pager{display:flex;gap:14px;margin:26px 0 0;flex-wrap:wrap}
+.pager a{
+  flex:1 1 260px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);transition:.18s;
+}
+.pager a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pager .dir{font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-soft);display:block}
+.pager .ttl{font-size:15px;color:var(--brand-dark);font-weight:640;display:block;margin-top:3px}
+.pager a.next{text-align:right}
+
+/* ---------- footer ---------- */
+footer.site{
+  text-align:center;font-size:13px;color:var(--ink-soft);
+  padding:20px;border-top:1px solid var(--line);margin-top:10px;
+}
+
+/* ---------- back to top ---------- */
+#toTop{
+  position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;cursor:pointer;font-size:20px;
+  box-shadow:0 4px 14px rgba(10,60,110,.35);opacity:0;visibility:hidden;
+  transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:60;
+}
+#toTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#toTop:hover{background:var(--brand-dark)}
+
+/* ---------- progress bar ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:80;
+  background:linear-gradient(90deg,var(--accent),#ffc061);
+}
+
+/* ---------- index page specifics ---------- */
+.hero{
+  background:linear-gradient(125deg,#0a4377,#0f5fa8 55%,#1a86d6);
+  color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.hero h2{margin:0 0 10px;font-size:32px;line-height:1.25;border:0;color:#fff}
+.hero p{margin:0 0 6px;opacity:.93;max-width:80ch}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.hero .stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 16px}
+.hero .stat b{display:block;font-size:22px;line-height:1.2}
+.hero .stat span{font-size:12.5px;opacity:.9}
+.unit-head{
+  background:#12324f;color:#fff;border-radius:9px;padding:11px 16px;
+  font-size:16.5px;font-weight:650;margin:0 0 4px;
+}
+.unit-head small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
+td.tno{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap;font-size:14px}
+td a.topic-link{text-decoration:none;font-weight:640;color:var(--brand-dark)}
+td a.topic-link:hover{text-decoration:underline;color:var(--brand)}
+.chip{
+  display:inline-block;font-size:11.5px;background:#eef3f9;border:1px solid #dce6f1;
+  color:#3a5a78;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;white-space:nowrap;
+}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.quick a{
+  display:block;text-decoration:none;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);transition:.18s;
+}
+.quick a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.quick b{display:block;font-size:14.5px;color:var(--brand-dark)}
+.quick span{font-size:12.8px;color:var(--ink-soft)}
+
+/* ---------- svg diagram shared classes ---------- */
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+svg .t-box{fill:#fff;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box2{fill:#e7f1fb;stroke:#0f5fa8;stroke-width:1.6}
+svg .t-box3{fill:#fff4e5;stroke:#e07b00;stroke-width:1.6}
+svg .t-box4{fill:#e8f6ee;stroke:#157a4b;stroke-width:1.6}
+svg .t-box5{fill:#fdecec;stroke:#a8232a;stroke-width:1.6}
+svg .t-lbl{font-size:13px;fill:#12283d;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-lbl-s{font-size:11px;fill:#4a5b6d;text-anchor:middle;dominant-baseline:middle}
+svg .t-lbl-w{font-size:13px;fill:#fff;text-anchor:middle;dominant-baseline:middle;font-weight:600}
+svg .t-cap{font-size:11.5px;fill:#5b6b7c;text-anchor:middle}
+svg .lnk{stroke:#33556f;stroke-width:1.7;fill:none}
+svg .lnk-d{stroke:#8aa2b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:#33556f}
+svg .arw-o{fill:#e07b00}
+svg .wire{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .wire-r{stroke:#a8232a;stroke-width:1.8;fill:none}
+svg .wire-b{stroke:#0f5fa8;stroke-width:1.8;fill:none}
+svg .cmp{stroke:#12283d;stroke-width:1.8;fill:none;stroke-linecap:round}
+svg .cmp-f{fill:#e7f1fb;stroke:#12283d;stroke-width:1.8}
+svg .cmp-y{fill:#fff4e5;stroke:#12283d;stroke-width:1.8}
+svg .cmp-g{fill:#e8f6ee;stroke:#12283d;stroke-width:1.8}
+svg .dot{fill:#12283d}
+svg .ax{stroke:#8aa2b8;stroke-width:1.2;fill:none}
+svg .ax-lbl{font-size:11px;fill:#5b6b7c}
+svg .grid{stroke:#eef2f7;stroke-width:1}
+svg .mech{fill:#dfe8f1;stroke:#4a5b6d;stroke-width:1.6}
+svg .mech2{fill:#f2d9b8;stroke:#8a5a1c;stroke-width:1.6}
+svg .mech3{fill:#cfe6d6;stroke:#2c6a48;stroke-width:1.6}
+svg .hatch{fill:url(#hatchpat);stroke:#4a5b6d;stroke-width:1.2}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:16px}
+  .card{padding:20px 16px}
+  h2.page-title{font-size:24px}
+  .toc ol{columns:1}
+  .wrap{padding:18px 12px 60px}
+  .hero{padding:24px 20px}
+  .hero h2{font-size:25px}
+  .pager a{flex:1 1 100%}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,#toTop,#progress,.pager{display:none !important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  figure.fig{break-inside:avoid;border:1px solid #ccc}
+  h3{break-after:avoid}
+  a{color:#000;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="11" rx="2.5"/>
+        <path d="M12 8V4"/><circle cx="12" cy="3" r="1.4"/>
+        <circle cx="9" cy="13" r="1.3" fill="#fff"/><circle cx="15" cy="13" r="1.3" fill="#fff"/>
+        <path d="M9.5 16.5h5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Robotics &amp; Mechatronics</h1>
+      <p class="sub">Unit I &middot; Topic 5 of 29</p>
+    </div>
+    <div class="spacer"></div>
+    <nav class="topnav">
+      <a href="../index.html">Contents</a>
+      <a href="#summary">Summary</a>
+      <a href="#questions">Questions</a>
+      <a href="javascript:window.print()">Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="card">
+    <nav class="crumbs"><a href="../index.html">Home</a> &rsaquo; Unit I &rsaquo; Topic 5</nav><div class="unit-tag">Unit I</div><h2 class="page-title"><span class="topic-no">05</span>LM35 Temperature Sensor, Phototransistor and IR Sensor</h2><p class="lede">Three easy-to-use sensors for the laboratory and for projects: the LM35 analogue temperature sensor with its 10 mV per degree output, the phototransistor for light detection, and the reflective IR sensor module used for obstacle avoidance and line following.</p><nav class="toc" aria-label="On this page"><h4>On this page</h4><ol><li><a href="#sec1">LM35 Temperature Sensor</a></li><li><a href="#sec2">Phototransistor</a></li><li><a href="#sec3">IR Sensor (Infrared Reflective / Obstacle Sensor)</a></li></ol></nav><h3 id="sec1"><span class="sec-no">1.</span>LM35 Temperature Sensor</h3><div class="defbox"><span class="tag">Definition</span><p>The <b>LM35</b> is a precision integrated-circuit temperature sensor whose output voltage is <b>directly proportional to the Celsius temperature</b>. Unlike a thermocouple or a thermistor, it needs no external calibration, no linearisation network and no cold-junction compensation.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 330" width="880" height="330" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="25" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">LM35 pin-out and basic interface circuit</text><rect x="75" y="75" width="230" height="145" rx="8" class="t-box"/><text x="190" y="104" font-size="14" fill="#12283d" text-anchor="middle" font-weight="700">LM35 (TO-92)</text><text x="190" y="126" font-size="10.8" fill="#5b6b7c" text-anchor="middle">flat side facing you</text><polyline points="130,190 130,250" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="130" y="270" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">+Vs</text><text x="130" y="286" font-size="10" fill="#5b6b7c" text-anchor="middle">pin 1</text><polyline points="190,190 190,250" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="190" y="270" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">Vout</text><text x="190" y="286" font-size="10" fill="#5b6b7c" text-anchor="middle">pin 2</text><polyline points="250,190 250,250" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="250" y="270" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">GND</text><text x="250" y="286" font-size="10" fill="#5b6b7c" text-anchor="middle">pin 3</text><text x="190" y="160" font-size="11" fill="#0f5fa8" text-anchor="middle">1       2       3</text><rect x="390" y="70" width="160" height="125" rx="8" class="t-box2"/><text x="470" y="104" font-size="16" fill="#12283d" text-anchor="middle" font-weight="700">LM35</text><text x="470" y="125" font-size="11" fill="#5b6b7c" text-anchor="middle">10 mV / °C</text><polyline points="430,70 430,42" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="430" y="34" font-size="11.5" fill="#a8232a" text-anchor="middle" font-weight="700">+5 V</text><polyline points="550,135 650,135" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="550" cy="135" r="3.3" class="dot" fill="#12283d"/><rect x="650" y="108" width="115" height="54" rx="6" class="t-box4"/><text x="707" y="130" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="700">ADC A0</text><text x="707" y="148" font-size="10.5" fill="#157a4b" text-anchor="middle">Vout</text><polyline points="470,195 470,235" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="470" y1="235" x2="470" y2="245" class="wire"/><line x1="457" y1="245" x2="483" y2="245" class="wire"/><line x1="462" y1="250" x2="478" y2="250" class="wire"/><line x1="466.5" y1="255" x2="473.5" y2="255" class="wire"/><text x="478" y="222" font-size="10.5" fill="#5b6b7c" text-anchor="start">GND</text><polyline points="350,70 430,70" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="350,70 350,118" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="339" y1="118" x2="361" y2="118" class="wire" stroke-width="2.4"/><line x1="339" y1="125" x2="361" y2="125" class="wire" stroke-width="2.4"/><polyline points="350,125 350,235" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="350" y1="235" x2="350" y2="245" class="wire"/><line x1="337" y1="245" x2="363" y2="245" class="wire"/><line x1="342" y1="250" x2="358" y2="250" class="wire"/><line x1="346.5" y1="255" x2="353.5" y2="255" class="wire"/><text x="330" y="180" font-size="10.5" fill="#5b6b7c" text-anchor="end">0.1 µF</text><text x="440" y="305" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">At 25 °C, Vout = 250 mV; at 100 °C, Vout = 1.00 V. The sensor ground and ADC ground are common.</text></svg></div><figcaption><b>Fig. 1:</b> LM35 pin-out in the TO-92 package and the basic interface circuit with a decoupling capacitor and an ADC input.</figcaption></figure><div class="formula"><span class="tag">Formula</span><p><b>LM35 transfer equation</b><span class='eq'>V<sub>out</sub> = 10 mV / &deg;C &times; T<sub>C</sub></span>Examples: 0 &deg;C &rarr; 0 mV;  25 &deg;C &rarr; 250 mV;  50 &deg;C &rarr; 500 mV;  100 &deg;C &rarr; 1.0 V;  150 &deg;C &rarr; 1.5 V.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><rect x="80" y="30" width="720" height="190" rx="6" class="t-box"/><line x1="120" y1="200" x2="120" y2="45" class="ax" marker-end="url(#ah)"/><line x1="120" y1="200" x2="770" y2="200" class="ax" marker-end="url(#ah)"/><text x="776" y="204" font-size="11.5" fill="#5b6b7c" text-anchor="start">temperature (&#176;C)</text><text x="114" y="39" font-size="11.5" fill="#5b6b7c" text-anchor="start">V out (mV)</text><path d="M 120 200 L 760 45" class="lnk" stroke-width="2"/><circle cx="120.0" cy="200.0" r="3.6" class="dot"/><text x="120.0" y="188.0" font-size="10.5" fill="#0f5fa8" text-anchor="middle">0&#176;C</text><text x="112.0" y="204.0" font-size="10" fill="#5b6b7c" text-anchor="end">0</text><circle cx="226.75" cy="174.175" r="3.6" class="dot"/><text x="226.75" y="162.175" font-size="10.5" fill="#0f5fa8" text-anchor="middle">25&#176;C</text><text x="218.75" y="178.175" font-size="10" fill="#5b6b7c" text-anchor="end">250</text><circle cx="333.5" cy="148.35" r="3.6" class="dot"/><text x="333.5" y="136.35" font-size="10.5" fill="#0f5fa8" text-anchor="middle">50&#176;C</text><text x="325.5" y="152.35" font-size="10" fill="#5b6b7c" text-anchor="end">500</text><circle cx="547.0" cy="96.7" r="3.6" class="dot"/><text x="547.0" y="84.7" font-size="10.5" fill="#0f5fa8" text-anchor="middle">100&#176;C</text><text x="539.0" y="100.7" font-size="10" fill="#5b6b7c" text-anchor="end">1000</text><circle cx="760.4999999999999" cy="45.04999999999998" r="3.6" class="dot"/><text x="760.4999999999999" y="33.04999999999998" font-size="10.5" fill="#0f5fa8" text-anchor="middle">150&#176;C</text><text x="752.4999999999999" y="49.04999999999998" font-size="10" fill="#5b6b7c" text-anchor="end">1500</text><text x="440" y="245" font-size="11.5" fill="#12283d" text-anchor="middle">slope = 10 mV per &#176;C; output starts from 0 mV at 0 &#176;C, so no offset adjustment is needed</text></svg></div><figcaption><b>Fig. 2:</b> Calibration curve of the LM35. Because the line passes through the origin, no offset adjustment is needed and the temperature is simply V<sub>out</sub> divided by 10 mV.</figcaption></figure><h4>Salient features</h4><ul><li>Calibrated directly in degrees Celsius, so no subtraction of 2.73 V is needed as with the LM335 (which is calibrated in kelvin).</li><li>Linear scale factor of +10.0 mV/&deg;C.</li><li>Accuracy guaranteed to &plusmn;0.5 &deg;C at 25 &deg;C, and typically &plusmn;0.25 &deg;C over the full range for the LM35/LM35A grade.</li><li>Operating range &minus;55 &deg;C to +150 &deg;C for the standard version (LM35C, LM35CA: &minus;40 &deg;C to +110 &deg;C).</li><li>Works from a single supply of 4 V to 30 V; low cost.</li><li>Very low self-heating, less than 0.1 &deg;C in still air, because it draws only about 60 &#181;A.</li><li>Low output impedance of about 0.1 &#937; for a 1 mA load, so long cables can be used.</li><li>Output can go down to 0 V, which suits single-supply circuits.</li></ul><h4>Pin configuration (TO-92, flat face towards you)</h4><div class="tbl-scroll"><table><caption>Table 5.1 &mdash; LM35 pin-out</caption><thead><tr><th class="num">Pin</th><th>Name</th><th>Connection</th></tr></thead><tbody><tr><td class="num">1</td><td>V<sub>S</sub> (+V<sub>S</sub>)</td><td>Positive supply, 4 V to 30 V (typically +5 V)</td></tr><tr><td class="num">2</td><td>V<sub>out</sub></td><td>Output, 10 mV per &deg;C, goes to the ADC</td></tr><tr><td class="num">3</td><td>GND</td><td>Ground / negative supply</td></tr></tbody></table></div><h4>Working and interfacing</h4><p>Inside the IC a band-gap reference and a differential amplifier produce a current that is proportional to absolute temperature; this is converted into a voltage referred to the Celsius scale. From the user's point of view the device behaves as a small voltage source with a very low series resistance.</p><p>For interfacing with a microcontroller, pin 1 is connected to +5 V, pin 3 to ground, and pin 2 to an analogue input through a small series resistor if desired. A <b>0.1 &#181;F ceramic capacitor</b> between the supply pin and ground, placed as close to the IC as possible, removes any high-frequency noise. For long cable runs a capacitor of 1 &#181;F at the sensor end is recommended. If the temperature can fall below 0 &deg;C, the ground pin must be raised above true ground (for example by connecting it to a resistor to a negative supply or to a 1.5 V reference), because a single positive supply cannot produce a negative output voltage.</p><div class="note"><span class="tag">Note</span><p><b>Important caution:</b> the LM35 pin-out is different from that of many other TO-92 devices such as the transistor BC547 or the LM335. Connecting the supply to the wrong pin will destroy the IC immediately. Always verify pin 1 by holding the flat face towards you and reading from left to right.</p></div><h4>Reading the temperature in software</h4><p>With a 10-bit ADC and a 5 V reference, each ADC count represents 5/1024 = 4.88 mV. The temperature is therefore</p><span class="eq">T (&deg;C) = (ADC value &times; 4.88 mV) / 10 mV  =  ADC value &times; 0.488</span><div class="example"><span class="tag">Example</span><p><b>Numerical.</b> The ADC reads 512. Voltage = 512 &times; 4.88 mV = 2.50 V. Temperature = 2.50 / 0.010 = <b>250 &deg;C</b>? No &mdash; 2.50 V would mean 250 &deg;C which is outside the LM35 range, so the reading indicates a fault (perhaps the supply pin and output pin are swapped). A realistic reading is 256, giving 256 &times; 4.88 = 1.25 V and T = <b>125 &deg;C</b>. This shows why the range of the sensor must always be checked against the reading. If a higher resolution is required, a 3.3 V reference or a pre-amplifier of gain 2 to 5 can be used, since the LM35 output is small.</p></div><h4>Applications</h4><p>The LM35 is used in digital thermometers, in temperature control of incubators, ovens, greenhouses and aquariums, in battery chargers and power supply thermal protection, in air conditioners and refrigerators, in engine and gearbox oil temperature monitoring, in cold storage and in weather stations. Because it is cheap, linear and accurate, it is the first choice for student projects on temperature measurement and control.</p><h3 id="sec2"><span class="sec-no">2.</span>Phototransistor</h3><div class="defbox"><span class="tag">Definition</span><p>A <b>phototransistor</b> is a bipolar junction transistor whose base-collector junction is exposed to light through a transparent window or a lens. Light falling on the junction generates electron-hole pairs, producing a base current which is amplified by the transistor's current gain &#946;. The result is a collector current that is proportional to the intensity of the incident light, but <b>much larger</b> than that of a photodiode for the same illumination.</p></div><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 310" width="880" height="310" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="25" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">Phototransistor symbol and correctly connected load-resistor circuit</text><text x="205" y="58" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Phototransistor symbol</text><line x1="163.0" y1="145" x2="193.0" y2="145" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="193.0" y1="121.0" x2="193.0" y2="169.0" class="cmp" stroke="#12283d" stroke-width="2.3"/><line x1="207.0" y1="138.0" x2="235.0" y2="113.0" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="207.0" y1="152.0" x2="235.0" y2="177.0" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="224.0" y1="165.0" x2="230.0" y2="172.0" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" marker-end="url(#ah)"/><text x="167.0" y="136.0" class="t-lbl-s" fill="#5b6b7c">B</text><text x="240.0" y="111.0" class="t-lbl-s" fill="#5b6b7c">C</text><text x="240.0" y="190.0" class="t-lbl-s" fill="#5b6b7c">E</text><path d="M 95 92 L 155 132" class="lnk" marker-end="url(#aho)"/><path d="M 115 76 L 175 116" class="lnk" marker-end="url(#aho)"/><text x="205" y="205" font-size="10.5" fill="#5b6b7c" text-anchor="middle">light creates base current; the base terminal is normally left open</text><text x="660" y="58" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Common-emitter interface</text><text x="560" y="78" font-size="11.5" fill="#a8232a" text-anchor="middle" font-weight="700">+5 V</text><polyline points="600,84 600,96" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 600.000,96.000 L 600.000,104.000 L 608.000,109.880 L 592.000,116.600 L 608.000,123.320 L 592.000,130.040 L 608.000,136.760 L 600.000,146.000 L 600.000,154.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="625" y="124" font-size="10.5" fill="#5b6b7c" text-anchor="start">RL = 10 kΩ</text><polyline points="600,154 600,165 630,165" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="600" cy="165" r="3.3" class="dot" fill="#12283d"/><text x="610" y="158" font-size="10.5" fill="#157a4b" text-anchor="start">Vout</text><line x1="592.2" y1="197" x2="619.2" y2="197" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="619.2" y1="175.4" x2="619.2" y2="218.6" class="cmp" stroke="#12283d" stroke-width="2.3"/><line x1="631.8" y1="190.7" x2="657.0" y2="168.2" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="631.8" y1="203.3" x2="657.0" y2="225.8" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="647.1" y1="215.0" x2="652.5" y2="221.3" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" marker-end="url(#ah)"/><text x="595.8000000000001" y="188.9" class="t-lbl-s" fill="#5b6b7c">B</text><text x="661.5" y="166.39999999999998" class="t-lbl-s" fill="#5b6b7c">C</text><text x="661.5" y="237.5" class="t-lbl-s" fill="#5b6b7c">E</text><polyline points="657,168 657,165 600,165" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="657,226 657,255" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="657" y1="255" x2="657" y2="265" class="wire"/><line x1="644" y1="265" x2="670" y2="265" class="wire"/><line x1="649" y1="270" x2="665" y2="270" class="wire"/><line x1="653.5" y1="275" x2="660.5" y2="275" class="wire"/><path d="M 580 197 L 610 197" class="lnk-d" marker-end="url(#aho)"/><text x="560" y="188" font-size="10.5" fill="#e07b00" text-anchor="end">light</text><polyline points="657,165 785,165" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="785" y="138" width="75" height="54" rx="6" class="t-box4"/><text x="822" y="160" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">ADC</text><text x="822" y="178" font-size="10" fill="#5b6b7c" text-anchor="middle">input</text><text x="440" y="295" font-size="11.5" fill="#12283d" text-anchor="middle" font-weight="600">Dark: transistor OFF and Vout ≈ 5 V. Light: collector current rises and Vout falls toward 0 V.</text></svg></div><figcaption><b>Fig. 3:</b> Phototransistor symbol with light input (left) and the standard load-resistor circuit (right). Output is high in darkness and low in bright light.</figcaption></figure><h4>Construction and types</h4><ul><li><b>NPN phototransistor</b> &mdash; the most common type; the collector is positive with respect to the emitter.</li><li><b>PNP phototransistor</b> &mdash; less common; used where the load must be connected to ground.</li><li><b>Photodarlington</b> &mdash; two transistors connected as a Darlington pair, giving a current gain of 10 000 or more. Much more sensitive but slower.</li><li><b>Base-lead version</b> &mdash; has an electrical base connection as well, allowing the sensitivity and the operating point to be set by a bias resistor. Most phototransistors have only two leads, collector and emitter.</li></ul><h4>Working principle</h4><p>In the dark, only a tiny leakage current flows, so the transistor is effectively OFF. When light of suitable wavelength (usually 400 nm to 1100 nm, peak near 850 nm to 940 nm) strikes the base-collector depletion region, photons with energy greater than the band gap create electron-hole pairs. These carriers are swept across the junction and act as a base current I<sub>B</sub>. The transistor amplifies this by &#946;, so the collector current is</p><span class="eq">I<sub>C</sub> = &#946; &times; I<sub>B(photo)</sub></span><p>Since I<sub>B(photo)</sub> is proportional to the light intensity, the collector current is also proportional to intensity. The device therefore works as a light-controlled current source.</p><h4>Phototransistor versus photodiode versus LDR</h4><div class="tbl-scroll"><table><caption>Table 5.2 &mdash; Comparison of light sensors</caption><thead><tr><th>Parameter</th><th>Phototransistor</th><th>Photodiode</th><th>LDR (photoresistor)</th></tr></thead><tbody><tr><td>Sensitivity</td><td>High (gain &#946;)</td><td>Low</td><td>Very high</td></tr><tr><td>Response speed</td><td>Fast, 5 to 100 &#181;s</td><td>Very fast, ns range</td><td>Slow, 10 to 100 ms</td></tr><tr><td>Output</td><td>Current proportional to light</td><td>Current proportional to light</td><td>Resistance decreases with light</td></tr><tr><td>Linearity</td><td>Moderate</td><td>Excellent</td><td>Poor (logarithmic)</td></tr><tr><td>Dark current</td><td>Small (&#181;A)</td><td>Very small (nA)</td><td>Not applicable</td></tr><tr><td>Cost and simplicity</td><td>Low, two leads, no bias needed</td><td>Low, but often needs a reverse bias and a transimpedance amplifier</td><td>Very low, simple divider</td></tr><tr><td>Typical use</td><td>Opto-couplers, encoders, object detection</td><td>Fibre optic receivers, precision light measurement</td><td>Light-sensitive switches, camera exposure meters</td></tr></tbody></table></div><h4>Load resistor circuit and design</h4><p>The phototransistor is connected in a common-emitter arrangement with a <b>load resistor R<sub>L</sub></b> between the collector and the positive supply. The output voltage is taken from the collector.</p><span class="eq">V<sub>out</sub> = V<sub>CC</sub> &minus; I<sub>C</sub> &times; R<sub>L</sub></span><p>In <b>darkness</b>, I<sub>C</sub> is nearly zero, so V<sub>out</sub> &#8776; V<sub>CC</sub> (HIGH). In <b>bright light</b>, I<sub>C</sub> is large, the voltage drop across R<sub>L</sub> is large, and V<sub>out</sub> falls towards zero (LOW). The circuit is therefore <b>inverting</b>.</p><p>The value of R<sub>L</sub> is a compromise. A <b>large</b> R<sub>L</sub> (say 100 k&#937;) gives a large output swing and high sensitivity but makes the circuit <b>slow</b>, because the junction capacitance has to charge through the large resistance. A <b>small</b> R<sub>L</sub> (say 1 k&#937;) is fast but gives a small output. Values between <b>1 k&#937; and 47 k&#937;</b> are typical; 10 k&#937; is a good starting point. The output should be buffered or fed to a comparator or a Schmitt trigger before being used as a digital signal.</p><div class="note"><span class="tag">Note</span><p>Phototransistors respond mainly to <b>infrared</b> as well as visible light. If only visible light should be detected, a filter must be used; if infrared is being detected, a plastic package with a clear (not black) lens or an IR-pass filter gives the best result.</p></div><h4>Applications</h4><ul><li><b>Opto-couplers / opto-isolators</b> (such as the 4N35 or PC817) in which an LED and a phototransistor are in one package, providing electrical isolation between two circuits.</li><li><b>Optical encoders</b> and slotted opto-switches for measuring shaft speed and position.</li><li><b>Object detection and counting</b> on conveyors, and paper-end detection in printers.</li><li><b>Line following and obstacle avoidance</b> in mobile robots (usually as part of an IR module).</li><li><b>Light meters</b>, automatic brightness control of displays, and safety light curtains.</li><li><b>Remote controls</b> (in the form of IR receiver modules) and fibre optic links.</li></ul><h3 id="sec3"><span class="sec-no">3.</span>IR Sensor (Infrared Reflective / Obstacle Sensor)</h3><p>An <b>IR sensor</b> in mechatronics practice usually means a module that contains an <b>infrared LED</b> as the transmitter and a <b>phototransistor or photodiode</b> as the receiver, working at a wavelength of about <b>940 nm</b>, which is invisible to the human eye. Such modules are the workhorses of line-following and obstacle-avoidance robots.</p><figure class="fig"><div class="svgbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 330" width="880" height="330" role="img" ><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" class="arw-o"/></marker>
+<pattern id="hatchpat" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<line x1="0" y1="0" x2="0" y2="7" stroke="#9fb3c6" stroke-width="1.4"/></pattern>
+</defs><text x="440" y="25" font-size="13.5" fill="#12283d" text-anchor="middle" font-weight="700">Reflective IR obstacle sensor: emitter, receiver and comparator wiring</text><text x="145" y="57" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">IR emitter</text><text x="100" y="76" font-size="11.5" fill="#a8232a" text-anchor="middle" font-weight="700">+5 V</text><polyline points="145,82 145,96" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 145.000,96.000 L 145.000,102.000 L 153.000,107.600 L 137.000,114.000 L 153.000,120.400 L 137.000,126.800 L 153.000,133.200 L 145.000,142.000 L 145.000,148.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="168" y="124" font-size="10.5" fill="#5b6b7c" text-anchor="start">330 Ω</text><polyline points="145,148 145,160" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="145" y1="160" x2="145" y2="175.0" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="155,175.0 135,175.0 145,193.0" class="cmp-f" fill="#e7f1fb" stroke="#12283d" stroke-width="1.8"/><line x1="157" y1="193.0" x2="133" y2="193.0" class="cmp" stroke="#12283d" stroke-width="1.8"/><line x1="145" y1="193.0" x2="145" y2="212" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="127" y1="185.0" x2="119" y2="177.0" class="lnk" stroke="#e07b00" stroke-width="1.4" marker-end="url(#aho)"/><line x1="133" y1="194.0" x2="125" y2="186.0" class="lnk" stroke="#e07b00" stroke-width="1.4" marker-end="url(#aho)"/><polyline points="145,212 145,235" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="145" y1="235" x2="145" y2="245" class="wire"/><line x1="132" y1="245" x2="158" y2="245" class="wire"/><line x1="137" y1="250" x2="153" y2="250" class="wire"/><line x1="141.5" y1="255" x2="148.5" y2="255" class="wire"/><text x="190" y="188" font-size="11" fill="#12283d" text-anchor="start" font-weight="600">IR LED</text><text x="425" y="57" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">IR receiver</text><text x="380" y="76" font-size="11.5" fill="#a8232a" text-anchor="middle" font-weight="700">+5 V</text><polyline points="425,82 425,96" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 425.000,96.000 L 425.000,102.000 L 433.000,107.600 L 417.000,114.000 L 433.000,120.400 L 417.000,126.800 L 433.000,133.200 L 425.000,142.000 L 425.000,148.000" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="448" y="124" font-size="10.5" fill="#5b6b7c" text-anchor="start">10 kΩ</text><polyline points="425,148 425,165 455,165" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="425" cy="165" r="3.3" class="dot" fill="#12283d"/><line x1="417.2" y1="197" x2="444.2" y2="197" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="444.2" y1="175.4" x2="444.2" y2="218.6" class="cmp" stroke="#12283d" stroke-width="2.3"/><line x1="456.8" y1="190.7" x2="482.0" y2="168.2" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="456.8" y1="203.3" x2="482.0" y2="225.8" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="472.1" y1="215.0" x2="477.5" y2="221.3" class="cmp" stroke="#12283d" stroke-width="1.8" fill="none" marker-end="url(#ah)"/><text x="420.8" y="188.9" class="t-lbl-s" fill="#5b6b7c">B</text><text x="486.5" y="166.39999999999998" class="t-lbl-s" fill="#5b6b7c">C</text><text x="486.5" y="237.5" class="t-lbl-s" fill="#5b6b7c">E</text><polyline points="482,168 482,165 425,165" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="482,226 482,250" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="482" y1="250" x2="482" y2="260" class="wire"/><line x1="469" y1="260" x2="495" y2="260" class="wire"/><line x1="474" y1="265" x2="490" y2="265" class="wire"/><line x1="478.5" y1="270" x2="485.5" y2="270" class="wire"/><path d="M 380 197 L 430 197" class="lnk-d" marker-end="url(#aho)"/><text x="360" y="188" font-size="10.5" fill="#e07b00" text-anchor="end">reflected IR</text><text x="425" y="157" font-size="10" fill="#157a4b" text-anchor="middle">SENSE</text><rect x="210" y="230" width="150" height="20" rx="3" class="mech2"/><text x="285" y="268" font-size="10.5" fill="#5b6b7c" text-anchor="middle">reflecting object</text><path d="M 175 205 L 235 230" class="lnk-d" marker-end="url(#ah)"/><path d="M 235 230 L 390 205" class="lnk-d" marker-end="url(#ah)"/><text x="700" y="57" font-size="12.5" fill="#12283d" text-anchor="middle" font-weight="700">Comparator output</text><path d="M 625,95 L 697,127.0 L 625,159 Z" class="cmp-f"/><text x="640" y="113" font-size="13" fill="#12283d" text-anchor="start" font-weight="700">+</text><text x="640" y="149" font-size="15" fill="#12283d" text-anchor="start" font-weight="700">−</text><polyline points="425,165 560,165 560,111 623,111" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="570" y="106" font-size="10" fill="#157a4b" text-anchor="middle">SENSE</text><rect x="500" y="220" width="105" height="38" rx="5" class="t-box3"/><text x="552" y="237" font-size="10.5" fill="#12283d" text-anchor="middle" font-weight="700">VREF preset</text><polyline points="552,220 552,159 623,159" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="565" y="183" font-size="10" fill="#a8232a" text-anchor="middle">VREF</text><polyline points="697,127 760,127" class="wire" stroke="#12283d" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="760" y="100" width="100" height="54" rx="6" class="t-box4"/><text x="810" y="122" font-size="11" fill="#12283d" text-anchor="middle" font-weight="700">MCU</text><text x="810" y="140" font-size="10" fill="#5b6b7c" text-anchor="middle">digital input</text><text x="440" y="310" font-size="11.2" fill="#12283d" text-anchor="middle">The comparator changes state when SENSE crosses VREF; the two electrical branches share ground but never short the LED or transistor.</text></svg></div><figcaption><b>Fig. 4:</b> A reflective IR obstacle sensor: the IR LED emits a beam, the phototransistor receives the reflected light, and a comparator converts the result into a clean digital output whose threshold is set by a preset.</figcaption></figure><h4>Types of IR sensing arrangement</h4><ul><li><b>Reflective type</b> &mdash; the transmitter and receiver are side by side, facing the same direction. Light reflected from a nearby object returns to the receiver. Used for obstacle detection, line following and object counting.</li><li><b>Transmissive / slotted type</b> &mdash; the transmitter and receiver face each other across a gap or slot. An object passing through the slot interrupts the beam. Used in encoders, tachometers and end-stop detection. Examples: MOC7811, ITR9606.</li><li><b>Diffuse reflective with background suppression</b> &mdash; uses triangulation to detect an object only within a set distance range.</li><li><b>IR receiver module for remote control</b> &mdash; such as the TSOP1738, which contains a photodiode, an amplifier, a band-pass filter tuned to 38 kHz and a demodulator, and gives a digital output for the coded signals from a TV remote.</li></ul><h4>Working principle of the reflective type</h4><ol><li>The IR LED is driven by a series current-limiting resistor (typically 220 &#937; to 330 &#937;) from a 5 V supply and emits an infrared beam.</li><li>If an object is within the sensing range, part of the beam is reflected back. A white or light-coloured surface reflects much more than a black surface, which is why a line-following robot can distinguish white paper from a black line.</li><li>The reflected light falls on the phototransistor, which conducts more heavily, pulling its collector voltage down.</li><li>This voltage is compared with a reference voltage set by a <b>preset (trimmer potentiometer)</b> in a <b>comparator</b> such as the LM358 or LM393.</li><li>When the received light exceeds the threshold, the comparator output changes state, giving a clean digital HIGH or LOW to the microcontroller.</li><li>An on-board LED usually lights to indicate detection, which is very useful for alignment and testing.</li></ol><h4>Practical notes and common modules</h4><p>The detection range of a reflective IR module is short, usually <b>2 mm to 30 mm</b>, and is adjusted by the on-board preset. It works best in the shade or indoors; strong ambient sunlight contains a lot of infrared and can saturate the receiver, which is why outdoor robots often modulate the IR LED with a 38 kHz carrier and use a matched TSOP receiver. The supply is normally 3.3 V or 5 V, the output is a digital level (some modules give an open-collector output that needs a pull-up), and the current consumption is 15 mA to 25 mA per module.</p><div class="tbl-scroll"><table><caption>Table 5.3 &mdash; Common IR sensor modules</caption><thead><tr><th>Module</th><th>Type</th><th>Range</th><th>Output</th><th>Typical use</th></tr></thead><tbody><tr><td>Generic reflective IR module (LM358 based)</td><td>Reflective</td><td>2 to 30 mm, adjustable</td><td>Digital HIGH/LOW</td><td>Line follower, obstacle detection</td></tr><tr><td>TCRT5000</td><td>Reflective phototransistor</td><td>1 to 25 mm</td><td>Analogue + digital (module version)</td><td>Line following, encoder, paper detection</td></tr><tr><td>IR obstacle module with 38 kHz modulation</td><td>Reflective, modulated</td><td>Up to 400 mm</td><td>Digital</td><td>Outdoor obstacle avoidance</td></tr><tr><td>Slot type (ITR9606, MOC7811)</td><td>Transmissive</td><td>Slot 3 to 5 mm</td><td>Digital</td><td>Speed measurement, end stops</td></tr><tr><td>TSOP1738 / VS1838B</td><td>Modulated receiver</td><td>10 m with remote</td><td>Digital, active low</td><td>IR remote control decoding</td></tr><tr><td>Sharp GP2Y0A21</td><td>IR triangulation (PSD)</td><td>10 to 80 cm</td><td>Analogue voltage</td><td>Distance measurement in robots</td></tr><tr><td>IR flame sensor</td><td>Passive, 760 to 1100 nm</td><td>Up to 1 m</td><td>Analogue + digital</td><td>Flame detection</td></tr></tbody></table></div><h4>Applications</h4><ul><li><b>Line following robots</b> &mdash; an array of reflective IR sensors detects a black line on a white surface.</li><li><b>Obstacle avoidance</b> in mobile robots, vacuum cleaners and automated guided vehicles.</li><li><b>Object counting</b> and part presence detection on production lines.</li><li><b>Edge detection</b> &mdash; preventing a robot from falling off a table.</li><li><b>Speed and position measurement</b> using a slotted disc and a transmissive sensor.</li><li><b>Touchless switches</b>, paper detection in printers, and coin validators.</li><li><b>Remote control receivers</b> and IR data links between devices.</li><li><b>Flame and heat source detection</b> in fire alarms.</li></ul><div class="warn"><span class="tag">Important</span><p>An IR LED must always be used with a series current-limiting resistor. Connecting it directly across a 5 V supply will burn it out within seconds. A typical safe current is 10 mA to 20 mA, giving R = (5 &minus; 1.2) / 0.015 &#8776; <b>250 &#937;</b>, so 220 &#937; or 330 &#937; is used.</p></div><div class="card summary" style="margin-top:30px"><h3 id="summary" style="margin-top:4px"><span class="sec-no">&#9733;</span>Summary</h3><ul class="kp"><li>The LM35 gives an output of exactly 10 mV per degree Celsius, starting from 0 mV at 0 &deg;C, and needs no calibration or linearisation.</li><li>LM35 pins in TO-92 with the flat face towards you are 1 = +V<sub>S</sub>, 2 = V<sub>out</sub>, 3 = GND. Supply is 4 V to 30 V and the current drawn is only about 60 &#181;A.</li><li>With a 10-bit ADC and 5 V reference, T = ADC value &times; 0.488 &deg;C. A decoupling capacitor of 0.1 &#181;F should be placed close to the supply pin.</li><li>A phototransistor is a BJT whose base-collector junction is light sensitive; light generates a base current that is amplified by &#946;, so it is far more sensitive than a photodiode but slower than a photodiode and faster than an LDR.</li><li>In a common-emitter phototransistor circuit V<sub>out</sub> = V<sub>CC</sub> &minus; I<sub>C</sub>R<sub>L</sub>; the output is HIGH in darkness and LOW in light. R<sub>L</sub> of 10 k&#937; is a good compromise between sensitivity and speed.</li><li>An IR sensor module pairs a 940 nm IR LED with a phototransistor and a comparator, and works in reflective or transmissive mode.</li><li>Reflective IR range is a few millimetres to a few centimetres and depends strongly on surface colour; sunlight can saturate the receiver, so modulation at 38 kHz is used outdoors.</li><li>Always use a series resistor with an IR LED; 220 &#937; to 330 &#937; at 5 V is normal.</li></ul></div><div class="card"><h3 id="questions" style="margin-top:4px"><span class="sec-no">?</span>Review Questions</h3><ol class="qa"><li>Draw the pin diagram of the LM35 and explain its working. What is its output at 37 &deg;C? (Answer: 370 mV)</li><li>Why is the LM35 preferred over a thermistor for a student-level temperature measurement project?</li><li>Derive the relation used to obtain temperature from a 10-bit ADC reading of the LM35 with a 5 V reference.</li><li>Explain the construction and working principle of a phototransistor. How is it different from a photodiode and an LDR?</li><li>Draw the load-resistor circuit of a phototransistor and explain how the value of R<sub>L</sub> affects sensitivity and speed.</li><li>Explain the working of a reflective IR obstacle sensor module with a neat circuit diagram.</li><li>Compare reflective and transmissive IR sensors and give two applications of each.</li><li>Why do outdoor IR sensors modulate the LED at 38 kHz? What role does the TSOP receiver play?</li><li>Calculate the series resistor required for an IR LED of forward voltage 1.2 V and forward current 15 mA from a 5 V supply. (Answer: 253 &#937;, use 270 &#937;)</li></ol></div><div class="pager"><a class="prev" href="04-strain-gauge-load-cell-tactile-float-sensor.html"><span class="dir">&larr; Previous topic</span><span class="ttl">04. Strain Gauge Load Cell, Tactile Sensor and Float Sensor</span></a><a class="next" href="06-ultrasonic-touch-pir-sensor.html"><span class="dir">Next topic &rarr;</span><span class="ttl">06. Ultrasonic Sensor, Touch Sensor and PIR Sensor</span></a></div>
+  </article>
+</main>
+
+<footer class="site">
+  Robotics &amp; Mechatronics &mdash; Study Notes &middot; Self-contained HTML (no internet needed) &middot; Diagrams drawn in inline SVG
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop');
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>420){btn.classList.add('show');}else{btn.classList.remove('show');}
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(bar){bar.style.width=(h>0?(y/h*100):0)+'%';}
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  onScroll();
+})();
+</script>
+</body>
+</html>
